@@ -352,6 +352,8 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
+    scout_apm (2.6.10)
+      parser
     semantic_range (2.3.0)
     sidekiq (6.1.1)
       connection_pool (>= 2.2.2)
@@ -451,6 +453,7 @@ DEPENDENCIES
   rspec-rails
   rubocop
   sass-rails (~> 5)
+  scout_apm
   sidekiq
   spring
   spring-watcher-listen (~> 2.0.0)
