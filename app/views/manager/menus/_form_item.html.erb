@@ -170,7 +170,7 @@
 
           <div class="collection-check-box">
             <input type="checkbox" value="<%=item.id%>" name="menu[custom_lists][<%=custom_list.id%>][]" id="menu_custom_lists_<%=custom_list.id%>-<%=item.id%>" <%=checked?(menu.custom_lists, custom_list.id, item.id)%>>
-            <i class=""><%= item.name%> <small>(<%= number_to_currency item.price, unit: "£"%>)</small></i>
+            <i class=""><%= item.name%> <small>(<%= number_to_currency item.price, unit: @restaurant.currency_symbol%>)</small></i>
           </div>
 
 

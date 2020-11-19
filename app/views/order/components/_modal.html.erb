@@ -111,7 +111,7 @@
             <%# end %>
                         </div>
                         <div class='col-3 text-right'>
-                          <small><%=number_to_currency(cli.price, unit: '+£') if cli.price.to_f > 0.0 %></small>
+                          <small><%=number_to_currency(cli.price, unit: "+#{@restaurant.currency_symbol}") if cli.price.to_f > 0.0 %></small>
                         </div>
                       </div>
                     <% else %>
@@ -121,7 +121,7 @@
                           <%= radio_button_tag "item-#{custom_list.id}", "item-#{custom_list.id}", nil, 'data-price' => ("%.2f" % cli.price).to_f ,class: "selection-item selection-item-radio-#{main_item}  selection-item-required-#{custom_list.id}", 'data-scope' => main_item, 'data-constraint' => custom_list.constraint, 'data-start_price' => start_price, 'data-id' => cli.id %> <small><strong><%=cli.name%></strong>  <% if cli.description.present?%>  <i>- <%=cli.description%></i><% end %></small>
                         </div>
                       <div class='col-3 text-right'>
-                          <small><%=number_to_currency(cli.price, unit: '+£') if cli.price.to_f > 0.0 %></small>
+                          <small><%=number_to_currency(cli.price, unit: "+#{@restaurant.currency_symbol}") if cli.price.to_f > 0.0 %></small>
                         </div>
                       </div>
                     <% end %>
@@ -138,7 +138,7 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
             <%= link_to add_to_basket_path(@path, main_item, menu_id: params[:menu_id], section_id: params[:section_id]), class: "btn btn-primary #{required_lists.present? ? 'disabled' : ''}", id: "add-to-basket-#{main_item}" do %>
-                Add to Order - <span class='button-price-<%=main_item%>'><%=number_to_currency(item[:price_a], unit: '£')%></span>
+                Add to Order - <span class='button-price-<%=main_item%>'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></span>
             <% end %>
             
           </div>

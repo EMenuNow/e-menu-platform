@@ -32,14 +32,14 @@
                     <%if note.present?%><br>
                       <strong>Note:</strong> <%= note.html_safe%><% end %></td>
                   <td><%= item['optionals'].join('<br> ').html_safe %></td>
-                  <td class='text-right'><%= number_to_currency(item['total'], unit: '£') %></td>
+                  <td class='text-right'><%= number_to_currency(item['total'], unit: @restaurant.currency_symbol) %></td>
                 </tr>
                 <% end if @basket %>
                 <tr>
                   <td>Total</td>
                   <td></td>
                   <td></td>
-                  <td class='text-right'><%= number_to_currency(@basket_item_total, unit: '£') %></td>
+                  <td class='text-right'><%= number_to_currency(@basket_item_total, unit: @restaurant.currency_symbol) %></td>
                 </tr>
               </tbody>  
             </table> 

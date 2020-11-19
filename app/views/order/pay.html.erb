@@ -153,7 +153,7 @@ $("#please-wait").removeClass("invisible");
     // apple pay
     var paymentRequest = stripe.paymentRequest({
       country: 'GB',
-      currency: 'gbp',
+      currency: '<%=@restaurant.currency_code%>',
       total: {
         label: '<%=@path%> charge',
         amount: <%= @payment_in_pence %>,
@@ -300,7 +300,7 @@ paymentRequest.on('paymentmethod', function(ev) {
     <div class="row bg-dark">
       <div class='col text-center text-light'>
           <h1>PAYMENT</h1>
-          <h2><%= number_to_currency(@total_payment.to_f, unit: '£') %></h2>
+          <h2><%= number_to_currency(@total_payment.to_f, unit: @restaurant.currency_symbol) %></h2>
           <%#=@stripe%>
       </div>
     </div>

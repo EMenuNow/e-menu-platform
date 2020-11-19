@@ -19,7 +19,7 @@
 	$('input:checked').prop("checked", false);
 	$("#error_detail_<%=@menu.id%>").html("");
 	$("#current_bill").html("<%=escape_javascript(render partial: 'tables/current_bill')%>");
-	$(".current-bill").html("<%=number_to_currency @price, unit: "£"%>");
+	$(".current-bill").html("<%=number_to_currency @price, unit: @menu.restaurant.currency_symbol%>");
 	$("#customer_for_<%=@menu.id%>").val("");
 	$(".pay-button").removeClass('invisible');
 	

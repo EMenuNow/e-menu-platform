@@ -23,8 +23,8 @@
             <td><%= table.created_at %></td>
             <td><%= table.aasm_state %></td>
             <td><%= table.password %></td>
-            <td><%= number_to_currency table.current_total, unit: "£"%></td>
-            <td><%= number_to_currency table.total, unit: "£"%></td>
+            <td><%= number_to_currency table.current_total, unit: table.restaurant.currency_symbol%></td>
+            <td><%= number_to_currency table.total, unit: table.restaurant.currency_symbol%></td>
             <td><%=link_to "Close Table", table_manager_finish_path(table), class: "btn btn-warning  mt-2 mb-2" if table.all_ready %></td>
           </tr>
           <tr>

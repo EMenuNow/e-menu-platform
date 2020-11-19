@@ -20,7 +20,7 @@
       <tr>
         <td><%= custom_list_item.name %></td>
         <td><%= custom_list_item.description %></td>
-        <td><%= number_to_currency(custom_list_item.price, unit: "£") %></td>
+        <td><%= number_to_currency(custom_list_item.price, unit: restaurant.currency_symbol) %></td>
         <td><%= link_to 'Edit', edit_manager_restaurant_custom_list_custom_list_item_path(restaurant, custom_list, custom_list_item) %></td>
         <td><%= link_to 'Destroy', manager_restaurant_custom_list_custom_list_item_path(restaurant, custom_list, custom_list_item), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>

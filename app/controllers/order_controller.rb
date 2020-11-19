@@ -130,7 +130,7 @@ def pay
   #Create Stripe Transaction
   @payment_intent = Stripe::PaymentIntent.create({
   amount: @payment_in_pence ,
-  currency: 'gbp',
+  currency: @restaurant.currency_code,
   payment_method_types: ['card'],
   description: "#{@path} charge"  
 })

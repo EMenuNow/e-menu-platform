@@ -88,7 +88,7 @@ class Receipt < ApplicationRecord
   def print_receipt(printer, action='print')
     puts 'Hello'
     print_receipt = ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: self, restaurant: restaurant_id })
-    print_receipt = print_receipt.gsub("&amp;","&").gsub("£","")
+    print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
@@ -135,7 +135,7 @@ class Receipt < ApplicationRecord
   def print_receipt_grouped(printer, item_screen_type_key, action='print')
     
     print_receipt = ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, item_screen_type_key: item_screen_type_key })
-    print_receipt = print_receipt.gsub("&amp;","&").gsub("£","")
+    print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
@@ -174,7 +174,7 @@ class Receipt < ApplicationRecord
   def secondary_print_receipt_grouped(printer, secondary_item_screen_type_key, action='print')
     
     print_receipt = ApplicationController.render(partial: "manager/live/order_item_screen_specific_print_secondary", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, secondary_item_screen_type_key: secondary_item_screen_type_key })
-    print_receipt = print_receipt.gsub("&amp;","&").gsub("£","")
+    print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 

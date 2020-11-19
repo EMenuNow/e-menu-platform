@@ -8,6 +8,7 @@ class Restaurant < ApplicationRecord
   has_many :delivery_postcodes
   has_many :receipts
   has_many :menus
+  belongs_to :currency
   has_many :restaurant_tables
   has_many :custom_lists, -> { order(position: :asc) }
   has_and_belongs_to_many :features
@@ -27,6 +28,7 @@ class Restaurant < ApplicationRecord
   delegate :ids, to: :features, prefix: true
   delegate :live_menus, to: :menus, prefix: true
   delegate :times, :delay_time_minutes, :kitchen_delay_minutes, to: :opening_time, prefix: true
+  delegate :name, :code, :symbol, to: :currency, prefix: true
 
   before_create :set_slug
 

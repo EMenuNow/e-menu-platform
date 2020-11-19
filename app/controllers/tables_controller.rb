@@ -101,7 +101,7 @@ class TablesController < ApplicationController
     begin
       status = Stripe::Charge.create(
         amount: price,
-        currency: 'gbp',
+        currency: @restaurant.currency_code,
         description: '#{@restaurant.name} charge',
         source: token
       )

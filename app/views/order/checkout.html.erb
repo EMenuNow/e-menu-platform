@@ -141,8 +141,8 @@ $(function(){
     fee = parseFloat($(this).val());
     new_basket = basket_total + fee
     $('#selected_delivery_fee').val(new_basket);
-    $('.delivery_fee_choose').html('£'+parseFloat(fee).toFixed(2));
-    $('#basket-total-value').html('£'+parseFloat(new_basket).toFixed(2));
+    $('.delivery_fee_choose').html(<%=@restaurant.currency_symbol%>+parseFloat(fee).toFixed(2));
+    $('#basket-total-value').html(<%=@restaurant.currency_symbol%>+parseFloat(new_basket).toFixed(2));
     $('#delivery_fee').val(parseFloat(fee));
     $('#total').val(parseFloat(new_basket));
     validate();
@@ -348,7 +348,7 @@ $('#kitchen-delay').hide();
                 Payment:
               </div>
               <div class='col'>
-                <%= number_to_currency(@basket_item_total.to_f / 100.to_f, unit: '£') %>
+                <%= number_to_currency(@basket_item_total.to_f / 100.to_f, unit: @restaurant.currency_symbol) %>
                  <%= hidden_field_tag :basket, @basket_item_total.to_f / 100.to_f %>
               </div>
             </div>
@@ -370,7 +370,7 @@ $('#kitchen-delay').hide();
                 Total:
               </div>
               <div class='col ' id='basket-total-value'>
-                <%= number_to_currency(@basket_item_total.to_f / 100.to_f, unit: '£') %>
+                <%= number_to_currency(@basket_item_total.to_f / 100.to_f, unit: @restaurant.currency_symbol) %>
 
               </div>
               <%= hidden_field_tag :total, @basket_item_total.to_f / 100.to_f%>    
@@ -400,7 +400,7 @@ $('#kitchen-delay').hide();
               <% postcodes = @restaurant.delivery_postcodes.order(:prefix)%>
               <% delivery_fees = @restaurant.delivery_postcodes.map{|d| d.delivery_fee}.uniq.sort%>
               <% delivery_fees.each do |delivery_fee| %>
-                <strong class=''><%=number_to_currency delivery_fee, unit: '£'%></strong> - 
+                <strong class=''><%=number_to_currency delivery_fee, unit: @restaurant.currency_symbol%></strong> - 
                 <%= postcodes.select{|d| d.delivery_fee == delivery_fee}.map{|s| s.prefix}.join(', ')%>
                 <br>
               <% end %>

@@ -79,7 +79,7 @@
         </div>
 
         <div class="col-lg-1 text-right mr-3">
-             <%= sub.prices_joined.map{|a| number_to_currency(a, unit: "£")}.join(" / ") if sub.prices_joined%>
+             <%= sub.prices_joined.map{|a| number_to_currency(a, unit: @restaurant.currency_symbol)}.join(" / ") if sub.prices_joined%>
         </div>
       </div>
         <div class="row">
