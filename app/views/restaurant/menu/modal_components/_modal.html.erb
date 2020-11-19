@@ -15,7 +15,7 @@
                         </span>
                       </div>
                       <div class="col">
-                        <%= sub.prices_joined.map{|a| number_to_currency(a, unit: "£")}.join(" / ") if sub.prices_joined%>
+                        <%= sub.prices_joined.map{|a| number_to_currency(a, unit: sub.restaurant.currency_symbol)}.join(" / ") if sub.prices_joined%>
                       </div>
                     </div>
                   </div>
@@ -57,7 +57,7 @@
                             <div class="col">
                               <div class="menu-description ml-3"><%=sub.description%></div>
                               <div class="menu-description ml-3">
-                                <%=custom_list_options(sub.custom_lists).html_safe%>
+                                <%=custom_list_options(sub.custom_lists, [], sub.restaurant.currency_symbol ).html_safe%>
                               </div>
                             </div>
                           </div>

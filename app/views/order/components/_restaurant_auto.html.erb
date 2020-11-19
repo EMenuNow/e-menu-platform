@@ -46,7 +46,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
                         <% unless disable_basket_link %>
 
                         <%= link_to checkout_path(@path) do %>
-                          <i class="fas fa-shopping-basket"></i> <%= number_to_currency(@basket_item_total, unit: '£') %>
+                          <i class="fas fa-shopping-basket"></i> <%= number_to_currency(@basket_item_total, unit: @restaurant.currency_symbol) %>
                         <% end %>
                         
                        

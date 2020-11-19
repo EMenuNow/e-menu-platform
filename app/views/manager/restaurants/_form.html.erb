@@ -126,11 +126,19 @@
   <div class="row">
     <div class="col">
         <div class="form-group ">
+          <%= form.label :currency_id %>
+          <%= form.select :currency_id, options_for_select(Currency.all.map{|s| [s.name, s.id]}, restaurant.currency_id), {prompt: "Choose Currency"}, {class: 'form-control  form-control-sm'} %>
+        </div>
+      </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+        <div class="form-group ">
           <%= form.label :stripe_api_key %>
           <%= form.text_field :stripe_api_key, class: 'form-control  form-control-sm', rows: 10  %>
         </div>
       </div>
-
   </div>
 
   <div class="row">
@@ -251,12 +259,12 @@ subtle_background_list = [
             <div class="card-group">
               <%subtle_background_list.reject{|a| a[:name]=="None"}.each do |subtle| %>
 
-<div class="card" style="width: 12rem;">
-  <%= image_tag "/background/#{subtle[:file]}.png", class: "img-fluid" %>
-  <div class="card-body">
-    <p class="card-text"><small><%=subtle[:name]%></small></p>
-  </div>
-</div>
+                <div class="card" style="width: 12rem;">
+                  <%= image_tag "/background/#{subtle[:file]}.png", class: "img-fluid" %>
+                  <div class="card-body">
+                    <p class="card-text"><small><%=subtle[:name]%></small></p>
+                  </div>
+                </div>
 
 
                    

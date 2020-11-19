@@ -28,7 +28,7 @@
       <div class=" p-1 rounded cursor-pointer" data-toggle="modal" data-target="#item-<%=item[:id]%>">
         <div class="row pb-1">
           <div class='col item-title'><strong  class='item-name '><%=item[:name]%></strong></div>
-          <div class='col-4 text-right'><strong  class='item-name'><%=number_to_currency(item[:price_a], unit: '£')%></strong></div>
+          <div class='col-4 text-right'><strong  class='item-name'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></strong></div>
         </div>
         <% if item[:image].present? or item[:description].present? %>
           <div class="row pt-2">

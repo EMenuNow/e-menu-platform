@@ -75,7 +75,7 @@
         });
 
         new_price = parseInt(price * 100) / 100
-        $(".button-price-"+scope).html("£"+ new_price)
+        $(".button-price-"+scope).html("<%=@restaurant.currency_symbol%>"+ new_price)
         $("#optionals-"+scope).html(optionals.join(','))
         note = $("#notes-"+scope).val()
         

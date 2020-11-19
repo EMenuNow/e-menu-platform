@@ -86,7 +86,7 @@
                 <tr>
                   <td><%= item['item'].html_safe %></td>
                   <td><%= item['optionals'].join('<br> ').html_safe %></td>
-                  <td class='text-right'><%= number_to_currency(item['total'], unit: '£') %></td>
+                  <td class='text-right'><%= number_to_currency(item['total'], unit: @receipt.restaurant.currency_symbol) %></td>
                 </tr>
                 <% end %>
 
@@ -94,7 +94,7 @@
                 <tr>
                   <td>Delivery Fee</td>
                   <td></td>
-                  <td class='text-right'><%= number_to_currency(@receipt.delivery_fee.to_f, unit: '£') %></td>
+                  <td class='text-right'><%= number_to_currency(@receipt.delivery_fee.to_f, unit: @receipt.restaurant.currency_symbol) %></td>
                 </tr>
               
               <% end %>
@@ -103,7 +103,7 @@
                 <tr>
                   <td>Total</td>
                   <td></td>
-                  <td class='text-right'><%= number_to_currency(@receipt.basket_total/100.to_f, unit: '£') %></td>
+                  <td class='text-right'><%= number_to_currency(@receipt.basket_total/100.to_f, unit: @receipt.restaurant.currency_symbol) %></td>
                 </tr>
               </tbody>
             </table> 
