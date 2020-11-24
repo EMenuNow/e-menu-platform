@@ -1,8 +1,8 @@
 class Restaurant::HomeController < ApplicationController
   def index
 
-
-  	@restaurants = Restaurant.all
+    redirect_to root_path
+  	# @restaurants = Restaurant.all
 
 
 
