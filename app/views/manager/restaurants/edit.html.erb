@@ -2,6 +2,6 @@
   <div class="my-3 p-3 bg-white rounded shadow-sm">
 	  <h3 class="pb-2 mb-0">Edit Restaurant</h3>
 		<%= render 'form', restaurant: @restaurant %>
-		<%= link_to 'Back', manager_restaurants_path %>
+		<%= link_to 'Back', manager_restaurant_path(@restaurant) %>
 	</div>
 </main>

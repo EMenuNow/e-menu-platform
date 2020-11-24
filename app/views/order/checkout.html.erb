@@ -141,8 +141,8 @@ $(function(){
     fee = parseFloat($(this).val());
     new_basket = basket_total + fee
     $('#selected_delivery_fee').val(new_basket);
-    $('.delivery_fee_choose').html(<%=@restaurant.currency_symbol%>+parseFloat(fee).toFixed(2));
-    $('#basket-total-value').html(<%=@restaurant.currency_symbol%>+parseFloat(new_basket).toFixed(2));
+    $('.delivery_fee_choose').html('<%=@restaurant.currency_symbol%>'+parseFloat(fee).toFixed(2));
+    $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+parseFloat(new_basket).toFixed(2));
     $('#delivery_fee').val(parseFloat(fee));
     $('#total').val(parseFloat(new_basket));
     validate();
