@@ -8,7 +8,7 @@
             </tr>
             <tr>
               <td style='text-align: right;'>Payment Date:</td>
-              <td><%=@receipt.created_at.strftime("%d %B %Y - %H:%M")%></td>
+              <td><%=@receipt.created_at.in_time_zone(@restaurant.time_zone).strftime("%d %B %Y - %H:%M")%></td>
             </tr>
             <tr>
               <td style='text-align: right;'>Receipt Number:</td>
