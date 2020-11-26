@@ -41,6 +41,10 @@ class Restaurant < ApplicationRecord
     end
  end
 
+ def time_zone
+  currency.code == 'cad' ? 'America/Toronto' : 'Europe/London'
+ end
+
 
   def stripe_sk_api_key
     Rails.env == 'production' ? stripe_api_key : 'sk_test_hOj5WqYB26UV1v5uuqXsADSG'
@@ -60,7 +64,7 @@ class Restaurant < ApplicationRecord
   end
 
   def is_open
-    t = Time.new.in_time_zone('Europe/London')
+    t = Time.new.in_time_zone(time_zone)
     today_day = t.strftime("%A").downcase
     today_opening_time = opening_time_times[today_day]['open']
     today_closing_time = opening_time_times[today_day]['close']
@@ -69,30 +73,30 @@ class Restaurant < ApplicationRecord
     time_today_opening < t and t < time_today_closing
   end
   def is_closing(notice = 0)
-    t = Time.new.in_time_zone('Europe/London')
+    t = Time.new.in_time_zone(time_zone)
     today_day = t.strftime("%A").downcase
     today_opening_time = opening_time_times[today_day]['open']
     today_closing_time = opening_time_times[today_day]['close']
     time_today_opening = Time.parse("#{t.year}-#{t.month}-#{t.day} #{today_opening_time}:00 +01:00")
     time_today_closing = Time.parse("#{t.year}-#{t.month}-#{t.day} #{today_closing_time}:00 +01:00") - opening_time_kitchen_delay_minutes.minutes
-
+    
     ((time_today_closing - t)/60).to_i
-
+    
     
   end
-    
-
-
+  
+  
+  
   def available_times
     # Delay time minutes
     dtm = opening_time_delay_time_minutes.minutes
     dtm = 30.minutes if dtm.blank?
-
+    
     # Busy time minutes
     btm = opening_time_kitchen_delay_minutes.minutes
-
-    t = Time.new.in_time_zone('Europe/London')
-    tomorrow = Time.new.in_time_zone('Europe/London') + 1.day
+    
+    t = Time.new.in_time_zone(time_zone)
+    tomorrow = Time.new.in_time_zone(time_zone) + 1.day
     #  binding.pry
     # rounded_t = Time.local(t.year, t.month, t.day, t.hour, t.min/15*15)
     round_down_t = Time.parse("#{t.year}-#{t.month}-#{t.day} #{t.hour}:#{t.min/15*15}:00")
