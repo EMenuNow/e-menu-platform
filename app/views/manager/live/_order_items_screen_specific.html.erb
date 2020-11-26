@@ -1,18 +1,18 @@
 
 
 
+  <% @restaurant = Restaurant.find(restaurant) if @restaurant.blank? %>
   <div class="row text-right">
 
     <div class='col'>
-    refreshed at: <%=Time.new%>
+    refreshed at: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
     </div>
   </div>
 
   <div class="row m-2">
-        <% @restaurant = Restaurant.find(restaurant) if @restaurant.blank? 
-        @screen_items = [] %>
 
         
+        <% @screen_items = [] %>
         <% @screen_items = ScreenItem.where(ready: false, restaurant_id: @restaurant.id, item_screen_type_key: item_screen_type_key) if !grouped %>
         <% @screen_items = ScreenItem.where(ready: false, restaurant_id: @restaurant.id, item_screen_type_key: item_screen_type_key)  if grouped %>
 
