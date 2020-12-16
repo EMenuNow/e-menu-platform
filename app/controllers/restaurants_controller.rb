@@ -16,7 +16,7 @@ class RestaurantsController < ApplicationController
 
   def get_restaurant
     @path = params[:id]
-    @restaurant = Restaurant.where("lowercase(path) = ?", @path.downcase).first
+    @restaurant = Restaurant.where("lower(path) = ?", @path.downcase).first
   end
 
   def basket_service

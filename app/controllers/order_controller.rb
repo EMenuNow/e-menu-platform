@@ -14,11 +14,11 @@ class OrderController < ApplicationController
     @basket_service = BasketService.new(@restaurant, cookies['emenu_basket'])
 
     if @basket_service.get_basket_db&.contents.present?
-      @basket = @basket_service.get_basket
+      @basket = @basket_service.get_basket_db
       @basket_item_count = @basket_service.get_basket_item_count
       @basket_item_total = @basket_service.get_basket_item_total
     else
-      cookies['emenu_basket'] = @basket_service.get_basket
+      cookies['emenu_basket'] = @basket_service.get_basket_db
     end
   end
 
