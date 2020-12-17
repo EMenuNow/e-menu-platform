@@ -30,7 +30,7 @@
   <%= render 'components/global/sidebar' %>
   <%= render 'components/global/topbar' %>
   <%= render 'components/global/environment' %>
-  <%= render "patrons/sessions/new", :locals => { :redirect_after_signup_to => restaurant_path(Restaurant.first.path), :resource => Patron.new } if !patron_signed_in? %>
+  <%#= render "patrons/sessions/new", :locals => { :redirect_after_signup_to => restaurant_path(Restaurant.first.path), :resource => Patron.new } if !patron_signed_in? %>
   <%= render 'components/global/order_messages' %>
   <%= yield %>
   <%#= render 'components/global/languages' %>

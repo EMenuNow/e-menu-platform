@@ -1,24 +1,44 @@
 <% content_for :hero do %>
 <div class="jumbotron jumbotron-fluid hero-main-user-background text-center">
-	<div class="container text-light">
-		<div class="row">
-			<div class="col-lg-12">
-				<h1 class="display-2"><%= t('restaurants.welcome', name: @restaurant.name) %></h1>
-			</div>
-		</div>
-	</div>
+  <div class="container text-light">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1 class="display-2"><%= t('restaurants.welcome', name: @restaurant.name) %></h1>
+      </div>
+    </div>
+  </div>
 </div>
 <% end %>
 
 <div class="row">
   <div class="col">
-		<% if @basket_service.service_types.blank? %>
-			This menu is for viewing only
-		<% else %>
-			<% @basket_service.service_types.each do |service_type| %>
-				<%= link_to service_type.first, "#", data: { value: restaurant_path(@restaurant.path, :service => service_type.second) }, :onclick=>"$('#patron_redirect_after_signup_to').val($(this).data('value'));" %>
-			<% end %>
-		<% end %>
-    <%= render partial: "patrons/sessions/new", locals: { redirect_after_signup_to: restaurant_path(@restaurant.path, :service => @basket_service.service_types&.first&.second) } %>
+    <% if @basket_service.service_types.blank? %>
+    This menu is for viewing only
+    <% else %>
+    <% @basket_service.service_types.each do |service_type| %>
+    <div class="row">
+      <div class="col-md-12 mb-2 text-center">
+        <%= link_to service_type.first, "#", data: { value: restaurant_path(@restaurant.path, :service => service_type.second) }, :onclick=>"$('#patron_redirect_after_signup_to').val($(this).data('value'));$('.selection-buttons').removeClass('bg-dark');$(this).addClass('bg-dark')", :class=>"selection-buttons bg-info text-white p-4 d-inline-block rounded w-50 text-center" %>
+      </div>
+    </div>
+    <% end %>
+    <% end %>
+    <div class="row pb-5">
+      <div class="col-md-12 mt-5 mb-2 text-center">
+        <h5>Please enter your email address to begin ordering</h5>
+        <div class="row">
+          <div class="col-md-6 offset-md-3 mt-2 text-center">
+            <%= render partial: "patrons/sessions/new", locals: { redirect_after_signup_to: restaurant_path(@restaurant.path, :service => @basket_service.service_types&.first&.second) } %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 offset-md-3 mt-2 text-left">
+            <%= link_to restaurant_path(@restaurant.path), :class=>"d-inline-block" do %>
+            <h6><u>Skip for now</u></h6>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,34 +1,42 @@
 <%
   redirect_after_signup_to ||= request.original_fullpath
 %>
-
-<h2>Sign up</h2>
-
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= f.hidden_field :redirect_after_signup_to, :value => redirect_after_signup_to %>
-  <%= render "patrons/shared/error_messages", resource: resource %>
-
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
+<% content_for :hero do %>
+<div class="jumbotron jumbotron-fluid hero-main-user-background mb-0">
+	<div class="container text-light text-center">
+		<div class="row mb-0">
+			<div class="col-lg-12 pt-3 pb-3">
+				<h1 class="display-2">Create Your Account</h1>
+        <h3>Access exclusive member discounts and restaurant loyalty programs</h3>
+			</div>
+		</div>
+	</div>
+</div>
 <% end %>
+<div class="row">
+  <div class="col-md-6 offset-md-3 text-center py-5">
+    <h2>Register</h2>
 
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+      <%= f.hidden_field :redirect_after_signup_to, :value => redirect_after_signup_to %>
+      <%= render "patrons/shared/error_messages", resource: resource %>
+
+      <div class="field">
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", :placeholder=>"Email address", :class => "w-100 p-1 mb-2 rounded" %>
+      </div>
+
+      <div class="field">
+        <%= f.password_field :password, autocomplete: "new-password", :placeholder=>"Password (#{ @minimum_password_length } characters minimum)", :class => "w-100 p-1 mb-2 rounded" %>
+      </div>
+
+      <div class="field">
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", :placeholder=>"Password confirmation", :class => "w-100 p-1 mb-2 rounded" %>
+      </div>
+
+      <div class="actions">
+        <%= f.submit "Sign up", :class => "w-100 p-1" %>
+      </div>
+    <% end %>
+  </div>
+</div>
 <%#= render "patrons/shared/links" %>

@@ -3,39 +3,40 @@
     <button class="navbar-toggler border-0" type="button" id="dismiss">
       <svg xmlns="http://www.w3.org/2000/svg" width="22.243" height="22.243" viewBox="0 0 22.243 22.243">
         <g id="Hamburger" transform="translate(2.121 2.121)">
-          <line id="Line_1" data-name="Line 1" y1="18" x2="18" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3"/>
-          <line id="Line_3" data-name="Line 3" x2="18" y2="18" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3"/>
+          <line id="Line_1" data-name="Line 1" y1="18" x2="18" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3" />
+          <line id="Line_3" data-name="Line 3" x2="18" y2="18" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3" />
         </g>
       </svg>
     </button>
 
     <ul class="list-unstyled components">
+      <% if patron_signed_in? %>
       <li>
-        <%= link_to "Sign In", new_patron_session_path %>
+        <%= link_to "Your account", edit_patron_registration_path %>
       </li>
       <li>
-        <%= link_to "Sign Up", new_patron_registration_path %>
+        <%= link_to "Edit settings",  settings_patrons_path %>
       </li>
+      <li>
+        <%= link_to "Sign Out", destroy_patron_session_path, method: :delete %>
+      </li>
+      <% end %>
+      <% if !patron_signed_in? %>
+      <li>
+        <%= link_to "Sign in", new_patron_session_path %>
+      </li>
+      <li>
+        <%= link_to "Register", new_patron_registration_path %>
+      </li>
+      <% end %>
       <% if @restaurant %>
-        <li>
-          <%= link_to @restaurant.name, restaurant_path(@restaurant.path) %>
-        </li>
+      <li>
+        <%= link_to @restaurant.name, restaurant_path(@restaurant.path) %>
+      </li>
       <% end %>
       <li>
         <%= link_to "Find Restaurant", root_path %>
       </li>
-      </li>
-      <% if patron_signed_in? %>
-        <li>
-          <%= link_to "Manage preferences", edit_patron_registration_path %>
-        </li>
-        <li>
-          <%= link_to "Edit settings",  settings_patrons_path %>
-        </li>
-        <li>
-          <%= link_to "Sign Out", destroy_patron_session_path, method: :delete %>
-        </li>
-      <% end %>
     </ul>
 
     <div class="sidebar-footer mt-auto">

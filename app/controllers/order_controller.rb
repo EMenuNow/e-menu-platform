@@ -5,6 +5,7 @@ class OrderController < ApplicationController
 
   def index
     @path = params[:path]
+    redirect_to restaurant_path(@path), status: 301
     @restaurant = Restaurant.find_by(path: @path)
     @menu = @restaurant.menus_live_menus
     @menu2 = get_serialized_menu(@restaurant)
@@ -18,7 +19,7 @@ class OrderController < ApplicationController
       @basket_item_count = @basket_service.get_basket_item_count
       @basket_item_total = @basket_service.get_basket_item_total
     else
-      cookies['emenu_basket'] = @basket_service.get_basket_db
+      cookies['emenu_basket'] = @basket_service.get_basket
     end
   end
 

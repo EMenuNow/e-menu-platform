@@ -43,7 +43,7 @@
         <%= number_to_currency(item['total'], unit: @restaurant.currency_symbol) %>
       </div>
     </div>
-    <% end if @basket? %>
+    <% end if @basket['items'].present? %>
     <hr />
     <div class="row pt-1">
       <div class="col offset-sm-1">
