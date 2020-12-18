@@ -10,15 +10,17 @@
     </button>
 
     <ul class="list-unstyled components">
+      <% if @restaurant %>
+      <li>
+        <%= link_to @restaurant.name, restaurant_path(@restaurant.path) %>
+      </li>
+      <% end %>
       <% if patron_signed_in? %>
       <li>
         <%= link_to "Your account", edit_patron_registration_path %>
       </li>
       <li>
         <%= link_to "Edit settings",  settings_patrons_path %>
-      </li>
-      <li>
-        <%= link_to "Sign Out", destroy_patron_session_path, method: :delete %>
       </li>
       <% end %>
       <% if !patron_signed_in? %>
@@ -29,14 +31,14 @@
         <%= link_to "Register", new_patron_registration_path %>
       </li>
       <% end %>
-      <% if @restaurant %>
       <li>
-        <%= link_to @restaurant.name, restaurant_path(@restaurant.path) %>
+        <%= link_to "Choose Restaurant", root_path %>
+      </li>
+      <% if patron_signed_in? %>
+      <li>
+        <%= link_to "Sign Out", destroy_patron_session_path, method: :delete %>
       </li>
       <% end %>
-      <li>
-        <%= link_to "Find Restaurant", root_path %>
-      </li>
     </ul>
 
     <div class="sidebar-footer mt-auto">

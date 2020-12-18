@@ -11,6 +11,7 @@
 </div>
 <div class="row bg-light-70">
   <div class="col">
+    <% if @basket['items'].present? %>
     <hr />
     <div class="d-none d-sm-block">
       <div class='row'>
@@ -43,28 +44,29 @@
         <%= number_to_currency(item['total'], unit: @restaurant.currency_symbol) %>
       </div>
     </div>
-    <% end if @basket['items'].present? %>
+    <% end %>
     <hr />
     <div class="row pt-1">
       <div class="col offset-sm-1">
         Total <%= "(#{@basket_service.discount_code.description})" if @basket_service.discount_code.present? %>
       </div>
       <div class="col">
-        <%= number_to_currency(@basket_item_total, unit: @restaurant.currency_symbol) %>
+        <%= number_to_currency(@basket_service.get_basket_item_total, unit: @restaurant.currency_symbol) %>
       </div>
     </div>
     <hr />
     <div class="row py-2 pb-5 bg-light-70">
       <div class="col">
         <%
-          disable_basket_link = true 
-          if @basket_item_count.present? and @basket_item_count > 0
+          disable_basket_link = true
+          if @basket_service.get_basket_item_count.present? and @basket_service.get_basket_item_total > 0
             disable_basket_link = false 
           end
           %>
-        <%= button_to "CHECKOUT", checkout_path(@path), disabled: disable_basket_link, method: :get,  class: 'btn btn-dark btn-block'%>
+        <%= button_to "CHECKOUT", checkouts_path(@path), disabled: disable_basket_link, method: :get,  class: 'btn btn-dark btn-block'%>
       </div>
     </div>
+    <% end %>
     <hr />
     <div class="row py-2 pb-5 bg-light-70">
       <div class="col">

@@ -22,6 +22,12 @@
 
     <div class="row bg-dark mb-2 p-4">
       <div class='col text-center text-light'>
+          <strong>Restaurant Address</strong><br>
+          <%=@restaurant.address%>
+      </div>
+    </div>
+    <div class="row bg-dark mb-2 p-4">
+      <div class='col text-center text-light'>
           <%=link_to 'Emenunow.com', '/', class: 'btn btn-warning'%>
           <%=link_to "#{@restaurant.name} Menu", restaurant_path(@path), class: 'btn btn-warning'%>
       </div>
@@ -30,3 +36,19 @@
 
   </div>
 </div>
+
+
+
+
+
+    <table>
+
+          <tbody>
+            <tr>
+              <td colspan=2></td>
+            </tr>
+            <tr>
+              <td colspan=2></td>
+            </tr>
+    </tbody>
+    </table>

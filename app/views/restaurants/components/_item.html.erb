@@ -15,7 +15,7 @@
       <div class="col">
         <% if item[:children].present? %>
         <% item[:children].each do |child| %>
-        <%= render 'order/components/item', item: child, no_background: true %>
+        <%= render 'restaurants/components/item', item: child, no_background: true %>
         <% end %>
         <% end %>
       </div>
@@ -41,5 +41,5 @@
     <% end %>
   </div>
 </div>
-<%= render 'order/components/modal', item: item if is_takeaway_or_delivery?(@restaurant)%>
+<%= render 'restaurants/components/modal', item: item if is_takeaway_or_delivery?(@restaurant)%>
 <% end %>

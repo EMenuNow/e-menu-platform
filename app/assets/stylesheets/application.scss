@@ -437,6 +437,9 @@ div.scrollmenu::-webkit-scrollbar {
  /* positioning context for advancers */
  position: relative;
  font-size: 0;
+ &::-webkit-scrollbar {
+  display: none;
+ }
 }
 .js .pn-ProductNav {
  /* Make an auto-hiding scroller for the 3 people using a IE */

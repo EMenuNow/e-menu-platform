@@ -154,7 +154,7 @@ function validateEmail(email) {
 $(function(){
 
   $('.delivery_fee_calculate').change(function(){
-    basket_total = <%=@basket_item_total.to_f%> 
+    basket_total = <%=@basket_service.get_basket_item_total.to_f%> 
     fee = parseFloat($(this).val());
     fee = isNaN(fee) ? 0 : fee;
     new_basket = basket_total + fee;
@@ -204,8 +204,8 @@ if (service_type == 'delivery'){
   $('#pay-now-button').hide();
   $('#help-info').hide();
   $('#kitchen-delay').hide();
-  $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_item_total.to_f%>');
-  $('#total').val(<%=@basket_item_total.to_f%>);
+  $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
+  $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
 
 } else if (service_type == 'tableservice') {
 
@@ -222,8 +222,8 @@ if (service_type == 'delivery'){
   $('#pay-now-button').hide();
   $('#help-info').hide();
   $('#kitchen-delay').show();
-  $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_item_total.to_f%>');
-  $('#total').val(<%=@basket_item_total.to_f%>);
+  $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
+  $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
 
 
 }
@@ -267,8 +267,8 @@ $('#kitchen-delay').hide();
   </div>
 <% end %>
 <div class='container-fluid bg-dark pb-2 ' ><!--  style="background: url('/images/restaurant/thesauce/main-bg2.jpg') no-repeat fixed center;" -->
-  <%= form_tag pay_path(@restaurant.path) do %>
-    <div class="row   justify-content-center pt-3">
+  <%= form_tag pay_checkouts_path(@restaurant.path) do %>
+    <div class="row justify-content-center pt-3">
       <div class="col-sm-12 col-md-6 m-2 text-center">         
         <%
         service_types = []
@@ -365,8 +365,8 @@ $('#kitchen-delay').hide();
                 Payment:
               </div>
               <div class='col'>
-                <%= number_to_currency(@basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
-                <%= hidden_field_tag :basket, @basket_item_total.to_f %>
+                <%= number_to_currency(@basket_service.get_basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
+                <%= hidden_field_tag :basket, @basket_service.get_basket_item_total.to_f %>
               </div>
             </div>
 
@@ -387,9 +387,9 @@ $('#kitchen-delay').hide();
                 Total:
               </div>
               <div class='col ' id='basket-total-value'>
-                <%= number_to_currency(@basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
+                <%= number_to_currency(@basket_service.get_basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
               </div>
-              <%= hidden_field_tag :total, @basket_item_total.to_f %>    
+              <%= hidden_field_tag :total, @basket_service.get_basket_item_total.to_f %>    
             </div>
 
 

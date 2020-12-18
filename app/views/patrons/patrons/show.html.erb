@@ -16,117 +16,120 @@
 	</div>
 </div>
 <% end %>
-<div class="row text-center">
-  <div class="col-md-12">
-    <div class="row mt-1 ">
-      <div class="col-md-12 p-0 m-0">
-        <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapse1">
-          <h5>User details</h5>
-        </a>
-        <div class="collapse p-5 bg-light text-center" id="collapse1">
-          <h5><%= current_patron.email.truncate(6) %></h5>
-          <h5><%= current_patron.full_name %></h5>
-          <h5>Active since: <%= current_patron.created_at.strftime("%d-%m-%y") %></h5>
-          <h5><%= current_patron.orders.size %> previous orders</h5>
+<div class="container">
+  <div class="row text-center">
+    <div class="col-md-12">
+      <div class="row mt-1 ">
+        <div class="col-md-12 p-0 m-0">
+          <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapse1">
+            <h5 class="m-0">Account details</h5>
+          </a>
+          <div class="collapse p-5 bg-light text-center" id="collapse1">
+            <h5><%= current_patron.full_name %></h5>
+            <h5><%= current_patron.email.truncate(6) %></h5>
+            <h5><%= current_patron.phone %></h5>
+            <h5>Active since: <%= current_patron.created_at.strftime("%d-%m-%y") %></h5>
+            <h5><%= current_patron.orders.size %> previous orders</h5>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row mt-1 ">
-      <div class="col-md-12 p-0 m-0">
-        <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse4" role="button" aria-expanded="false" aria-controls="collapse4">
-          <h5>Order history</h5>
-        </a>
-        <div class="collapse p-5 bg-light" id="collapse4">
-          <% if orders.present? %>
-            <% orders.each do |order| %>
-              <%= order.inspect %>
+      <div class="row mt-1 ">
+        <div class="col-md-12 p-0 m-0">
+          <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse4" role="button" aria-expanded="false" aria-controls="collapse4">
+            <h5 class="m-0">Order history</h5>
+          </a>
+          <div class="collapse p-5 bg-light" id="collapse4">
+            <% if orders.present? %>
+              <% orders.each do |order| %>
+                <%= order.inspect %>
+              <% end %>
+            <% else %>
+              <h5>You have made no orders yet :)</h5>
             <% end %>
-          <% else %>
-            <h5>You have made no orders yet :)</h5>
-          <% end %>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row mt-1 ">
-      <div class="col-md-12 p-0 m-0">
-        <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse5" role="button" aria-expanded="false" aria-controls="collapse5">
-          <h5>Saved addresses</h5>
-        </a>
-        <div class="collapse p-5 bg-light" id="collapse5">
-          <% if addresses.present? %>
-            <% addresses.each do |address| %>
-              <div class="row py-3">
-                <div class="col-md-12">
-                  <%= address.inspect %>
-                </div>
-              </div>
-            <% end %>
-          <% else %>
-            <h5>You have no addresses saved yet :)</h5>
-          <% end %>
-        </div>
-      </div>
-    </div>
-    <div class="row mt-1 ">
-      <div class="col-md-12 p-0 m-0">
-        <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapse2">
-          <h5>Allergens and Diet</h5>
-        </a>
-        <div class="collapse p-5 bg-light" id="collapse2">
-          <% MenuItemCategorisation.all.group_by(&:type).each do |group, mics| %>
-            <div class="row py-3">
-              <% mics.each do |mic| %>
-                <div class="col-md-2">
-                  <label>
-                    <h5><i class="<%= mic.icon %>" %></i> <%= mic.name.titleize %>: 
-                    <%= check_box_tag :active, "active", pallergens.select{|x|x.menu_item_categorisation_id == mic.id}.first&.active, data: { :method => :patch, :url => patron_allergen_path(mic.id), remote: true, :authenticity_token => true } %></h5>
-                  </label>
+      <div class="row mt-1 ">
+        <div class="col-md-12 p-0 m-0">
+          <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse5" role="button" aria-expanded="false" aria-controls="collapse5">
+            <h5 class="m-0">Saved addresses</h5>
+          </a>
+          <div class="collapse p-5 bg-light" id="collapse5">
+            <% if addresses.present? %>
+              <% addresses.each do |address| %>
+                <div class="row py-3">
+                  <div class="col-md-12">
+                    <%= address.inspect %>
+                  </div>
                 </div>
               <% end %>
-            </div>
-          <% end %>
+            <% else %>
+              <h5>You have no addresses saved yet :)</h5>
+            <% end %>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row mt-1 ">
-      <div class="col-md-12 p-0 m-0">
-        <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapse3">
-          <h5>Marketing</h5>
-        </a>
-        <div class="collapse p-5 bg-light" id="collapse3">
-          <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
-            <label>
-              <h5><i class=""></i> <%= "Emenu news" %>: 
-              <%= f.check_box :emenu_news, { checked: marketing.emenu_news, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
-            </label>
-          <% end %>
-          <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
-            <label>
-              <h5><i class=""></i> <%= "Emenu promotions" %>: 
-              <%= f.check_box :emenu_news, { checked: marketing.emenu_promotions, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
-            </label>
-          <% end %>
-          <hr />
-          <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
-            <label>
-              <h5><i class=""></i> <%= "Restaurant news" %>: 
-              <%= f.check_box :emenu_news, { checked: marketing.restaurant_news, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
-            </label>
-          <% end %>
-          <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
-            <label>
-              <h5><i class=""></i> <%= "Restaurant promotions" %>: 
-              <%= f.check_box :emenu_news, { checked: marketing.restaurant_promotions, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
-            </label>
-          <% end %>
+      <div class="row mt-1 ">
+        <div class="col-md-12 p-0 m-0">
+          <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapse2">
+            <h5 class="m-0">Allergens and Diet</h5>
+          </a>
+          <div class="collapse p-5 bg-light" id="collapse2">
+            <% MenuItemCategorisation.all.group_by(&:type).each do |group, mics| %>
+              <div class="row py-3">
+                <% mics.each do |mic| %>
+                  <div class="col-md-2">
+                    <label>
+                      <h5><i class="<%= mic.icon %>" %></i> <%= mic.name.titleize %>: 
+                      <%= check_box_tag :active, "active", pallergens.select{|x|x.menu_item_categorisation_id == mic.id}.first&.active, data: { :method => :patch, :url => patron_allergen_path(mic.id), remote: true, :authenticity_token => true } %></h5>
+                    </label>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row mt-1 mb-5">
-      <div class="col-md-12 p-0 m-0">
-        <%= link_to destroy_patron_session_path, method: :delete, class: "btn col-md-12 bg-dark text-light mt-1" do %>
-          <h5>Log out</h5>
-        <% end %>
+      <div class="row mt-1 ">
+        <div class="col-md-12 p-0 m-0">
+          <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapse3">
+            <h5 class="m-0">Marketing</h5>
+          </a>
+          <div class="collapse p-5 bg-light" id="collapse3">
+            <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
+              <label>
+                <h5><i class=""></i> <%= "Emenu news" %>: 
+                <%= f.check_box :emenu_news, { checked: marketing.emenu_news, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
+              </label>
+            <% end %>
+            <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
+              <label>
+                <h5><i class=""></i> <%= "Emenu promotions" %>: 
+                <%= f.check_box :emenu_promotions, { checked: marketing.emenu_promotions, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
+              </label>
+            <% end %>
+            <hr />
+            <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
+              <label>
+                <h5><i class=""></i> <%= "Restaurant news" %>: 
+                <%= f.check_box :restaurant_news, { checked: marketing.restaurant_news, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
+              </label>
+            <% end %>
+            <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
+              <label>
+                <h5><i class=""></i> <%= "Restaurant promotions" %>: 
+                <%= f.check_box :restaurant_promotions, { checked: marketing.restaurant_promotions, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
+              </label>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-1 mb-5">
+        <div class="col-md-12 p-0 m-0">
+          <%= link_to destroy_patron_session_path, method: :delete, class: "btn col-md-12 bg-dark text-light mt-1" do %>
+            <h5 class="m-0">Log out</h5>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>

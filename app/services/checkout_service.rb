@@ -1,7 +1,7 @@
 class CheckoutService < ApplicationController
 
   attr_accessor :name, :total_payment, :service_type, :collection_time, :telephone, :address,
-                :table_number, :email, :house_number, :street, :postcode, :basket, :delivery_fee, :discount_code
+                :table_number, :email, :house_number, :street, :postcode, :basket, :delivery_fee, :discount_code, :payment_in_pence
 
   def initialize(restaurant, parameters, basket_service)
     parameters.each_pair {|k,v|instance_variable_set("@#{k}", v)}
@@ -19,7 +19,11 @@ class CheckoutService < ApplicationController
       amount: @payment_in_pence,
       currency: @restaurant.currency_code,
       payment_method_types: ['card'],
-      description: "#{@path} charge"  
+      description: "#{@path} charge",
+      application_fee_amount: (@payment_in_pence * 0.015).to_i,
+      transfer_data: {
+        destination: "acct_1HFMjjEdU8EUcuyG"
+      },  
     })
   end
 

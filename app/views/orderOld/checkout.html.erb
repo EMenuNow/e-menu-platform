@@ -1,0 +1,431 @@
+
+<% content_for :js do %>
+
+
+<script type="text/javascript">
+
+
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
+
+    $('.validation_check').on("keyup change", function() {   
+       validate();
+
+    });
+
+    function validate(){
+
+      $('.pay-now-payment').addClass('disabled')
+
+      val_time = $('#collection_time').val()
+      val_name = $('#name').val()
+      val_telephone = $('#telephone').val()
+      val_email = $('#email').val()
+      val_table_number = $('#table_number').val()
+ 
+      valid_time = false
+      valid_name = false
+      valid_telephone = false
+      valid_email = false
+      valid_table_number = false
+      valid_address_house_number = false
+      valid_address_street = false
+      valid_address_postcode = false
+
+
+      <% if is_delivery?(@restaurant)%>
+      val_address_house_number = $('#house_number').val()
+      val_address_street = $('#street').val()
+      val_address_postcode_prefix = $('#postcode_prefix').val()
+      val_address_postcode_suffix = $('#postcode_suffix').val()
+        
+      // alert('val')
+      if (val_address_house_number.length < 1){
+        // alert("Please enter a name");
+        $('#house_number_required').html('*');  
+        valid_address_house_number = false      
+      } else {
+        $('#house_number_required').html('');
+        valid_address_house_number = true
+      }
+
+      if (val_address_street.length < 3){
+        // alert("Please enter a name");
+        $('#street_required').html('*');  
+        valid_address_street = false      
+      } else {
+        $('#street_required').html('');
+        valid_address_street = true
+      }
+
+      if (val_address_postcode_suffix.length < 3 || val_address_postcode_prefix.length < 1){
+        // alert("Please enter a name");
+        $('#postcode_required').html('*');  
+        valid_address_postcode = false      
+      } else {
+        $('#postcode_required').html('');
+        valid_address_postcode = true
+      }
+
+      <% end %>
+
+
+      // alert('val')
+      if (!val_time){
+        // alert("Please enter a time");
+        $('#time_required').html('*');  
+        valid_time = false      
+      } else {
+        $('#time_required').html('');
+        valid_time = true
+      }
+
+      if (val_name.length < 2){
+        // alert("Please enter a name");
+        $('#name_required').html('*');  
+        valid_name = false      
+      } else {
+        $('#name_required').html('');
+        valid_name = true
+      }
+
+      if (val_telephone.length < 10){
+        $('#telephone_required').html('*');  
+        valid_telephone = false      
+      } else {
+        $('#telephone_required').html('');
+        valid_telephone = true
+      }
+
+      if (val_table_number.length < 1){
+        $('#table_number_required').html('*'); 
+        valid_table_number = false      
+      } else {
+        $('#table_number_required').html('');
+        valid_table_number = true
+      }
+
+      if (!validateEmail(val_email)) {
+        $('#email_required').html('*');  
+        valid_email = false      
+      } else {
+        $('#email_required').html('');
+        valid_email = true
+      }
+
+
+      if (valid_address_house_number & valid_address_street & valid_address_postcode){
+        $('#address_required').html('');
+      } else {
+        $('#address_required').html('*');
+      }
+
+      service_type = $('#service_type').val();
+      // console.log(service_type);
+      if (service_type == 'tableservice'){
+        if (valid_table_number & valid_email){
+            $('#pay-now-button').show();
+        } else {
+            $('#pay-now-button').hide();
+        }
+      } else if (service_type == 'delivery'){    
+        prefix = $("#postcode_prefix option:selected").text();
+        suffix = $("#postcode_suffix").val().toUpperCase();
+        $("#postcode").val( prefix + ' ' + suffix  );
+        if (valid_address_house_number & valid_address_street & valid_address_postcode & valid_telephone & valid_time & valid_name & valid_email){   
+           $('#pay-now-button').show();
+        } else {
+           $('#pay-now-button').hide();
+        }
+      } else if (service_type == 'collection') {
+        if (valid_telephone & valid_time & valid_name & valid_email){
+           $('#pay-now-button').show();
+        } else {
+           $('#pay-now-button').hide();
+        }
+      }
+    }
+
+
+
+
+$(function(){
+
+  $('.delivery_fee_calculate').change(function(){
+    basket_total = <%=@basket_item_total.to_f%> 
+    fee = parseFloat($(this).val());
+    fee = isNaN(fee) ? 0 : fee;
+    new_basket = basket_total + fee;
+    $('#selected_delivery_fee').val(new_basket);
+    $('.delivery_fee_choose').html('<%=@restaurant.currency_symbol%>'+parseFloat(fee).toFixed(2));
+    $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+parseFloat(new_basket).toFixed(2));
+    $('#delivery_fee').val(parseFloat(fee));
+    $('#total').val(parseFloat(new_basket));
+    validate();
+
+  });
+
+$('#service_type').change(function(){
+  service_type = $(this).val();
+//  console.log(service_type)
+  validate();
+if (service_type == 'delivery'){
+
+  $('#time-field').show();
+  $('#table-number-field').hide();
+  $('#name-field').show();
+  $('#telephone-field').show();
+  $('#email-field').show();
+  $('#address-field').show();
+  $('#payment-info').show();
+  $('#delivery-fee').show();
+  $('#total-info').show();
+  $('#basket-total').show();
+  $('#delivery-info').show();
+  $('#pay-now-button').hide();
+  $('#help-info').hide();
+  $('#kitchen-delay').hide();
+  $('.delivery_fee_calculate').change();
+
+} else if (service_type == 'collection') {
+
+  $('#time-field').show();
+  $('#table-number-field').hide();
+  $('#name-field').show();
+  $('#telephone-field').show();
+  $('#email-field').show();
+  $('#address-field').hide();
+  $('#payment-info').show();
+  $('#delivery-fee').hide();
+  $('#basket-total').show();
+  $('#delivery-info').show();
+  $('#pay-now-button').hide();
+  $('#help-info').hide();
+  $('#kitchen-delay').hide();
+  $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_item_total.to_f%>');
+  $('#total').val(<%=@basket_item_total.to_f%>);
+
+} else if (service_type == 'tableservice') {
+
+  $('#time-field').hide();
+  $('#table-number-field').show();
+  $('#name-field').hide();
+  $('#telephone-field').hide();
+  $('#email-field').show();
+  $('#address-field').hide();
+  $('#payment-info').show();
+  $('#delivery-fee').hide();
+  $('#basket-total').show();
+  $('#delivery-info').show();
+  $('#pay-now-button').hide();
+  $('#help-info').hide();
+  $('#kitchen-delay').show();
+  $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_item_total.to_f%>');
+  $('#total').val(<%=@basket_item_total.to_f%>);
+
+
+}
+
+
+});
+
+
+
+//$('#help-info').hide();
+$('#time-field').hide();
+$('#table-number-field').hide();
+$('#name-field').hide();
+$('#telephone-field').hide();
+$('#email-field').hide();
+$('#address-field').hide();
+// $('#payment-info').hide();
+$('#delivery-fee').hide();
+// $('#basket-total').hide();
+$('#pay-now-button').hide();
+$('#delivery-info').hide();
+$('#kitchen-delay').hide();
+
+
+
+
+});
+
+
+
+</script>
+
+
+<% end %>
+
+<% if  alert.present? %>
+<div class="row container-fluid  bg-danger p-3 ">
+  <div class='col text-light' >
+    <%= alert %>
+  </div>
+  </div>
+<% end %>
+<div class='container-fluid bg-dark pb-2 ' ><!--  style="background: url('/images/restaurant/thesauce/main-bg2.jpg') no-repeat fixed center;" -->
+  <%= form_tag pay_checkouts_path(@restaurant.path) do %>
+    <div class="row justify-content-center pt-3">
+      <div class="col-sm-12 col-md-6 m-2 text-center">         
+        <%
+        service_types = []
+        service_types << ['Collection', 'collection'] if is_takeaway?(@restaurant) 
+        service_types << ['Delivery', 'delivery'] if is_delivery?(@restaurant)
+        service_types << ['Table Service', 'tableservice'] if is_tableservice?(@restaurant) and @restaurant.is_open
+        %>
+
+        <div class="row bg-dark" id='help-info'>
+          <div class='col-sm-12 col-md-12 text-center text-light pb-2'>
+            Please choose Service type
+          </div>
+        </div>
+
+        <div class="row bg-dark">
+          <div class='col-sm-12 col-md-12 text-center text-light pb-2'>
+            <%= select_tag :service_type, options_for_select(service_types), {prompt: 'Choose Service', class: ' form-control'}%>
+          </div>
+        </div>
+        <% if @restaurant.opening_time_kitchen_delay_minutes > 0 %>
+        <div class="row bg-dark  border border-danger " id='kitchen-delay'>
+          <div class='col-sm-12 col-md-12 text-center text-danger pb-2'>
+            Please Note: The kitchen is busy and there could be up to <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes delay
+          </div>
+        </div>
+        <% end %>
+        <div class="row bg-dark" id='time-field'>
+          <div class='col-sm-12 col-md-12 text-left text-light mb-3'>
+            <%= label_tag :time %> <strong id='time_required' class='text-danger'>*</strong>
+            <%= select_tag :collection_time, options_for_select(@delivery_time_options.map{|s| [s[:text], s[:value]]}), { prompt: 'Select time', class: "border p-2 bg-light form-control validation_check"} %>
+          </div>
+        </div>
+        <div class="row bg-dark">
+          <div class=' col-sm-12 col-md-6 text-left text-light form-group' id='table-number-field'>
+            <%= label_tag :table_number %> <strong id='table_number_required' class= 'text-danger'>*</strong>
+            <%= text_field_tag :table_number,  nil, class: "border p-2 bg-light form-control validation_check" %>
+          </div>
+          <div id='name-field' class='col-sm-12 col-md-6 text-left text-light form-group'>
+            <%= label_tag :name %> <strong id='name_required' class='text-danger'>*</strong>
+            <%= text_field_tag :name,  nil, class: "border p-2 bg-light form-control validation_check" %>
+          </div>
+          <div id='telephone-field' class='col-sm-12 col-md-6 text-left text-light form-group'>
+            <%= label_tag :telephone %> <strong id='telephone_required' class='text-danger'>*</strong>
+            <%= text_field_tag :telephone,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: '' %>
+          </div>
+        </div>
+        <div class="row bg-dark" id='email-field'>
+          <div class='col-sm-12 col-md-12 text-left text-light form-group'>
+            <%= label_tag :email %> <strong id='email_required' class='text-danger'>*</strong>
+            <%= email_field_tag :email,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: 'for your email receipt' %>
+          </div>
+        </div>
+        <% if is_delivery?(@restaurant)%>
+          <%# Address %>
+          <div class="row bg-dark text-light" id='address-field' >
+            <div class='col-sm-12 text-left'>
+              <%= label_tag :address %> <strong id='address_required' class='text-danger'>*</strong>
+              <div class="row bg-dark">
+                <div class='col-sm-12 '>
+                  <%# Left %>
+                  <label>House number <strong id='house_number_required' class='text-danger'>* </strong> and street <strong id='street_required' class='text-danger'>*</strong></label> 
+                  <div class="row bg-dark">
+                    <div class='col-4 form-group pr-1'>
+                      <%= text_field_tag :house_number,  nil, class: "border  bg-light form-control validation_check", placeholder: 'No.' %>    
+                    </div>
+                    <div class='col-8 form-group pl-1 '>
+                      <%= text_field_tag :street,  nil, class: "border bg-light form-control validation_check", placeholder: 'Street' %>
+                    </div>
+                  </div>
+                </div>
+                <div class='col-sm-12 '>
+                  <%# Right %>
+                  <%= label_tag :postcode %> <strong id='postcode_required' class='text-danger'>* </strong>
+                  <div class="row bg-dark">
+                    <div class='col form-group pr-1'>
+                      <%= select_tag :postcode_prefix, options_for_select(@restaurant.delivery_postcodes.map{|a| [a.prefix, a.delivery_fee]}), {prompt: "Postcode start", class: "border p-2 bg-light form-control delivery_fee_calculate validation_check"} %>  
+                      <%= hidden_field_tag :postcode %>
+                    </div>
+                    <div class='col form-group pl-1'>
+                      <%= text_field_tag :postcode_suffix,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: 'Post Code end' %>  
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %> 
+        <div class="row bg-dark mt-4 mb-4">
+          <div class='col text-center text-light'>
+
+
+            <div class="row" id='payment-info'>
+              <div class='col'>
+                Payment:
+              </div>
+              <div class='col'>
+                <%= number_to_currency(@basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
+                <%= hidden_field_tag :basket, @basket_item_total.to_f %>
+              </div>
+            </div>
+
+            <% if is_delivery?(@restaurant)%>
+            <div class="row " id='delivery-fee'>
+              <div class='col'>
+                Delivery:
+              </div>
+              <div class='col'>
+                <span class='delivery_fee_choose'>Select Address</span> 
+                <%= hidden_field_tag :delivery_fee%>    
+              </div>
+            </div>
+            <% end %>
+            
+            <div class="row" id='basket-total'>
+              <div class='col'>
+                Total:
+              </div>
+              <div class='col ' id='basket-total-value'>
+                <%= number_to_currency(@basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
+              </div>
+              <%= hidden_field_tag :total, @basket_item_total.to_f %>    
+            </div>
+
+
+      
+          
+          
+          
+          
+          </div>
+        </div>
+        <div class="row bg-dark mt-4 mb-4 " id='pay-now-button'>
+          <div class='col'>
+            <%= submit_tag "Pay Now", class: 'btn btn-primary btn-block' %>
+          </div>
+        </div>
+        <div class="row bg-dark" id='delivery-info'>
+          <div class='col text-secondary'>
+            <% if is_delivery?(@restaurant)%>
+              We currently deliver to these postcodes. Delivery fees indicated: <br>
+              <% postcodes = @restaurant.delivery_postcodes.order(:prefix)%>
+              <% delivery_fees = @restaurant.delivery_postcodes.map{|d| d.delivery_fee}.uniq.sort%>
+              <% delivery_fees.each do |delivery_fee| %>
+                <strong class=''><%=number_to_currency delivery_fee, unit: @restaurant.currency_symbol%></strong> - 
+                <%= postcodes.select{|d| d.delivery_fee == delivery_fee}.map{|s| s.prefix}.join(', ')%>
+                <br>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+
+
+
+
+

@@ -2,6 +2,7 @@
   redirect_after_signup_to ||= params[:redirect_after_signup_to]
   redirect_after_signup_to ||= request.original_fullpath
   password_field_enabled ||= false
+  show_hero ||= false
 %>
 <% content_for :hero do %>
 <div class="jumbotron jumbotron-fluid hero-main-user-background mb-0">
@@ -14,7 +15,7 @@
 		</div>
 	</div>
 </div>
-<% end %>
+<% end if show_hero %>
 <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
   <%= f.hidden_field :redirect_after_signup_to, :value => redirect_after_signup_to %>
   <div class="field">
