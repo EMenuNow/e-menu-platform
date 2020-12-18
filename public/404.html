@@ -106,12 +106,13 @@
    frmArr = document.referrer.split("/");
    host = frmArr[2];
    homeHost = "eat.emenunow.com";
+   stagingHost = "staging.emenunow.com";
    homePage = "http://eat.emenunow.com/";
 
    function goBack() {
     !frmArr
      ? (window.location.href = homePage)
-     : host != homeHost
+     : host != homeHost && host != stagingHost
      ? (window.location.href = homePage)
      : window.history.back();
    }
