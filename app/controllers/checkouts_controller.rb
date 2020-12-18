@@ -43,7 +43,7 @@ class CheckoutsController < ApplicationController
 
     respond_to do |format|
       if error
-        format.html { redirect_to checkout_path(@path), alert: "Payment Error: #{e.message}" } 
+        format.html { redirect_to checkouts_path(@path), alert: "Payment Error: #{e.message}" } 
         format.json { render json: {ok: true, error: true, path: receipt_path(@path, @receipt.uuid)} }
       else
         format.html { redirect_to receipt_path(@path, @receipt.uuid), notice: "Payment Successful" }
