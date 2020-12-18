@@ -183,7 +183,7 @@ get 'receipt/:receipt_id/key/:item_screen_type_key/print/:printer_id', to: 'mana
   # get 'order/add_to_basket/:path/:main_item', to: 'order#add_to_basket', as: :add_to_basket
   # get 'order/add_to_basket/:path/:main_item/:items', to: 'order#add_to_basket', as: :add_to_basket_items
   # get 'order/add_to_basket/:path/:main_item/:items/note/:note', to: 'order#add_to_basket', as: :add_to_basket_items_notes
-  # get 'order/:path/menu/:menu_id/section/:section_id', to: 'order#index', as: :order_menu_section
+  get 'baskets/:path/menu/:menu_id/section/:section_id', to: 'baskets#index', as: :order_menu_section
   # get 'order/:path/menu/:menu_id', to: 'order#index', as: :order_menu
   get 'order/:path', to: 'order#index'
 

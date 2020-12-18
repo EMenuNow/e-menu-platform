@@ -53,7 +53,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
         <% menu_nav.each do |menu| %>
         <div class="col p-0 m-1 ml-5 mr-5">
           <% button_css = menu[:menu_id] == menu_id ? 'btn-outline-dark' : 'btn-dark'%>
-          <%= link_to menu[:name], order_menu_path(@restaurant.path, menu[:menu_id]), class: "btn #{button_css} btn-block" %>
+          <%#= link_to menu[:name], order_menu_path(@restaurant.path, menu[:menu_id]), class: "btn #{button_css} btn-block" %>
         </div>
         <% end %>
       </div>
