@@ -55,13 +55,13 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
   <div class='row'>
     <div class='col-sm-12 col-md-12 col-lg-12 col-xl-8 pb-4'>
       <% menu.select{|w| w[:id] == menu_id }.each do |m| %>
-      <% if  m[:node_type] == 'menu' %>
+      <% if m[:node_type] == 'menu' %>
       <div class="row">
         <div class="col">
           <div class="container-fluid">
             <% nav_items = m[:children].map{|a| {name: a[:name], id: a[:id]}} %>
             <% 
-              current_section = params[:section_id] || nav_items.first[:id]
+              current_section = (params[:section_id] || nav_items.first[:id]).to_i
             %>
             <div class='row bg-dark'>
               <div class='col  bg-dark '>
@@ -69,23 +69,13 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
                   <nav id="pnProductNav" class="pn-ProductNav dragscroll" data-overflowing="both">
                     <div id="pnProductNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition" style="transform: none;">
                       <% nav_items.each do |nav|%>
-                      <% selected = current_section.to_i == nav[:id] ? true : false %>
+                      <% selected = current_section == nav[:id] ? true : false %>
                       <%= link_to nav[:name], restaurant_path(@restaurant.path, menu_id: m[:id], section_id: nav[:id]), class: 'pn-ProductNav_Link', 'aria-selected'=>"#{selected}" %>
                       <% end %>
 
                       <!--<span id="pnIndicator" class="pn-ProductNav_Indicator" style="transform: translateX(1680.5px) scaleX(1.1829687500000001); background-color: rgb(236, 187, 12);"></span>-->
                     </div>
                   </nav>
-                  <button id="pnAdvancerLeft" class="pn-Advancer pn-Advancer_Left" type="button">
-                    <svg class="pn-Advancer_Icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 551 1024">
-                      <path d="M445.44 38.183L-2.53 512l447.97 473.817 85.857-81.173-409.6-433.23v81.172l409.6-433.23L445.44 38.18z"></path>
-                    </svg>
-                  </button>
-                  <button id="pnAdvancerRight" class="pn-Advancer pn-Advancer_Right" type="button">
-                    <svg class="pn-Advancer_Icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 551 1024">
-                      <path d="M105.56 985.817L553.53 512 105.56 38.183l-85.857 81.173 409.6 433.23v-81.172l-409.6 433.23 85.856 81.174z"></path>
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>

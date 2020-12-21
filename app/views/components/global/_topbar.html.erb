@@ -11,7 +11,7 @@
 
     </button>
     <% if @restaurant && @restaurant.image.attached? %>
-      <%= image_tag @restaurant.image.variant(resize: "48x48"), class: "img-fluid"  %>
+      <%= link_to (image_tag @restaurant.image.variant(resize: "48x48"), class: "img-fluid"), restaurant_path(@restaurant.path) %>
     <% else %>
       <%= link_to root_path, :class=>"navbar-brand" do %>
         <%= image_tag("logo/Logo__icon_v1.0.0-dark-bkg.svg", height: '20', width: 'auto') %>
