@@ -20,9 +20,9 @@ class CheckoutService < ApplicationController
       currency: @restaurant.currency_code,
       payment_method_types: ['card'],
       description: "#{@path} charge",
-      application_fee_amount: (@payment_in_pence * 0.015).to_i,
+      application_fee_amount: ((@payment_in_pence * 0.015)*1.2).to_i,
       transfer_data: {
-        destination: "acct_1HFMjjEdU8EUcuyG"
+        destination: @restaurant.stripe_connected_account_id
       },  
     })
   end

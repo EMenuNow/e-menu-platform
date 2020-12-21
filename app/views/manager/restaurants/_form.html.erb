@@ -1,19 +1,18 @@
-
 <%= form_with(model: [:manager, restaurant], local: true) do |form| %>
-  <% if restaurant.errors.any? %>
-    <div id="error_explanation" class="alert alert-danger">
-      <h2><%= pluralize(restaurant.errors.count, "error") %> prohibited this restaurant from being saved:</h2>
+<% if restaurant.errors.any? %>
+<div id="error_explanation" class="alert alert-danger">
+  <h2><%= pluralize(restaurant.errors.count, "error") %> prohibited this restaurant from being saved:</h2>
 
-      <ul>
-      <% restaurant.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <ul>
+    <% restaurant.errors.full_messages.each do |message| %>
+    <li><%= message %></li>
+    <% end %>
+  </ul>
+</div>
+<% end %>
 
-  <%= form.hidden_field :restaurant_user_id %>
-        
+<%= form.hidden_field :restaurant_user_id %>
+
 
 
 <!-- Tabs -->
@@ -38,16 +37,16 @@
 
 <div class="tab-content" id="myTabContent">
   <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-  <!-- Home -->
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :name %>
-        <%= form.text_field :name, class: 'form-control  form-control-sm' %>
+    <!-- Home -->
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :name %>
+          <%= form.text_field :name, class: 'form-control  form-control-sm' %>
+        </div>
       </div>
     </div>
-  </div>
- <div class="row">
+    <div class="row">
       <div class="col">
         <div class="form-group ">
           <%= form.label :image %>
@@ -56,156 +55,164 @@
       </div>
       <div class="col">
         <div class="form-group ">
-           <% if restaurant.image.attached? %>
-              <%= image_tag restaurant.image.variant(resize: "200x200"), class: "img-fluid"  %>
-            <% end %>
+          <% if restaurant.image.attached? %>
+          <%= image_tag restaurant.image.variant(resize: "200x200"), class: "img-fluid"  %>
+          <% end %>
         </div>
       </div>
     </div>
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :address %>
-        <%= form.text_field :address, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :postcode %>
-        <%= form.text_field :postcode, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
+    <div class="row">
+      <div class="col">
         <div class="form-group ">
-    <%= form.label :telephone %>
-    <%= form.text_field :telephone, class: 'form-control  form-control-sm' %>
-  </div>
-    </div>
-    <div class="col">
-      <div class="form-group ">
-    <%= form.label :email %>
-    <%= form.text_field :email, class: 'form-control  form-control-sm' %>
-  </div>
-    </div>
-  </div>
-
-
-
-
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :cuisine_id %>
-        <%= form.select :cuisine_id,  options_for_select(@cuisines.map{|a| [a.name, a.id]}, restaurant.cuisine_id ), {prompt: "Choose cuisine"}, {class: 'form-control  form-control-sm'} %>
+          <%= form.label :address %>
+          <%= form.text_field :address, class: 'form-control  form-control-sm' %>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :postcode %>
+          <%= form.text_field :postcode, class: 'form-control  form-control-sm' %>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :path %>
-        <%= form.text_field :path, class: 'form-control  form-control-sm' %>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :telephone %>
+          <%= form.text_field :telephone, class: 'form-control  form-control-sm' %>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :email %>
+          <%= form.text_field :email, class: 'form-control  form-control-sm' %>
+        </div>
       </div>
     </div>
-  </div>
-  
 
-  <!-- Home -->
+
+
+
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :cuisine_id %>
+          <%= form.select :cuisine_id,  options_for_select(@cuisines.map{|a| [a.name, a.id]}, restaurant.cuisine_id ), {prompt: "Choose cuisine"}, {class: 'form-control  form-control-sm'} %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :path %>
+          <%= form.text_field :path, class: 'form-control  form-control-sm' %>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Home -->
   </div>
   <div class="tab-pane fade" id="finance" role="tabpanel" aria-labelledby="finance-tab">
-  <!-- Finance -->
+    <!-- Finance -->
 
-  <div class="row">
-    <div class="col">
-      <h3>Stripe</h3>
+    <div class="row">
+      <div class="col">
+        <h3>Stripe</h3>
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col">
+    <div class="row">
+      <div class="col">
         <div class="form-group ">
           <%= form.label :currency_id %>
           <%= form.select :currency_id, options_for_select(Currency.all.map{|s| [s.name, s.id]}, restaurant.currency_id), {prompt: "Choose Currency"}, {class: 'form-control  form-control-sm'} %>
         </div>
       </div>
-  </div>
+    </div>
 
-  <div class="row">
-    <div class="col">
+    <div class="row">
+      <div class="col">
         <div class="form-group ">
           <%= form.label :stripe_api_key %>
           <%= form.text_field :stripe_api_key, class: 'form-control  form-control-sm', rows: 10  %>
         </div>
       </div>
-  </div>
+    </div>
 
-  <div class="row">
-    <div class="col">
+    <div class="row">
+      <div class="col">
         <div class="form-group ">
           <%= form.label :stripe_publish_api_key %>
           <%= form.text_field :stripe_publish_api_key, class: 'form-control  form-control-sm', rows: 10  %>
         </div>
       </div>
+    </div>
 
-  </div>
-
-  <!-- Finance -->
-  </div>
-  <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-  <!-- Settings -->
-
-
- <div class="row">
-    <div class="col">
-      <div class="form-group ">
-      <label for="restaurant_show_on_homepage">Show on eat.emenunow.com homepage</label>
-
-        <%= form.check_box :show_on_homepage, class: 'form-control  form-control-sm' %>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label "Stripe Connected Account ID" %>
+          <%= form.text_field :stripe_connected_account_id, class: 'form-control  form-control-sm', rows: 10  %>
+        </div>
       </div>
     </div>
+
+    <!-- Finance -->
+  </div>
+  <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+    <!-- Settings -->
+
+
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <label for="restaurant_show_on_homepage">Show on eat.emenunow.com homepage</label>
+
+          <%= form.check_box :show_on_homepage, class: 'form-control  form-control-sm' %>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Settings -->
   </div>
 
-
-  <!-- Settings -->
-  </div>
-
-<div class="tab-pane fade" id="tracking" role="tabpanel" aria-labelledby="tracking-tab">
-  <!-- tracking -->
+  <div class="tab-pane fade" id="tracking" role="tabpanel" aria-labelledby="tracking-tab">
+    <!-- tracking -->
 
 
-  <div class="row mt-2">
-    <div class="col">
+    <div class="row mt-2">
+      <div class="col">
         <div class="form-group ">
           <%= form.label :facebook_pixel %>
           <%= form.text_field :facebook_pixel, class: 'form-control  form-control-sm' %>
         </div>
       </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :facebook %>
-        <%= form.text_field :facebook, class: 'form-control  form-control-sm' %>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :facebook %>
+          <%= form.text_field :facebook, class: 'form-control  form-control-sm' %>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :twitter %>
+          <%= form.text_field :twitter, class: 'form-control  form-control-sm' %>
+        </div>
       </div>
     </div>
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :twitter %>
-        <%= form.text_field :twitter, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-  </div>
-  <!-- tracking -->
+    <!-- tracking -->
   </div>
 
 
   <div class="tab-pane fade" id="styling" role="tabpanel" aria-labelledby="styling-tab">
-  <!-- Styling -->
+    <!-- Styling -->
 
 
-  <div class="row mt-5 border-bottom border-gray">
+    <div class="row mt-5 border-bottom border-gray">
       <div class="col">
         <div class="form-group ">
           <%= form.label :background_image %>
@@ -214,15 +221,15 @@
       </div>
       <div class="col">
         <div class="form-group ">
-           <% if restaurant.background_image.attached? %>
-              <%= image_tag restaurant.background_image.variant(resize: "200x200"), class: "img-fluid"  %>
-            <% end %>
+          <% if restaurant.background_image.attached? %>
+          <%= image_tag restaurant.background_image.variant(resize: "200x200"), class: "img-fluid"  %>
+          <% end %>
         </div>
       </div>
     </div>
 
 
-<% 
+    <% 
 subtle_background_list = [
 {file: 'None', name: 'None'},
 {file: 'wall4_@2X', name: 'Wall'},
@@ -243,12 +250,12 @@ subtle_background_list = [
 
 
 
-  <div class="row mt-3 border-bottom border-gray">
-    <div class="col">
-      <div class="row">
+    <div class="row mt-3 border-bottom border-gray">
+      <div class="col">
+        <div class="row">
           <div class="col">
             <div class="form-group ">
-              <%= form.label :subtle_pattern_background %> <small class='text-gray text-warning'><i> WARNING: Choosing a subtle pattern  background will override the uploaded image</i></small>
+              <%= form.label :subtle_pattern_background %> <small class='text-gray text-warning'><i> WARNING: Choosing a subtle pattern background will override the uploaded image</i></small>
               <%= form.select :subtle_background,  options_for_select(subtle_background_list.map{|s| [s[:name], s[:file]]}, restaurant.subtle_background ), {prompt: "Choose Subtle Background"}, {class: 'form-control  form-control-sm'} %>
             </div>
           </div>
@@ -256,8 +263,8 @@ subtle_background_list = [
         <div class="row">
           <div class="col">
             <div class="form-group ">
-            <div class="card-group">
-              <%subtle_background_list.reject{|a| a[:name]=="None"}.each do |subtle| %>
+              <div class="card-group">
+                <%subtle_background_list.reject{|a| a[:name]=="None"}.each do |subtle| %>
 
                 <div class="card" style="width: 12rem;">
                   <%= image_tag "/background/#{subtle[:file]}.png", class: "img-fluid" %>
@@ -267,67 +274,67 @@ subtle_background_list = [
                 </div>
 
 
-                   
+
                 <% end %>
-                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-  </div>
+    </div>
 
 
 
-  <div class="row mt-3">
-    <div class="col">
+    <div class="row mt-3">
+      <div class="col">
         <div class="form-group ">
           <%= form.label :css_font_url %>
           <%= form.text_field :css_font_url, class: 'form-control  form-control-sm' %>
         </div>
       </div>
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :css_font_class %>
-        <%= form.text_field :css_font_class, class: 'form-control  form-control-sm' %>
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :css_font_class %>
+          <%= form.text_field :css_font_class, class: 'form-control  form-control-sm' %>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col">
-      <h3>Custom CSS</h3>
+    <div class="row">
+      <div class="col">
+        <h3>Custom CSS</h3>
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col">
+    <div class="row">
+      <div class="col">
         <div class="form-group ">
           <%= form.label :custom_css %>
           <%= form.text_area :custom_css, class: 'form-control  form-control-sm', rows: 10 %>
         </div>
       </div>
 
-  </div>
-
-
-  <div class="row">
-    <div class="col">
-      <h3>Custom Styles</h3>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col">
+
+    <div class="row">
+      <div class="col">
+        <h3>Custom Styles</h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
         <div class="form-group ">
           <%= form.label :custom_styles %>
           <%= form.text_area :custom_styles, class: 'form-control  form-control-sm', rows: 10  %>
         </div>
       </div>
 
-  </div>
+    </div>
 
 
-  <!-- /Styling -->
+    <!-- /Styling -->
   </div>
 </div>
 
@@ -348,12 +355,13 @@ subtle_background_list = [
 
 
 
-  <div class="row">
-    <div class="col">
+<div class="row">
+  <div class="col">
 
 
-  <div class="actions">
-    <%= form.submit nil, class: "btn btn-primary" %>
+    <div class="actions">
+      <%= form.submit nil, class: "btn btn-primary" %>
+    </div>
   </div>
-</div></div>
+</div>
 <% end %>

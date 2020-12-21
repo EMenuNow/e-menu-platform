@@ -137,7 +137,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <%= link_to basket_path(@path, main_item, menu_id: params[:menu_id], section_id: params[:section_id]), class: "btn btn-primary #{required_lists.present? ? 'disabled' : ''}", id: "add-to-basket-#{main_item}", method: :PATCH do %>
+            <%= link_to basket_path(@path, main_item: main_item, menu_id: params[:menu_id], section_id: params[:section_id], add_to_basket: true), class: "btn btn-primary #{required_lists.present? ? 'disabled' : ''}", id: "add-to-basket-#{main_item}", method: :PATCH do %>
                 Add to Order - <span class='button-price-<%=main_item%>'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></span>
             <% end %>
             

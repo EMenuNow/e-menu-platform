@@ -73,11 +73,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
           <div class="container-fluid">
             <% nav_items = m[:children].map{|a| {name: a[:name], id: a[:id]}} %>
             <% 
-              if params[:section_id].present?
-                current_section = params[:section_id].to_i
-              else            
-                current_section = nav_items.first[:id] 
-              end
+              current_section = params[:section_id] || nav_items.first[:id]
             %>
             <div class='row bg-dark'>
               <div class='col  bg-dark '>
@@ -85,8 +81,8 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
                   <nav id="pnProductNav" class="pn-ProductNav dragscroll" data-overflowing="both">
                     <div id="pnProductNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition" style="transform: none;">
                       <% nav_items.each do |nav|%>
-                      <% selected = current_section == nav[:id] ? true : false %>
-                      <%= link_to nav[:name], order_menu_section_path(@restaurant.path, m[:id], nav[:id]), class: 'pn-ProductNav_Link', 'aria-selected'=>"#{selected}" %>
+                      <% selected = current_section.to_i == nav[:id] ? true : false %>
+                      <%= link_to nav[:name], restaurant_path(@restaurant.path, menu_id: m[:id], section_id: nav[:id]), class: 'pn-ProductNav_Link', 'aria-selected'=>"#{selected}" %>
                       <% end %>
 
                       <!--<span id="pnIndicator" class="pn-ProductNav_Indicator" style="transform: translateX(1680.5px) scaleX(1.1829687500000001); background-color: rgb(236, 187, 12);"></span>-->

@@ -47,10 +47,10 @@
     <% end %>
     <hr />
     <div class="row pt-1">
-      <div class="col offset-sm-1">
+      <div class="col-sm-8 offset-sm-1">
         Total <%= "(#{@basket_service.discount_code.description})" if @basket_service.discount_code.present? %>
       </div>
-      <div class="col">
+      <div class="col-sm-2">
         <%= number_to_currency(@basket_service.get_basket_item_total, unit: @restaurant.currency_symbol) %>
       </div>
     </div>
