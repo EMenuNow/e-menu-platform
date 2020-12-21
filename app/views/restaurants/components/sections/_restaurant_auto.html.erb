@@ -3,37 +3,25 @@ style = "background: url('#{url_for(@restaurant.background_image)}') no-repeat f
 style = "background: url('#{@restaurant.background}') ;" if @restaurant.background.present?
 %>
 
-
-
-
 <div class="container-fluid background-color" style="<%= style %>">
   <div class="row">
-    <div class="col text-left mt-1 mb-3">
-      <% if @restaurant.image.attached? %>
-      <%= image_tag @restaurant.image.variant(resize: "200x200"), class: "img-fluid"  %>
-      <% end %>
-    </div>
     <div class="col text-right text-dark">
       <div class='row'>
         <div class='col pt-3'>
           <h3>
             <% if is_takeaway_or_delivery?(@restaurant)%>
-
-
             <% 
-                      disable_basket_link = true 
-                      if @basket_item_count.present? and @basket_item_count > 0
-                        disable_basket_link = false 
-                      end
-                    %>
+              disable_basket_link = true 
+              if @basket_item_count.present? and @basket_item_count > 0
+                disable_basket_link = false 
+              end
+            %>
 
             <% unless disable_basket_link %>
             <%= link_to "#basket" do %>
             <i class="fas fa-shopping-basket"></i> <%= number_to_currency(@basket_item_total, unit: @restaurant.currency_symbol) %>
             <% end if @basket %>
             <% end %>
-
-
             <% end %>
           </h3>
         </div>
@@ -99,7 +87,6 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
                     </svg>
                   </button>
                 </div>
-
               </div>
             </div>
             <div class='row'>
@@ -126,7 +113,6 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
       <% end %>
       <% end %>
     </div>
-
     <div class='col-sm-12 col-md-12 col-lg-12 col-xl-4 border'>
       <div class='col-sm-auto'>
         <%= render 'restaurants/components/basket' if is_takeaway_or_delivery?(@restaurant)%>
