@@ -2,11 +2,33 @@
   <%= javascript_include_tag 'cable_drinks'%>
 <% end %>
 
+<% content_for :js do%>
+  <script>
+    var order_bell;
+    
+    $(function() {
+      $("#accept-button").on('click', function() {
+        $('body').removeClass('bg-danger');
+        $("#accept-button").hide();
+      });
+    });
+    
+    window.addEventListener("click", function() {
+      order_bell = new Audio("<%= asset_path("order-bell.wav") %>");
+      order_bell.play().then(() => { order_bell.pause()} )
+    });
+  </script>
+<% end %>
 
 <%= hidden_field_tag :restaurant_id, @restaurant.id%>
 <%= render 'manager/live/kitchen_delay' %>
 
+<div class='row mt-2'>
+    <div class='col'>
+      <%= link_to 'Accept', '#', class: 'btn btn-block btn-warning', id: 'accept-button', style: 'display:none;'%> 
+    </div>
+</div>
+
 <div class="container-fluid mt-2 mb-2" id='current-orders'>
   <%= render 'manager/live/order_items_screen_specific', printers: @printers, item_screen_type_key: 'DRINK', grouped: @item_screen.grouped %>
 </div>
-

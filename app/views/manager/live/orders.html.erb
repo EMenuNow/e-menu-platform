@@ -6,12 +6,14 @@
 <% content_for :js do%>
   <script>
     var order_bell;
-    $(function(){
-        $("#accept-button").click(function(){
-          $('body').removeClass('bg-danger');
-          $("#accept-button").hide();
-        });
+    
+    $(function() {
+      $("#accept-button").on('click', function() {
+        $('body').removeClass('bg-danger');
+        $("#accept-button").hide();
+      });
     });
+    
     window.addEventListener("click", function() {
       order_bell = new Audio("<%= asset_path("order-bell.wav") %>");
       order_bell.play().then(() => { order_bell.pause()} )
@@ -29,8 +31,6 @@
     </div>
 </div>
 
-
 <div class="container-fluid mt-2 mb-2" id='current-orders'>
   <%= render 'manager/live/order_items', printers: @printers %>
 </div>
-

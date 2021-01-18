@@ -34,8 +34,8 @@ class ReceiptsController < ApplicationController
     @receipt.is_ready = !@receipt.is_ready?
     @receipt.save
     @restaurant = @receipt.restaurant
-    @receipt.broadcast
-    redirect_to manager_live_orders_path(@restaurant.id)
+    # @receipt.broadcast
+    # redirect_to manager_live_orders_path(@restaurant.id)
   end
 
 
@@ -49,8 +49,8 @@ class ReceiptsController < ApplicationController
     path = manager_live_food_path(@restaurant) if @screen_item.item_screen_type_key == "FOOD"
     path = manager_live_drinks_path(@restaurant) if @screen_item.item_screen_type_key == "DRINK"
   
-    @receipt.broadcast_items
-    redirect_to path
+    # @receipt.broadcast_items
+    # redirect_to path
   end
 
   def is_items_ready
@@ -61,8 +61,8 @@ class ReceiptsController < ApplicationController
     path = manager_live_food_path(@restaurant) if params[:item_screen_type_key] == "FOOD"
     path = manager_live_drinks_path(@restaurant) if params[:item_screen_type_key] == "DRINK"
   
-    @receipt.broadcast_items
-    redirect_to path
+    # @receipt.broadcast_items
+    # redirect_to path
   end
 
 
