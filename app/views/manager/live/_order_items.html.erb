@@ -1,71 +1,68 @@
+<% content_for :js do %>
+  <script>
+    $(function() {
+      $(".receipt-ready").on('confirm:complete', function(e) {
+        if (e.originalEvent.detail[0]) {
+          var receiptId = this.id.match(/\d+/);
+          $(`#receipt-${receiptId}-card`).hide();
+        };
+      });
+    });
+  </script>
+<% end %> 
 
-
-
-  <% @restaurant = Restaurant.find(restaurant) if @restaurant.blank?  %>
-  <div class="row text-right">
-
-    <div class='col'>
+<% @restaurant = Restaurant.find(restaurant) if @restaurant.blank? %>
+<div class="row text-right">
+  <div id="refreshed-time" class='col'>
     refreshed at: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
-    </div>
   </div>
+</div>
 
-  <div class="row m-2">
-        <% @restaurant.receipts.where(is_ready: false, source: :takeaway).each do |receipt| %>
-
-           
-              <div class=" col-sm-6">
-              <div class="card">
-                <div class="card-body">
-
-                  <div class="row m-2">
-
-                    <div class=" col">
-                    
-                      <% if receipt.delivery_or_collection != 'tableservice' %><h5 class="card-title">Name: <%=receipt.name%></h5><% end %>
-                      <% if receipt.delivery_or_collection != 'tableservice' %><h6 class="card-title">Time: <%=receipt.collection_time%></h6><% end %>
-                      <h6 class="card-title">Type: <%=receipt.delivery_or_collection%></h6>
-                      <% if receipt.delivery_or_collection == 'tableservice' %><h6 class="card-title">Table Number: <%=receipt.table_number%></h6><% end %>
-                      <% if receipt.telephone.present? %>  <h6 class="card-title">Telephone: <%=receipt.telephone%></h6><% end %>
-                      <% if receipt.delivery_or_collection == 'delivery' %> <h6 class="card-title">Address: <%=receipt.address%></h6><% end %>
-                    </div>
-                    <div class=" col-sm-5 text-right">
-                      <strong>Received: <%=receipt.created_at.in_time_zone(@restaurant.time_zone).strftime('%H:%M') %> </strong>
-                    </div>
-
-
+<div id="receipt-group" class="row m-2">
+  <% @restaurant.receipts.where(is_ready: false, source: :takeaway).each do |receipt| %>
+    <div id="receipt-<%= receipt.id %>-card" class="col-sm-6 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row m-2">
+            <div class=" col">
+              <% if receipt.delivery_or_collection != 'tableservice' %><h5 class="card-title">Name: <%=receipt.name%></h5><% end %>
+              <% if receipt.delivery_or_collection != 'tableservice' %><h6 class="card-title">Time: <%=receipt.collection_time%></h6><% end %>
+              <h6 class="card-title">Type: <%=receipt.delivery_or_collection%></h6>
+              <% if receipt.delivery_or_collection == 'tableservice' %><h6 class="card-title">Table Number: <%=receipt.table_number%></h6><% end %>
+              <% if receipt.telephone.present? %>  <h6 class="card-title">Telephone: <%=receipt.telephone%></h6><% end %>
+              <% if receipt.delivery_or_collection == 'delivery' %> <h6 class="card-title">Address: <%=receipt.address%></h6><% end %>
+            </div>
+            <div class=" col-sm-5 text-right">
+              <strong>Received: <%=receipt.created_at.in_time_zone(@restaurant.time_zone).strftime('%H:%M') %> </strong>
+            </div>
+          </div>
+          <p class="card-text">
+            <ul class="list-group">
+              <% receipt.items['items'].each do |item| %>
+                <li class="list-group-item">
+                  <div class="row">
+                    <div class="col"><%= item['item'].html_safe%></div>
                   </div>
-
-                  <p class="card-text">
-                    <ul class="list-group">
-                      <% receipt.items['items'].each do |item| %>
-                        <li class="list-group-item">
-                            <div class="row">
-                              <div class="col"><%= item['item'].html_safe%></div>
-                            </div>
-                            <div class="row">
-                              <div class="col"><small><%= item['optionals'].join('<br> ').html_safe%></small></div>
-                            </div>
-                            <% if item['note'].present? %>
-                            <div class="row">
-                              <div class="col"><strong>Note: </strong><%=item['note']%></div>
-                            </div>
-                            <% end %>
-                         </li>
-                      <% end %>
-                    </ul>
-                  </p>
-                  <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, class: 'btn btn-warning mt-3', data: { confirm: 'Are you sure?' } %>
-                  <%= link_to "creation_broadcast",receipt_creation_broadcast_path(receipt.id, only_path: true), method: :post, class: 'btn btn-danger mt-3' if Rails.env=='development' %>
-
-                  <% printers.each do |printer|%>
-                  <%# binding.pry %>
-                    <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info  mt-3' %>
+                  <div class="row">
+                    <div class="col"><small><%= item['optionals'].join('<br> ').html_safe%></small></div>
+                  </div>
+                  <% if item['note'].present? %>
+                    <div class="row">
+                      <div class="col"><strong>Note: </strong><%=item['note']%></div>
+                    </div>
                   <% end %>
-        
-                </div>
-              </div>
-              </div>
-            <% end %>
-
-
-  </div>
+                </li>
+              <% end %>
+            </ul>
+          </p>
+          <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning mt-3 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
+          <%= link_to "creation_broadcast",receipt_creation_broadcast_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-danger mt-3' if Rails.env=='development' %>
+          <% printers.each do |printer|%>
+            <%# binding.pry %>
+            <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info  mt-3' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

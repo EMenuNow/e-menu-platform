@@ -1,17 +1,27 @@
+<% content_for :js do %>
+  <script>
+    $(function() {
+      $(".delay-button").on("click", function() {
+        var delay = this.id.match(/\d+/);
+        $("#current-delay").text("Current Delay: " + delay + " minutes");
+      });
+    });
+  </script>
+<% end %> 
 
 <div class='row mt-2'>
-    <div class='col-sm-3 text-center'>
-      Current Delay: <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes 
-    </div>
-    <%
-      redirect_path = params[:action]
-    %>
+  <div id="current-delay" class='col-sm-3 text-center'>
+    Current Delay: <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes 
+  </div>
+  <%
+    redirect_path = params[:action]
+  %>
 
-    <div class='col text-center'>
-      <%= link_to 'Clear Delay', manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, class: 'btn btn-success btn-sm', id: 'accept-button'%> | 
-      <%= link_to 'Delay 15 Mins', manager_restaurant_set_delay_path(@restaurant, value: 15, redirect_path: redirect_path), method: :post, class: 'btn btn-warning btn-sm', id: 'accept-button'%> | 
-      <%= link_to 'Delay 30 Mins', manager_restaurant_set_delay_path(@restaurant, value: 30, redirect_path: redirect_path), method: :post, class: 'btn btn-warning btn-sm', id: 'accept-button'%> | 
-      <%= link_to 'Delay 45 Mins', manager_restaurant_set_delay_path(@restaurant, value: 45, redirect_path: redirect_path), method: :post, class: 'btn btn-warning btn-sm', id: 'accept-button'%> | 
-      <%= link_to 'Delay 60 Mins', manager_restaurant_set_delay_path(@restaurant, value: 60, redirect_path: redirect_path), method: :post, class: 'btn btn-warning btn-sm', id: 'accept-button'%> | 
-    </div>
+  <div class='col text-center'>
+    <%= link_to 'Clear Delay', manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-success btn-sm delay-button', id: 'delay-0-button'%> | 
+    <%= link_to 'Delay 15 Mins', manager_restaurant_set_delay_path(@restaurant, value: 15, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-15-button'%> | 
+    <%= link_to 'Delay 30 Mins', manager_restaurant_set_delay_path(@restaurant, value: 30, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-30-button'%> | 
+    <%= link_to 'Delay 45 Mins', manager_restaurant_set_delay_path(@restaurant, value: 45, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-45-button'%> | 
+    <%= link_to 'Delay 60 Mins', manager_restaurant_set_delay_path(@restaurant, value: 60, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-60-button'%> | 
+  </div>
 </div>

@@ -1,7 +1,7 @@
 <%
   pallergens = current_patron.patron_allergens
   marketing = current_patron.patron_marketing_preference
-  orders = current_patron.orders.limit(10)
+  orders = current_patron.orders.order("created_at DESC").take(10)
   addresses = current_patron.patron_addresses.limit(10)
 %>
 
@@ -28,20 +28,129 @@
             <h5><%= current_patron.full_name %></h5>
             <h5><%= current_patron.email.truncate(6) %></h5>
             <h5><%= current_patron.phone %></h5>
-            <h5>Active since: <%= current_patron.created_at.strftime("%d-%m-%y") %></h5>
+            <h5>Active since: <%= current_patron.created_at.strftime("%d %B %Y") %></h5>
             <h5><%= current_patron.orders.size %> previous orders</h5>
           </div>
         </div>
       </div>
-      <div class="row mt-1 ">
+      <div class="row mt-1">
         <div class="col-md-12 p-0 m-0">
           <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse4" role="button" aria-expanded="false" aria-controls="collapse4">
             <h5 class="m-0">Order history</h5>
           </a>
-          <div class="collapse p-5 bg-light" id="collapse4">
+          <div class="collapse p-4 bg-light" id="collapse4">
             <% if orders.present? %>
-              <% orders.each do |order| %>
-                <%= order.inspect %>
+              <% orders.each.with_index(1) do |order, i| %>
+
+                <% receipt =  order.receipts.first %>
+                <% items =  receipt.items['items'] %>
+
+                <div class="card mb-3">
+                  <div class="card-header">
+                    <h5 class="card-text float-left">Order #<%= order.id %></h5>
+                    <p class="card-text float-right"><%= order.created_at.in_time_zone(order.restaurant.time_zone).strftime("%d %B %Y") %></p>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col w-100">
+                        <h4 class="card-title float-left"><%= order.restaurant.name %></h4>
+                        <p class="card-text text-right"><%= pluralize( items.count, "Item" ) %></p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col w-100">
+                        <p class='card-text text-right'><%= number_to_currency(receipt.basket_total.to_f / 100.0, unit: order.restaurant.currency_symbol) %></p>
+                      </div>
+                    </div>
+                    <div class="row justify-content-right mt-3">
+                      <div class="col-auto ml-auto">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#receipt-<%= i %>">
+                          Details
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade w-auto h-auto" id="receipt-<%= i %>" tabindex="-1" aria-labelledby="receipt-<%= i %>-label" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="card-text float-left">Order #<%= order.id %></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row bg-light text-dark text-left pt-2">
+                          <div class="col mb-3">
+                            <h1><%=order.restaurant.name%></h1>
+                            <div><strong>Payment Date: </strong><%= receipt.created_at.in_time_zone(order.restaurant.time_zone).strftime("%d %B %Y - %H:%M") %></div>
+                            <div><strong>Receipt Number: </strong><%=receipt.uuid%></div>
+                            <% if receipt.delivery_or_collection != 'tableservice'  %><div><strong>Name: </strong><%=receipt.name%></div><% end %>
+                            <div><strong>Type: </strong><%=receipt.delivery_or_collection.camelcase%></div>
+                            <% if receipt.delivery_or_collection != 'tableservice'  %><div><strong>Time: </strong><%=receipt.collection_time%></div><% end %>
+                            <% if receipt.email.present? %><div><strong>Email: </strong><%=receipt.email%></div><% end %>
+                            <% if receipt.telephone.present? %><div><strong>Telephone: </strong><%=receipt.telephone%></div><% end %>
+                            <% if receipt.delivery_or_collection == 'delivery'  %><div><strong>Address: </strong><%=receipt.address%></div><% end %>
+                            <% if receipt.table_number.present? %><div><strong>Table Number: </strong><%=receipt.table_number%></div><% end %>
+                          </div>
+                        </div>
+
+
+                        <div class="row bg-light text-dark text-left">
+                          <div class="col">
+                            <table class='table'>
+                              <thead>
+                                <tr>
+                                  <th>Item</th>
+                                  <th>Extras</th>
+                                  <th>Total</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                
+                                <% items.each do |item|%>
+                                  <tr>
+                                    <td><%= item['item'].html_safe %> <% if item['note'].present?%> (Note: <%= item['note'].html_safe %>)<% end %></td>
+                                    <td><%= item['optionals'].join('<br> ').html_safe %></td>
+                                    <td class='text-right'><%= number_to_currency(item['total'], unit: order.restaurant.currency_symbol) %></td>
+                                  </tr>
+                                <% end %>
+                                <% if receipt.discount_code.present? %>
+                                  <tr>
+                                    <td><%= receipt.discount_code.description %></td>
+                                    <td></td>
+                                    <td class='text-right'>
+                                      -<%= number_to_currency(receipt.discount_code.calculate_discount_from_basket_total(receipt.basket_total), unit: order.restaurant.currency_symbol) %>
+                                    </td>
+                                  </tr>
+                                <% end %>
+                                <% if receipt.delivery_fee.present? %>
+                                  <tr>
+                                    <td>Delivery Fee</td>
+                                    <td></td>
+                                    <td class='text-right'><%= number_to_currency(receipt.delivery_fee.to_f, unit: order.restaurant.currency_symbol) %></td>
+                                  </tr>
+                                <% end %>
+                                <tr>
+                                  <td>Total</td>
+                                  <td></td>
+                                  <td class='text-right'><%= number_to_currency(receipt.basket_total.to_f / 100.0, unit: order.restaurant.currency_symbol) %></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               <% end %>
             <% else %>
               <h5>You have made no orders yet :)</h5>

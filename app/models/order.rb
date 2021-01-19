@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class Order < ApplicationRecord
-    has_and_belongs_to_many :patrons
+    has_many :patron_orders, class_name: 'Patron::PatronOrder'
+    has_many :patrons, through: :patron_orders
     belongs_to :restaurant
     has_many :receipts
 

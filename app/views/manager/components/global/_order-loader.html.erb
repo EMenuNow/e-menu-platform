@@ -1,0 +1,23 @@
+<% content_for :js do %>
+
+  <%= javascript_include_tag "live_order_loader"%>
+
+<% end %>
+<div id="live-order-overlay"></div>
+<div id="order-loader" class="card text-center">
+  <h5 class="card-header">
+    Live Orders
+  </h5>
+  <div class="card-body">
+    <div class="progress mb-3">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+    </div>
+    <div id="loader-status-loading">
+      <p class="card-title">Loading...</p>
+    </div>
+    <div id="loader-status-loaded">
+      <p class="card-title">Loaded!</p>
+      <button id="dismiss-loader" class="btn btn-warning">Proceed</button>
+    </div>
+  </div>
+</div>

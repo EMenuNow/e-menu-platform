@@ -6,7 +6,10 @@ class Patron < ApplicationRecord
 
   attr_accessor :redirect_after_signup_to
 
-  has_and_belongs_to_many :orders
+  has_many :patron_orders, class_name: 'Patron::PatronOrder'
+  has_many :patron_baskets, class_name: 'Patron::PatronBasket'
+  has_many :orders, through: :patron_orders
+  has_many :baskets, through: :patron_baskets
   has_many :patron_allergens
   has_many :patron_addresses
   has_one :patron_marketing_preference

@@ -25,6 +25,7 @@
 
   <body>
     <%= render 'manager/components/global/sidebar' %>
+    <%= render 'manager/components/global/order-loader' %>
     <%= render 'manager/components/global/topbar' %>
     <%= render 'components/global/messages' %>
     <%= render 'components/global/environment' %>
@@ -34,6 +35,7 @@
       <%= yield %>
 
     </div>
+    <div class="overlay"></div>
     <%= yield :js %>
     <%= yield :channels %>
   </body>

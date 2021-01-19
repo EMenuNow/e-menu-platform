@@ -172,7 +172,24 @@ ul ul a {
  }
 }
 
-.overlay {
+#order-loader {
+  background-color: white;
+  transition: all 0.3s;
+  position: fixed;
+  width: clamp(250px, 30vw, 450px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* top layer */
+  z-index: 9999;
+
+  &.hidden {
+    display: none;
+  }
+}
+ 
+.overlay,
+#live-order-overlay {
  display: none;
  position: fixed;
  top: 0px;
@@ -188,7 +205,8 @@ ul ul a {
  /* animate the transition */
 }
 /* display .overlay when it has the .active class */
-.overlay.active {
+.overlay.active,
+#live-order-overlay.active {
  display: block;
  opacity: 1;
  transition: opacity 0.75s;
