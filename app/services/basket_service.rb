@@ -1,11 +1,12 @@
 class BasketService < ApplicationController
   include TablesHelper
 
-  attr_accessor :discount_code, :service_types, :services_enabled, :service_selected, :basket
+  attr_accessor :discount_code, :service_types, :services_enabled, :service_selected, :basket, :patron
 
-  def initialize(restaurant, basket)
+  def initialize(restaurant, patron, basket)
 
     @restaurant = restaurant
+    @patron = patron
     
     @cookie = @basket = (basket || { key: "#{@restaurant.id}-#{SecureRandom.uuid}" }.to_json)
     @basket_item_total ||= 0
@@ -25,6 +26,7 @@ class BasketService < ApplicationController
       @basket_item_total = @basket['items'].map{|d| d['total']}.inject(:+)
       apply_discount_code(@basket_db.discount_code)
     end
+    @basket_db.patrons << @patron if @patron and !@basket_db.patrons.include?(@patron)
   end
   
   def apply_discount_code(code)

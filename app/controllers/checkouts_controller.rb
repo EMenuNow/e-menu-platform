@@ -71,7 +71,7 @@ class CheckoutsController < ApplicationController
 
   def get_basket
     cookies.delete :emenu_basket if cookies['emenu_basket'].present? && @restaurant.id != JSON.parse(cookies['emenu_basket'])['key'].split('-').first.to_i
-    @basket_service = BasketService.new(@restaurant, cookies['emenu_basket'])
+    @basket_service = BasketService.new(@restaurant, current_patron, cookies['emenu_basket'])
     cookies['emenu_basket'] = @basket_service.get_cookie
   end
 end

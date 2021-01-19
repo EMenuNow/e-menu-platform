@@ -1,12 +1,13 @@
 class CheckoutService < ApplicationController
 
   attr_accessor :name, :total_payment, :service_type, :collection_time, :telephone, :address,
-                :table_number, :email, :house_number, :street, :postcode, :basket, :delivery_fee, :discount_code, :payment_in_pence
+                :table_number, :email, :house_number, :street, :postcode, :basket, :delivery_fee, :discount_code, :payment_in_pence, :basket_service
 
   def initialize(restaurant, parameters, basket_service)
     parameters.each_pair {|k,v|instance_variable_set("@#{k}", v)}
     @restaurant = restaurant
     @basket_service = basket_service
+    @patron = @basket_service.patron
 
     @total_payment = @total.to_f 
     @payment_in_pence = (@total_payment*100).to_i
@@ -46,7 +47,7 @@ class CheckoutService < ApplicationController
       end 
     end
 
-    Order.create(
+    @order = Order.create(
       uuid: SecureRandom.uuid,
       restaurant_id: @restaurant.id,
       basket_total: @total_payment * 100,
@@ -63,8 +64,12 @@ class CheckoutService < ApplicationController
       delivery_or_collection: @service_type,
       delivery_fee: @delivery_fee, 
       table_number: @table_number,
-      discount_code: @basket_service.discount_code
+      discount_code: @basket_service.discount_code,
+      value: @total_payment * 100,
+      currency: @restaurant.currency.code
     )
+    @order.patrons << @patron if @patron and !@order.patrons.include?(@patron)
+    @order
   end
 
 end

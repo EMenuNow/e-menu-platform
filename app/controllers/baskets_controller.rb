@@ -3,7 +3,7 @@ class BasketsController < ApplicationController
   before_action :set_path_and_restaurant
 
   def update
-    basket_service = BasketService.new(@restaurant, cookies['emenu_basket'])
+    basket_service = BasketService.new(@restaurant, current_patron, cookies['emenu_basket'])
 
     if params[:discount_code]
       action = basket_service.apply_discount_code(params[:discount_code])
