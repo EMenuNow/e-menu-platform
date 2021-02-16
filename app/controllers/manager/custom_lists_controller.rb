@@ -53,7 +53,7 @@ class CustomListsController < Manager::BaseController
 
     respond_to do |format|
       if @custom_list.save
-        format.html { redirect_to manager_restaurant_custom_list_path(@restaurant, @custom_list), notice: 'Custom list was successfully created.' }
+        format.html { redirect_to manager_restaurant_custom_list_path(@restaurant, @custom_list), notice: 'Option Set was successfully created.' }
         format.json { render :show, status: :created, location: @custom_list }
       else
         format.html { render :new }
@@ -75,7 +75,7 @@ class CustomListsController < Manager::BaseController
     
     respond_to do |format|
       if @custom_list.update(custom_list_params)
-        format.html { redirect_to manager_restaurant_custom_list_path(@restaurant, @custom_list), notice: 'Custom list was successfully updated.' }
+        format.html { redirect_to manager_restaurant_custom_list_path(@restaurant, @custom_list), notice: 'Option Set was successfully updated.' }
         format.json { render :show, status: :ok, location: @custom_list }
       else
         format.html { render :edit }
@@ -96,7 +96,7 @@ class CustomListsController < Manager::BaseController
 
     @custom_list.destroy
     respond_to do |format|
-      format.html { redirect_to manager_restaurant_custom_lists_path(@restaurant), notice: 'Custom list was successfully destroyed.' }
+      format.html { redirect_to manager_restaurant_custom_lists_path(@restaurant), notice: 'Option Set was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

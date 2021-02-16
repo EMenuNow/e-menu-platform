@@ -51,6 +51,6 @@
     <%= form.hidden_field :restaurant_id %>
 
   <div class="actions">
-    <%= form.submit nil, class: 'btn btn-warning mt-2' %>
+    <%= form.submit (action_name == "edit" ? "Update Option Set" : "Create Option Set"), class: 'btn btn-warning mt-2' %>
   </div>
 <% end %>

@@ -1,4 +1,24 @@
-    <h3 class=" pb-2 mb-0">Item</h3>
+<% content_for :js do %>
+  <script>
+    $(document).ready(function() {
+      $('.select-all').click(function () {
+          var set = $(this).parent();
+          var group = set.find('input:checkbox');
+          var checked = set.find('input:checkbox:checked');
+
+          if (checked.length == group.length) {
+            $(this).removeClass('selected');
+            group.prop('checked', $(this).hasClass('selected'));
+          } else {
+            $(this).addClass('selected');
+            group.prop('checked', $(this).hasClass('selected'));
+          };
+      });
+    });
+  </script>
+<% end %>
+
+<h3 class=" pb-2 mb-0">Item</h3>
 
 <%= menu.node_type%>
 
@@ -149,6 +169,7 @@
     <div class="row">
       <div class="col mb-2">
         <h4>These are the available options for a customer to choose whilst ordering their meal.</h4>
+        <%= link_to 'Edit all Option Sets', manager_restaurant_custom_lists_path(@restaurant), class: "h5" %>
       </div>
     </div>
     <div class="row">
@@ -163,22 +184,22 @@
         <%# end %>
       </div> -->
       <% @restaurant.custom_lists.each do |custom_list| %>
-      <div class="col-12 col-lg-6 mb-4">
+      <div id="collection-check-set-<%= custom_list.id %>" class="collection-check-set col-12 col-lg-6 mb-4">
         <h6><strong><%= custom_list.name %></strong> (<%=constraint_to_human custom_list.constraint%>)</h6>
+        <%= link_to 'Edit Option Set details', edit_manager_restaurant_custom_list_path(@restaurant, custom_list) %> | 
+        <%= link_to 'Edit Option Set items', manager_restaurant_custom_list_path(@restaurant, custom_list) %>
         
         <% custom_list.custom_list_items.each do |item| %>
 
-          <div class="collection-check-box">
+          <div class="collection-check-box my-2">
             <input type="checkbox" value="<%=item.id%>" name="menu[custom_lists][<%=custom_list.id%>][]" id="menu_custom_lists_<%=custom_list.id%>-<%=item.id%>" <%=checked?(menu.custom_lists, custom_list.id, item.id)%>>
             <i class=""><%= item.name%> <small>(<%= number_to_currency item.price, unit: @restaurant.currency_symbol%>)</small></i>
+            <i><%= link_to '[edit]', edit_manager_restaurant_custom_list_custom_list_item_path(@restaurant, custom_list, item), class: "text-muted" %></i>
           </div>
-
 
         <% end %>
 
- 
-
-
+        <button type="button" id="select-all-<%= custom_list.id %>" class="select-all btn btn-primary btn-sm">Toggle all in set</button>
       </div>
       <% end %>
     </div>

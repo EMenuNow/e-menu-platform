@@ -46,6 +46,6 @@
     <%= form.hidden_field :custom_list_id, value: @custom_list.id %>
 
   <div class="actions">
-    <%= form.submit nil, class: "btn btn-warning mt-2" %>
+    <%= form.submit (action_name == "edit" ? "Update Option Set Item" : "Create Option Set Item"), class: "btn btn-warning mt-2" %>
   </div>
 <% end %>
