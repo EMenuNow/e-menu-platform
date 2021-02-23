@@ -72,8 +72,8 @@
       </div>
       <div class="col-lg-3">
         <div class="card shadow p-3 mb-5 bg-white rounded">
-          <h3 class="m-0">EMenu Fees</h3>
-          <h5 class="m-0"><%= number_to_currency(total_emenu_commission_value, unit: @restaurant.currency_symbol) %></h5>
+          <h3 class="m-0">Z Reports</h3>
+          <h5 class="m-0"><%= link_to "Daily Reports", manager_restaurant_reporting_daily_path(@restaurant) %></h5>
         </div>
       </div>
     </div>
@@ -136,6 +136,20 @@
               </div>
             </div>
           <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="row pb-1">
+      <div class="col-lg-12">
+        <h2>Download data</h2>
+        <div class="row pt-4 pb-1">
+          <div class="col-12">
+            <%= link_to "Download summary (excel)", manager_reports_path(format: "xlsx", view: "summary"), :class=>"d-block" %>
+            <%= link_to "Download detailed daily billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%d %m"), :class=>"d-block" %>
+            <%= link_to "Download detailed weekly billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%W"), :class=>"d-block" %>
+            <%= link_to "Download detailed monthly billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%m"), :class=>"d-block" %>
+            <%= link_to "Download invoices (pdf)", manager_reports_path(format: "pdf") %>
+          </div>
         </div>
       </div>
     </div>

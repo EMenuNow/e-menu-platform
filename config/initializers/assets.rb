@@ -21,6 +21,7 @@ Rails.application.config.assets.precompile +=
   cable_drinks.js
   color_picker.js
   live_order_loader.js
+  pdf.js
  ]
 
 # Precompile additional assets.
