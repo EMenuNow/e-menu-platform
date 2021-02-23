@@ -18,7 +18,7 @@
         <div class="container">
           <div class="row pb-1 text-center">
             <div class="col-12">
-              <%= wicked_pdf_image_tag "logo/Logo__icon_v1.0.0-light-bkg.svg", :class=>"w-25 pb-5" %>
+              <%= wicked_pdf_image_tag "logo/logo.png", :class=>"w-25 pb-5" %>
               <h2 class="text-dark">Invoice for period</h2>
               <h4 class="text-dark"><%= dates.last %> to <%= dates.first %></h4>
               <h6 class="text-dark">Invoice Number: <%= (@restaurant.id.to_s + dates.last.to_s + dates.first.to_s).gsub("-","") %></h6>
@@ -121,7 +121,7 @@
         <div class="container">
           <div class="row text-center">
             <div class="col-12">
-              <%= wicked_pdf_image_tag "logo/Logo__icon_v1.0.0-light-bkg.svg", :class=>"pb-2", :style=>"width:100px;" %>
+              <%= wicked_pdf_image_tag "logo/logo.png", :class=>"pb-2", :style=>"width:100px;" %>
               <h6 class="text-dark">Thank you for your custom</h6>
             </div>
           </div>
