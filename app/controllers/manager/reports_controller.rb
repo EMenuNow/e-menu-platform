@@ -18,7 +18,7 @@ module Manager
         format.html
         format.xlsx
         format.pdf do
-          render pdf: "emenu-invoice-download", :layout => false, show_as_html: false
+          render pdf: "emenu-invoice-download", :layout => false, show_as_html: true
         end
       end
     end
