@@ -90,11 +90,11 @@
         data.addColumn('string', 'Date');
         data.addColumn('number', 'Revenue');
         data.addColumn('number', 'Orders');
-        data.addColumn('number', 'Emenu Fee');
+        // data.addColumn('number', 'Emenu Fee');
         data.addRows([
         <% @receipts.reverse.group_by{|x|x.created_at.strftime("%d-%m-%Y")}.each do |g, receipts| %>
           <% sum = receipts.sum{|x|x.basket_total}/100 %>
-          ["<%=DateTime.parse(g).strftime("%d-%m-%Y")%>", {v:<%=sum%>, f: "<%=number_to_currency(sum, unit: @restaurant.currency_symbol)%>"}, <%= receipts.size %>, <%= receipts.sum(&:application_fee_amount)/100.0 %>],
+          ["<%=DateTime.parse(g).strftime("%d-%m-%Y")%>", {v:<%=sum%>, f: "<%=number_to_currency(sum, unit: @restaurant.currency_symbol)%>"}, <%= receipts.size %>],
         <% end %>
         ]);
         var options = {
@@ -113,20 +113,49 @@
         var chart = new google.visualization.ColumnChart(document.getElementById('number_format_chart'));
         chart.draw(data, options);
       }
+
+      function drawLine() {
+        var data = google.visualization.arrayToDataTable([
+          ['Date', 'Revenue', 'Orders'],
+          <% @receipts.reverse.group_by{|x|x.created_at.strftime("%d-%m-%Y")}.each do |g, receipts| %>
+            <% sum = receipts.sum{|x|x.basket_total}/100 %>
+            ["<%=DateTime.parse(g).strftime("%d-%m-%Y")%>", {v:<%=sum%>, f: "<%=number_to_currency(sum, unit: @restaurant.currency_symbol)%>"}, <%= receipts.size %>],
+          <% end %>
+        ]);
+        var options = {
+          legend: {position: 'top', textStyle: {}},
+          vAxis: {
+            minValue:0,
+            viewWindow: {
+                min: 0
+            },
+          },
+          hAxis: {
+          },
+          height: 500
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('number_line_chart'));
+        chart.draw(data, options);
+      }
     </script>
     <% end %>
     <div class="row pb-1">
       <div class="col-lg-12">
         <h2>Daily Revenue</h2>
         <div class="card shadow p-3 mt-4 mb-5 bg-white rounded">
-          <div id="number_format_chart" width="100%" height="300px"></div>
+          <% if @receipts.size > 10 %>
+            <div id="number_line_chart" width="100%" height="300px"></div>
+          <% else %>
+            <div id="number_format_chart" width="100%" height="300px"></div>
+          <% end %>
         </div>
       </div>
     </div>
     <div class="row pb-1">
       <div class="col-lg-12">
-        <h2>Product Sales</h2>
-        <% popular = @receipts.group_by{|t|t.items["items"].map{|j|j["item"]}.flatten} %>
+        <h2>Top Product Sales</h2>
+        <% popular = @receipts.group_by{|t|t.items["items"].map{|j|j["item"]}.flatten}.sort_by{|x, y|y.size}.reverse.take(8) %>
         <div class="row pt-4 pb-1 justify-content-center">
           <% popular.each do |group, x| %>
             <div class="col-3">
