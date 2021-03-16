@@ -205,4 +205,8 @@ class Receipt < ApplicationRecord
 
   end
 
+  def self.group_by_time(receipts, seconds = 360)
+    receipts.group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc }
+  end
+
 end

@@ -200,7 +200,7 @@ if (service_type == 'delivery'){
   $('#payment-info').show();
   $('#delivery-fee').hide();
   $('#basket-total').show();
-  $('#delivery-info').show();
+  $('#delivery-info').hide();
   $('#pay-now-button').hide();
   $('#help-info').hide();
   $('#kitchen-delay').hide();
@@ -218,7 +218,7 @@ if (service_type == 'delivery'){
   $('#payment-info').show();
   $('#delivery-fee').hide();
   $('#basket-total').show();
-  $('#delivery-info').show();
+  $('#delivery-info').hide();
   $('#pay-now-button').hide();
   $('#help-info').hide();
   $('#kitchen-delay').show();
@@ -267,199 +267,213 @@ $('#kitchen-delay').hide();
   </div>
 <% end %>
 <div class='container-fluid bg-dark pb-2 ' ><!--  style="background: url('/images/restaurant/thesauce/main-bg2.jpg') no-repeat fixed center;" -->
-  <%= form_tag pay_checkouts_path(@restaurant.path), id: "data-form" do %>
-    <div class="row justify-content-center pt-3">
-      <div class="col-sm-12 col-md-6 m-2 text-center">         
+  <div class="container">
+    <div class="row pt-5">
+      <div class='col-sm-12 col-md-12 text-left text-light pb-4'>
+        <h1><%= @restaurant.name %></h1>
+      </div>
+    </div>
+    <div class="row pb-5">
+      <div class="col-md-7">         
         <%
-        service_types = []
-        service_types << ['Collection', 'collection'] if is_takeaway?(@restaurant) 
-        service_types << ['Delivery', 'delivery'] if is_delivery?(@restaurant)
-        service_types << ['Table Service', 'tableservice'] if is_tableservice?(@restaurant) and @restaurant.is_open
+          service_types = []
+          service_types << ['Collection', 'collection'] if is_takeaway?(@restaurant) 
+          service_types << ['Delivery', 'delivery'] if is_delivery?(@restaurant)
+          service_types << ['Table Service', 'tableservice'] if is_tableservice?(@restaurant) and @restaurant.is_open
         %>
-
-        <div class="row bg-dark" id='help-info'>
-          <div class='col-sm-12 col-md-12 text-center text-light pb-2'>
-            Please choose Service type
-          </div>
-        </div>
-
-        <div class="row bg-dark">
-          <div class='col-sm-12 col-md-12 text-center text-light pb-2'>
-            <%= select_tag :service_type, options_for_select(service_types), {prompt: 'Choose Service', class: ' form-control'}%>
-          </div>
-        </div>
-        <% if @restaurant.opening_time_kitchen_delay_minutes > 0 %>
-        <div class="row bg-dark  border border-danger " id='kitchen-delay'>
-          <div class='col-sm-12 col-md-12 text-center text-danger pb-2'>
-            Please Note: The kitchen is busy and there could be up to <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes delay
-          </div>
-        </div>
-        <% end %>
-        <div class="row bg-dark" id='time-field'>
-          <div class='col-sm-12 col-md-12 text-left text-light mb-3'>
-            <%= label_tag :time %> <strong id='time_required' class='text-danger'>*</strong>
-            <%= select_tag :collection_time, options_for_select(@delivery_time_options.map{|s| [s[:text], s[:value]]}), { prompt: 'Select time', class: "border p-2 bg-light form-control validation_check"} %>
-          </div>
-        </div>
-        <div class="row bg-dark">
-          <div class=' col-sm-12 col-md-6 text-left text-light form-group' id='table-number-field'>
-            <%= label_tag :table_number %> <strong id='table_number_required' class= 'text-danger'>*</strong>
-            <%= text_field_tag :table_number,  nil, class: "border p-2 bg-light form-control validation_check" %>
-          </div>
-          <div id='name-field' class='col-sm-12 col-md-6 text-left text-light form-group'>
-            <%= label_tag :name %> <strong id='name_required' class='text-danger'>*</strong>
-            <%= text_field_tag :name,  nil, class: "border p-2 bg-light form-control validation_check" %>
-          </div>
-          <div id='telephone-field' class='col-sm-12 col-md-6 text-left text-light form-group'>
-            <%= label_tag :telephone %> <strong id='telephone_required' class='text-danger'>*</strong>
-            <%= text_field_tag :telephone,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: '' %>
-          </div>
-        </div>
-        <div class="row bg-dark" id='email-field'>
-          <div class='col-sm-12 col-md-12 text-left text-light form-group'>
-            <%= label_tag :email %> <strong id='email_required' class='text-danger'>*</strong>
-            <%= email_field_tag :email,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: 'for your email receipt' %>
-          </div>
-        </div>
-        <% if is_delivery?(@restaurant)%>
-          <%# Address %>
-          <div class="row bg-dark text-light" id='address-field' >
-            <div class='col-sm-12 text-left'>
-              <%= label_tag :address %> <strong id='address_required' class='text-danger'>*</strong>
-              <div class="row bg-dark">
-                <div class='col-sm-12 '>
-                  <%# Left %>
-                  <label>House number <strong id='house_number_required' class='text-danger'>* </strong> and street <strong id='street_required' class='text-danger'>*</strong></label> 
-                  <div class="row bg-dark">
-                    <div class='col-4 form-group pr-1'>
-                      <%= text_field_tag :house_number,  nil, class: "border  bg-light form-control validation_check", placeholder: 'No.' %>    
-                    </div>
-                    <div class='col-8 form-group pl-1 '>
-                      <%= text_field_tag :street,  nil, class: "border bg-light form-control validation_check", placeholder: 'Street' %>
+        <%= form_tag checkouts_path(@restaurant.path), id: "data-form" do %>
+          <div class="row">
+            <div class='col-sm-12 col-md-12 text-light'>
+              <div class="row bg-light justify-content-center rounded text-dark">
+                <div class='col-11 pb-2 pt-4'>
+                  <div class="row" id=''>
+                    <div class='col-sm-12 col-md-12 pb-4'>
+                      <h3>Complete your order</h3>
                     </div>
                   </div>
-                </div>
-                <div class='col-sm-12 '>
-                  <%# Right %>
-                  <%= label_tag :postcode %> <strong id='postcode_required' class='text-danger'>* </strong>
-                  <div class="row bg-dark">
-                    <div class='col form-group pr-1'>
-                      <%= select_tag :postcode_prefix, options_for_select(@restaurant.delivery_postcodes.map{|a| [a.prefix, a.delivery_fee]}), {prompt: "Postcode start", class: "border p-2 bg-light form-control delivery_fee_calculate validation_check"} %>  
-                      <%= hidden_field_tag :postcode %>
-                    </div>
-                    <div class='col form-group pl-1'>
-                      <%= text_field_tag :postcode_suffix,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: 'Post Code end' %>  
+
+                  <div class="row">
+                    <div class='col-sm-12 col-md-12 text-left pb-4'>
+                      <h6><b>Please choose your required service</b></h6>
+                      <%= select_tag :service_type, options_for_select(service_types), {class: ' form-control p-0 overflow-hidden', size:service_types.size}%>
                     </div>
                   </div>
+                  <div class="row" id='delivery-info'>
+                    <div class='col text-secondary pb-4'>
+                      <% if is_delivery?(@restaurant)%>
+                        We currently deliver to these postcodes. Delivery fees are added to the total below: <br>
+                        <% postcodes = @restaurant.delivery_postcodes.order(:prefix)%>
+                        <% delivery_fees = @restaurant.delivery_postcodes.map{|d| d.delivery_fee}.uniq.sort%>
+                        <% delivery_fees.each do |delivery_fee| %>
+                          <strong class=''><%=number_to_currency delivery_fee, unit: @restaurant.currency_symbol%></strong> - 
+                          <%= postcodes.select{|d| d.delivery_fee == delivery_fee}.map{|s| s.prefix}.join(', ')%>
+                          <br>
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </div>
+                  <% if @restaurant.opening_time_kitchen_delay_minutes > 0 %>
+                  <div class="row border border-danger " id='kitchen-delay'>
+                    <div class='col-sm-12 col-md-12 text-center text-danger pb-2'>
+                      Please Note: The kitchen is busy and there could be up to <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes delay
+                    </div>
+                  </div>
+                  <% end %>
+                  <div class="row" id='time-field'>
+                    <div class='col-sm-12 col-md-12 text-left mb-3'>
+                      <b><%= label_tag :time %> <strong id='time_required' class='text-danger'>*</strong></b>
+                      <%= select_tag :collection_time, options_for_select(@delivery_time_options.map{|s| [s[:text], s[:value]]}), { prompt: 'Select time', class: "border p-2 bg-light form-control validation_check"} %>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class=' col-12 text-left form-group' id='table-number-field'>
+                      <b><%= label_tag :table_number %> <strong id='table_number_required' class= 'text-danger'>*</strong></b>
+                      <%= label_tag "If ordering separately order within 2 mins of each other to get your orders at the same time" %>
+                      <%= text_field_tag :table_number,  nil, placeholder: "Table number", class: "border p-2 bg-light form-control validation_check" %>
+                    </div>
+                    <div id='name-field' class='col-sm-12 col-md-6 text-left form-group'>
+                      <b><%= label_tag :name %> <strong id='name_required' class='text-danger'>*</strong></b>
+                      <%= text_field_tag :name,  nil, class: "border p-2 bg-light form-control validation_check" %>
+                    </div>
+                    <div id='telephone-field' class='col-sm-12 col-md-6 text-left form-group'>
+                      <b><%= label_tag :telephone %> <strong id='telephone_required' class='text-danger'>*</strong></b>
+                      <%= text_field_tag :telephone,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: '' %>
+                    </div>
+                  </div>
+                  <div class="row" id='email-field'>
+                    <div class='col-sm-12 col-md-12 text-left form-group'>
+                      <b><%= label_tag :email %> <strong id='email_required' class='text-danger'>*</strong></b>
+                      <%= email_field_tag :email,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: 'for your email receipt' %>
+                    </div>
+                  </div>
+                  <% if is_delivery?(@restaurant)%>
+                    <%# Address %>
+                    <div class="row" id='address-field' >
+                      <div class='col-sm-12 text-left'>
+                        <b><%= label_tag :address %> <strong id='address_required' class='text-danger'>*</strong></b>
+                        <div class="row">
+                          <div class='col-sm-12 '>
+                            <%# Left %>
+                            <b><label>House number <strong id='house_number_required' class='text-danger'>* </strong> and street <strong id='street_required' class='text-danger'>*</strong></label> </b>
+                            <div class="row">
+                              <div class='col-4 form-group pr-1'>
+                                <b><%= text_field_tag :house_number,  nil, class: "border  bg-light form-control validation_check", placeholder: 'No.' %></b>
+                              </div>
+                              <div class='col-8 form-group pl-1 '>
+                                <b><%= text_field_tag :street,  nil, class: "border bg-light form-control validation_check", placeholder: 'Street' %></b>
+                              </div>
+                            </div>
+                          </div>
+                          <div class='col-sm-12 '>
+                            <%# Right %>
+                            <b><%= label_tag :postcode %> <strong id='postcode_required' class='text-danger'>* </strong></b>
+                            <div class="row">
+                              <div class='col form-group pr-1'>
+                                <b><%= select_tag :postcode_prefix, options_for_select(@restaurant.delivery_postcodes.map{|a| [a.prefix, a.delivery_fee]}), {prompt: "Postcode start", class: "border p-2 bg-light form-control delivery_fee_calculate validation_check"} %></b>
+                                <%= hidden_field_tag :postcode %>
+                              </div>
+                              <div class='col form-group pl-1'>
+                                <b><%= text_field_tag :postcode_suffix,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: 'Post Code end' %></b>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %> 
+                  <div class="row mt-4 mb-4">
+                    <div class='col text-center'>
+                      <div class="row" id='payment-info'>
+                        <div class='col'>
+                          Payment:
+                        </div>
+                        <div class='col'>
+                          <%= number_to_currency(@basket_service.get_basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
+                          <%= hidden_field_tag :basket, @basket_service.get_basket_item_total.to_f %>
+                        </div>
+                      </div>
+
+                      <% if is_delivery?(@restaurant)%>
+                      <div class="row " id='delivery-fee'>
+                        <div class='col'>
+                          Delivery:
+                        </div>
+                        <div class='col'>
+                          <span class='delivery_fee_choose'>Select Address</span> 
+                          <%= hidden_field_tag :delivery_fee%>    
+                        </div>
+                      </div>
+                      <% end %>
+                      
+                      <div class="row" id='basket-total'>
+                        <div class='col'>
+                          Total:
+                        </div>
+                        <div class='col ' id='basket-total-value'>
+                          <%= number_to_currency(@basket_service.get_basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
+                        </div>
+                        <%= hidden_field_tag :total, @basket_service.get_basket_item_total.to_f %>    
+                      </div>
+                    </div>
+                  </div>
+                  <% if false %>
+                    <div class="row mt-4 mb-4" id='pay-now-button'>
+                      <div class='col'>
+                        <%= submit_tag "Pay Now", class: 'btn btn-primary btn-block' %>
+                      </div>
+                    </div>
+                  <% else %>
+                    <div class="row mt-4 mb-4 " id='pay-now-button'>
+                      <div class='col'>
+                        <button id="checkout-button" class="btn btn-primary btn-block">Pay Now</button>
+                      </div>
+                    </div>
+                    <script src="https://js.stripe.com/v3/"></script>
+                    <script type="text/javascript">
+                      var stripe = Stripe('<%= @restaurant.stripe_pk_api_key %>');
+                      var checkoutButton = document.getElementById('checkout-button');
+
+                      document.getElementById("data-form").addEventListener('submit', function(e) {
+                        e.preventDefault();
+
+                        const formData = new FormData(this);
+
+                        fetch('<%= checkouts_path(@restaurant.path) %>', {
+                          method: 'POST',
+                          body: formData
+                        })
+                        .then(function(response) {
+                          return response.json();
+                        })
+                        .then(function(session) {
+                          return stripe.redirectToCheckout({ sessionId: session.id });
+                        })
+                        .then(function(result) {
+                          if (result.error) {
+                            alert(result.error.message);
+                          }
+                        })
+                        .catch(function(error) {
+                          console.error('Error:', error);
+                        });
+                      });
+                    </script>
+                  <% end %>
                 </div>
               </div>
             </div>
           </div>
-        <% end %> 
-        <div class="row bg-dark mt-4 mb-4">
-          <div class='col text-center text-light'>
-
-
-            <div class="row" id='payment-info'>
-              <div class='col'>
-                Payment:
-              </div>
-              <div class='col'>
-                <%= number_to_currency(@basket_service.get_basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
-                <%= hidden_field_tag :basket, @basket_service.get_basket_item_total.to_f %>
-              </div>
-            </div>
-
-            <% if is_delivery?(@restaurant)%>
-            <div class="row " id='delivery-fee'>
-              <div class='col'>
-                Delivery:
-              </div>
-              <div class='col'>
-                <span class='delivery_fee_choose'>Select Address</span> 
-                <%= hidden_field_tag :delivery_fee%>    
-              </div>
-            </div>
-            <% end %>
-            
-            <div class="row" id='basket-total'>
-              <div class='col'>
-                Total:
-              </div>
-              <div class='col ' id='basket-total-value'>
-                <%= number_to_currency(@basket_service.get_basket_item_total.to_f, unit: @restaurant.currency_symbol) %>
-              </div>
-              <%= hidden_field_tag :total, @basket_service.get_basket_item_total.to_f %>    
-            </div>
-
-
-      
-          
-          
-          
-          
-          </div>
-        </div>
-        <% if false %>
-          <div class="row bg-dark mt-4 mb-4 " id='pay-now-button'>
-            <div class='col'>
-              <%= submit_tag "Pay Now", class: 'btn btn-primary btn-block' %>
-            </div>
-          </div>
-        <% else %>
-          <div class="row bg-dark mt-4 mb-4 " id='pay-now-button'>
-            <div class='col'>
-              <button id="checkout-button" class="btn btn-primary btn-block">Pay Now</button>
-            </div>
-          </div>
-          <script src="https://js.stripe.com/v3/"></script>
-          <script type="text/javascript">
-            var stripe = Stripe('<%= @restaurant.stripe_pk_api_key %>');
-            var checkoutButton = document.getElementById('checkout-button');
-
-            document.getElementById("data-form").addEventListener('submit', function(e) {
-              e.preventDefault();
-
-              const formData = new FormData(this);
-
-              fetch('<%= checkouts_path(@restaurant.path) %>', {
-                method: 'POST',
-                body: formData
-              })
-              .then(function(response) {
-                return response.json();
-              })
-              .then(function(session) {
-                return stripe.redirectToCheckout({ sessionId: session.id });
-              })
-              .then(function(result) {
-                if (result.error) {
-                  alert(result.error.message);
-                }
-              })
-              .catch(function(error) {
-                console.error('Error:', error);
-              });
-            });
-          </script>
         <% end %>
-        <div class="row bg-dark" id='delivery-info'>
-          <div class='col text-secondary'>
-            <% if is_delivery?(@restaurant)%>
-              We currently deliver to these postcodes. Delivery fees indicated: <br>
-              <% postcodes = @restaurant.delivery_postcodes.order(:prefix)%>
-              <% delivery_fees = @restaurant.delivery_postcodes.map{|d| d.delivery_fee}.uniq.sort%>
-              <% delivery_fees.each do |delivery_fee| %>
-                <strong class=''><%=number_to_currency delivery_fee, unit: @restaurant.currency_symbol%></strong> - 
-                <%= postcodes.select{|d| d.delivery_fee == delivery_fee}.map{|s| s.prefix}.join(', ')%>
-                <br>
-              <% end %>
-            <% end %>
+      </div>
+      <div class="col-md-5">
+        <div class="row ">
+          <div class="col-md-11 bg-white rounded offset-md-1">
+            <%= render 'restaurants/components/basket'%>
           </div>
         </div>
       </div>
     </div>
-  <% end %>
+  </div>
 </div>
 
 

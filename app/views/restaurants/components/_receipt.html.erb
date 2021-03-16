@@ -25,20 +25,20 @@
         </tr>
       </thead>
       <tbody>
-        <% items =  @receipt.items['items']%>
+        <% items = @receipt.items['items']%>
 
         <% items.each do |item|%>
         <tr>
           <td><%= item['item'].html_safe %> <% if item['note'].present?%> (Note: <%= item['note'].html_safe %>)<% end %></td>
           <td><%= item['optionals'].join('<br> ').html_safe %></td>
-          <td class='text-right'><%= number_to_currency(item['total'], unit: @restaurant.currency_symbol) %></td>
+          <td class='text-left'><%= number_to_currency(item['total'], unit: @restaurant.currency_symbol) %></td>
         </tr>
         <% end %>
         <% if @receipt.discount_code.present? %>
         <tr>
           <td><%= @receipt.discount_code.description %></td>
           <td></td>
-          <td class='text-right'>
+          <td class='text-left'>
             -<%= number_to_currency(@receipt.discount_code.calculate_discount_from_basket_total(@receipt.basket_total), unit: @restaurant.currency_symbol) %>
           </td>
         </tr>
@@ -47,13 +47,13 @@
         <tr>
           <td>Delivery Fee</td>
           <td></td>
-          <td class='text-right'><%= number_to_currency(@receipt.delivery_fee.to_f, unit: @restaurant.currency_symbol) %></td>
+          <td class='text-left'><%= number_to_currency(@receipt.delivery_fee.to_f, unit: @restaurant.currency_symbol) %></td>
         </tr>
         <% end %>
         <tr>
           <td>Total</td>
           <td></td>
-          <td class='text-right'><%= number_to_currency(@receipt.basket_total.to_f / 100.0, unit: @restaurant.currency_symbol) %></td>
+          <td class='text-left'><%= number_to_currency(@receipt.basket_total.to_f / 100.0, unit: @restaurant.currency_symbol) %></td>
         </tr>
       </tbody>
     </table>

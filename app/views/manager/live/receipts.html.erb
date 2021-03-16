@@ -1,64 +1,75 @@
+<div class="container">
+  <div class="row my-5">
+    <div class="col-10 mx-auto">
+      <h1 class="py-5">Receipts</h1>
+      <%= paginate @receipts %>
+      <table class='table'>
+        <thead>
+          <tr>
 
-<h1>Receipts</h1>
-<%= paginate @receipts %>
-<table class='table'>
-  <thead>
-    <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Table Number</th>
+            <th>Telephone</th>
+            <th>Address</th>
+            <th>Time</th>
+            <th>Basket total</th>
+            <th>Delivery Fee</th>
+            <th>Item</th>
+            
+            <th>Email</th>
+          </tr>
+        </thead>
 
-      <th>Date</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Table Number</th>
-      <th>Telephone</th>
-      <th>Address</th>
-      <th>Time</th>
-      <th>Basket total</th>
-      <th>Delivery Fee</th>
-      <th>Item</th>
-      
-      <th>Email</th>
-    </tr>
-  </thead>
+        <tbody>
+          <% @receipts.order(created_at: :desc).each do |receipt| %>
+            <tr>
+              <td><%= receipt.created_at.in_time_zone(receipt.restaurant.time_zone).strftime('%Y-%m-%d %H:%M') %></td>
+              <td><%= receipt.name %></td>
+              <td><%= receipt.delivery_or_collection %></td>
+              <td><%= receipt.table_number %></td>
+              <td><%= receipt.telephone %></td>
+              <td><%= receipt.address if receipt.delivery_or_collection == 'delivery' %></td>
+              <td><%= receipt.collection_time %></td>
+              <td><%= number_to_currency(receipt.basket_total/100.to_f, unit: receipt.restaurant.currency_symbol) %></td>
+              <td><%= number_to_currency(receipt.delivery_fee.to_f, unit: receipt.restaurant.currency_symbol) %></td>
+              
+              <%
+              items = ""
+              receipt.items['items'].each do |item|
+                item_screen_type = ""
+                item_screen_type = "(#{item['item_screen_type_name']})" if item['item_screen_type_name'].present?
+                options = item['optionals']   
+                items << "<li>#{item['item']} #{item_screen_type} <br><strong>Note:</strong> #{item['note']}<br> #{options.join('<br> ')}</li>"
 
-  <tbody>
-    <% @receipts.order(created_at: :desc).each do |receipt| %>
-      <tr>
-        <td><%= receipt.created_at.in_time_zone(receipt.restaurant.time_zone).strftime('%Y-%m-%d %H:%M') %></td>
-        <td><%= receipt.name %></td>
-        <td><%= receipt.delivery_or_collection %></td>
-        <td><%= receipt.table_number %></td>
-        <td><%= receipt.telephone %></td>
-        <td><%= receipt.address if receipt.delivery_or_collection == 'delivery' %></td>
-        <td><%= receipt.collection_time %></td>
-        <td><%= number_to_currency(receipt.basket_total/100.to_f, unit: receipt.restaurant.currency_symbol) %></td>
-        <td><%= number_to_currency(receipt.delivery_fee.to_f, unit: receipt.restaurant.currency_symbol) %></td>
+              end
+              %>
+              <td><ul><%= items.html_safe %></ul></td>
         
-        <%
-        items = ""
-        receipt.items['items'].each do |item|
-          item_screen_type = ""
-          item_screen_type = "(#{item['item_screen_type_name']})" if item['item_screen_type_name'].present?
-          options = item['optionals']   
-          items << "<li>#{item['item']} #{item_screen_type} <br><strong>Note:</strong> #{item['note']}<br> #{options.join('<br> ')}</li>"
-
-        end
-        %>
-        <td><ul><%= items.html_safe %></ul></td>
-   
-        <td><%= receipt.email %></td>
-        <td><% if receipt.email.present? %><%= link_to 'Send Again', manager_send_receipts_path(receipt.id) %><% end %></td>
-        <td><% if @printers.present? %>
-        
-          <% @printers.each do |printer|%>
-            <%= link_to printer.name, print_receipt_url(receipt.id, printer.id), remote: true %>
+              <td><%= receipt.email %></td>
+              <td>
+                <% if receipt.email.present? %><%= link_to 'Send Again', manager_send_receipts_path(receipt.id), class: "btn btn-info" %><% end %>
+                <% if receipt.order.refunds.present? %>
+                  <div class="mt-3">Order has been refunded</div>
+                <% else %>
+                  <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info mt-3', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>
+                <% end %>
+              </td>
+              <td><% if @printers.present? %>
+              
+                <% @printers.each do |printer|%>
+                  <%= link_to printer.name, print_receipt_url(receipt.id, printer.id), remote: true %>
+                <% end %>
+              
+              <% end %>
+              
+              </td>
+            </tr>
           <% end %>
-        
-        <% end %>
-        
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-<%= paginate @receipts %>
-
+        </tbody>
+      </table>
+      <%= paginate @receipts %>
+    </div>
+  </div>
+</div>
