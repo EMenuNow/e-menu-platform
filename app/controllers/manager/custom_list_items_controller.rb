@@ -84,6 +84,20 @@ class CustomListItemsController < Manager::BaseController
     end
   end
 
+  def toggle_active
+    @custom_list_item = CustomListItem.find(params[:custom_list_item_id])
+
+    Rails.cache.delete("api/restaurant/#{@restaurant.id}/menu")
+    Rails.cache.delete("restaurant_order_menu_#{@restaurant.id}")
+
+    Rails.cache.delete("custom_list_item_#{@custom_list_item.id}")
+    Rails.cache.delete_matched("custom_list_items*-#{@custom_list_item.id}-*")
+    Rails.cache.delete("custom_list_#{@custom_list.id}")
+
+    @custom_list_item.available = !@custom_list_item.available
+    @custom_list_item.save
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_custom_list_item
@@ -96,7 +110,7 @@ class CustomListItemsController < Manager::BaseController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def custom_list_item_params
-      params.require(:custom_list_item).permit(:name, :custom_list_id, :price, :description, :available)
+      params.require(:custom_list_item).permit(:name, :custom_list_id, :custom_list_item_id, :price, :description, :available)
     end
 
     def clear_list_item(list_id, list_item_id)
