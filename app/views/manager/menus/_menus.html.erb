@@ -1,4 +1,29 @@
+<% content_for :js do %>
 
+  <script>
+  
+    $(function(){
+      $('.available_menu').on('change', function() {
+        menu_id = $(this).val();
+        menu_checked = $(this).is(':checked');
+        menu_available = $(`#available_${menu_id}`);
+        menu_item = $(`#item-${menu_id}`);
+
+        if (menu_checked) {
+          menu_available.text('Available');
+          menu_item.removeClass('alert');
+          menu_item.removeClass('alert-danger');
+        } else {
+          menu_available.text('Unavailable');
+          menu_item.addClass('alert');
+          menu_item.addClass('alert-danger');
+        }
+      })
+    })
+  
+  </script>
+
+<% end %>
 
 
 

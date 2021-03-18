@@ -82,6 +82,14 @@ module Manager
       end
     end
 
+    def toggle_active
+      Rails.cache.delete("api/restaurant/#{@restaurant.id}/menu")
+      Rails.cache.delete("restaurant_order_menu_#{@restaurant.id}")
+      @menu = Menu.find(params[:menu_id])
+      @menu.available = !@menu.available
+      @menu.save
+    end
+
 
     # PATCH/PUT /menus/1
     # PATCH/PUT /menus/1.json
