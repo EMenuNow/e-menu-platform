@@ -22,11 +22,13 @@
   <% @restaurant.receipts.where(is_ready: false, source: :takeaway).uniq(&:uuid).group_by{|x|x.table_number}.each do |g, receipts| %>
     <h3 class="pt-3"><b><%= g.present? ? "Table number: #{g}" : "Orders" %></b></h3>
     <div class="card-body border col-12">
-      <% Receipt.group_by_time(receipts).each do |t, receipts| %>
-        <% if receipts.size > 1 && g.present? %>
-          <h4 class="pb-2 pt-3">Deliver together</h4>
-        <% end %>
-        <div class="row">
+      <div class="row">
+        <% Receipt.group_by_time(receipts).each do |t, receipts| %>
+          <% if receipts.size > 1 && g.present? %>
+            <div class="col-md-12">
+              <h4 class="pb-2 pt-3">Deliver together</h4>
+            </div>
+          <% end %>
           <% receipts.each do |receipt| %>
             <div class="card-body border col-md-4">
               <div id="receipt-<%= receipt.id %>-card" class="">
@@ -63,7 +65,7 @@
                     <% end %>
                   </ul>
                 </p>
-                <% if receipt.order.refunds.present? %>
+                <% if receipt&.order&.refunds.present? %>
                   <div class="btn btn-warning mt-3">Order has been refunded</div>
                 <% else %>
                   <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning mt-3 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
@@ -77,8 +79,8 @@
               </div>
             </div>
           <% end %>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
   <% end %>
 </div>

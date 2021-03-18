@@ -1,7 +1,7 @@
 class CheckoutService < ApplicationController
 
   attr_accessor :name, :total_payment, :service_type, :collection_time, :telephone, :address,
-                :table_number, :email, :house_number, :street, :postcode, :basket, :delivery_fee, :discount_code, :payment_in_pence, :basket_service
+                :table_number, :group_order, :email, :house_number, :street, :postcode, :basket, :delivery_fee, :discount_code, :payment_in_pence, :basket_service
 
   def initialize(restaurant, parameters, basket_service)
 
@@ -80,7 +80,8 @@ class CheckoutService < ApplicationController
       emenu_commission: @emenu_commission,
       chargeback_fee: @chargeback_fee,
       chargeback_enabled: @chargeback_enabled,
-      emenu_vat_charge: @emenu_vat_charge
+      emenu_vat_charge: @emenu_vat_charge,
+      group_order: @group_order
     )
     @order.patrons << @patron if @patron and !@order.patrons.include?(@patron)
     @order

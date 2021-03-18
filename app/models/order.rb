@@ -31,7 +31,8 @@ class Order < ApplicationRecord
         emenu_commission: self.emenu_commission,
         chargeback_fee: self.chargeback_fee,
         chargeback_enabled: self.chargeback_enabled,
-        emenu_vat_charge: self.emenu_vat_charge
+        emenu_vat_charge: self.emenu_vat_charge,
+        group_order: self.group_order
       )
     end
 

@@ -50,7 +50,7 @@
               <td><%= receipt.email %></td>
               <td>
                 <% if receipt.email.present? %><%= link_to 'Send Again', manager_send_receipts_path(receipt.id), class: "btn btn-info" %><% end %>
-                <% if receipt.order.refunds.present? %>
+                <% if receipt&.order&.refunds.present? %>
                   <div class="mt-3">Order has been refunded</div>
                 <% else %>
                   <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info mt-3', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>

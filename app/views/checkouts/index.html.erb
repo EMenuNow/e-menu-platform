@@ -24,7 +24,7 @@ function validateEmail(email) {
       val_telephone = $('#telephone').val()
       val_email = $('#email').val()
       val_table_number = $('#table_number').val()
- 
+
       valid_time = false
       valid_name = false
       valid_telephone = false
@@ -211,6 +211,7 @@ if (service_type == 'delivery'){
 
   $('#time-field').hide();
   $('#table-number-field').show();
+  $('#group-order-boolean').show();
   $('#name-field').hide();
   $('#telephone-field').hide();
   $('#email-field').show();
@@ -236,6 +237,7 @@ if (service_type == 'delivery'){
 //$('#help-info').hide();
 $('#time-field').hide();
 $('#table-number-field').hide();
+$('#group-order-boolean').hide();
 $('#name-field').hide();
 $('#telephone-field').hide();
 $('#email-field').hide();
@@ -328,8 +330,13 @@ $('#kitchen-delay').hide();
                   <div class="row">
                     <div class=' col-12 text-left form-group' id='table-number-field'>
                       <b><%= label_tag :table_number %> <strong id='table_number_required' class= 'text-danger'>*</strong></b>
-                      <%= label_tag "If ordering separately order within 2 mins of each other to get your orders at the same time" %>
                       <%= text_field_tag :table_number,  nil, placeholder: "Table number", class: "border p-2 bg-light form-control validation_check" %>
+                    </div>
+                    <div class=' col-12 text-left form-group' id='group-order-boolean'>
+                      <label>
+                        <%= check_box_tag :group_order %>
+                        <span>I'm ordering as a group and want my orders to arrive at the same time</span>
+                      </label>
                     </div>
                     <div id='name-field' class='col-sm-12 col-md-6 text-left form-group'>
                       <b><%= label_tag :name %> <strong id='name_required' class='text-danger'>*</strong></b>

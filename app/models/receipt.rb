@@ -14,9 +14,11 @@ class Receipt < ApplicationRecord
   #   @@my_logger ||= Logger.new("#{Rails.root}/log/mylog.log")
   # end
 
-  def item_breakdown
+  def group_item_breakdown
+  end
 
-    item_screens = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key <> 'FULL'")
+  def item_breakdown
+    item_screens = ItemScreen.where(restaurant_id: restaurant_id).joins(:item_screen_type).where("item_screen_types.key <> 'FULL'")
     if item_screens.present?
       items['items'].each do |item|
         ScreenItem.create(restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['item_screen_type_key'], uuid: item['uuid'])
@@ -31,7 +33,6 @@ class Receipt < ApplicationRecord
   end
 
   def broadcast_items
-
     @printers = Printer.where(restaurant_id: restaurant_id)
 
     item_screen_foods = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key = 'FOOD'")
@@ -48,13 +49,9 @@ class Receipt < ApplicationRecord
       html_drinks  = ApplicationController.render(partial: "manager/live/order_items_screen_specific", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant: restaurant_id, item_screen_type_key: 'DRINK' })
       ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks})
     end
-
   end
 
   def creation_print
-
-
-
     item_screens = ItemScreen.where(restaurant_id: restaurant_id).joins(:item_screen_type).where("item_screen_types.key = 'FULL'")
     item_screen = nil
     item_screen = item_screens.first if item_screens.present?
@@ -82,7 +79,10 @@ class Receipt < ApplicationRecord
 
   def print_receipt(printer, action='print')
     puts 'Hello'
-    print_receipt = ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: self, restaurant: restaurant_id })
+    print_receipt = ""
+    self.find_grouped_receipts.each do |x|
+      print_receipt += ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: x, restaurant: restaurant_id })
+    end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
@@ -122,7 +122,6 @@ class Receipt < ApplicationRecord
   end
 
   def print_receipt_grouped(printer, item_screen_type_key, action='print')
-    
     print_receipt = ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, item_screen_type_key: item_screen_type_key })
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
@@ -203,6 +202,12 @@ class Receipt < ApplicationRecord
     }
 
 
+  end
+
+  def find_grouped_receipts(seconds = 360)
+    return [self] if self.table_number.blank?
+    receipts = self.restaurant.receipts.where(table_number: self.table_number).limit(100).group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc }.select{|x,y|y.map(&:id).include?(self.id)}&.values&.first&.uniq(&:uuid)&.sort_by{|x|x.created_at}
+    DateTime.now.to_i > receipts.first.created_at.to_i + seconds ? receipts : []
   end
 
   def self.group_by_time(receipts, seconds = 360)
