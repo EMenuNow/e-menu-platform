@@ -78,10 +78,11 @@ class Receipt < ApplicationRecord
   end
 
   def print_receipt(printer, action='print')
-    puts 'Hello'
     print_receipt = ""
     self.find_grouped_receipts.each do |x|
       print_receipt += ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: x, restaurant: restaurant_id })
+    end.empty? and begin
+      return
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
@@ -122,7 +123,12 @@ class Receipt < ApplicationRecord
   end
 
   def print_receipt_grouped(printer, item_screen_type_key, action='print')
-    print_receipt = ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, item_screen_type_key: item_screen_type_key })
+    print_receipt = ""
+    self.find_grouped_receipts.each do |x|
+      print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, item_screen_type_key: item_screen_type_key })
+    end.empty? and begin
+      return
+    end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
@@ -204,13 +210,13 @@ class Receipt < ApplicationRecord
 
   end
 
-  def find_grouped_receipts(seconds = 360)
-    return [self] if self.table_number.blank?
+  def find_grouped_receipts(seconds = 300)
+    return [self] if self.table_number.blank? || !self.group_order
     receipts = self.restaurant.receipts.where(table_number: self.table_number).limit(100).group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc }.select{|x,y|y.map(&:id).include?(self.id)}&.values&.first&.uniq(&:uuid)&.sort_by{|x|x.created_at}
     DateTime.now.to_i > receipts.first.created_at.to_i + seconds ? receipts : []
   end
 
-  def self.group_by_time(receipts, seconds = 360)
+  def self.group_by_time(receipts, seconds = 300)
     receipts.group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc }
   end
 
