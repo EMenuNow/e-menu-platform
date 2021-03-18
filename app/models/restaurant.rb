@@ -39,6 +39,7 @@ class Restaurant < ApplicationRecord
   before_create :set_slug
 
   after_create :default_features
+  after_create :default_theme
 
   has_one_attached :image
   has_one_attached :background_image
@@ -177,6 +178,31 @@ class Restaurant < ApplicationRecord
     # 1 = Images
     # 8 = Menu in Sections
     # 13 = Checkout
+  end
+
+  def default_theme
+    theme = Theme.new
+    theme.restaurant_id = self.id
+    theme.color_primary = '#FFFFFF'
+    theme.color_secondary = '#182627'
+    
+    theme.css_font_url = 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&family=Raleway:wght@200;300&display=swap'
+    
+    theme.font_primary = 'Open Sans, Sans-Serif'
+    theme.font_weight_primary = 300
+    theme.text_transform_primary = 'none'
+    theme.font_style_primary = 'none'
+
+    theme.font_secondary = 'Raleway, sans-serif'
+    theme.font_weight_secondary = 200
+    theme.text_transform_secondary = 'none'
+    theme.font_style_secondary = 'none'
+
+    theme_css = File.read("#{Rails.root}/app/assets/stylesheets/restaurant/default_theme.css")
+
+    theme.custom_css = theme_css
+
+    theme.save
   end
 
 end
