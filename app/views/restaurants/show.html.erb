@@ -159,6 +159,12 @@
         </div>
       </div>
     <% end %>
+  <% elsif @restaurant.is_open and !enable_checkout?(@restaurant) %>
+    <div class="row">
+      <div class="col text-warning text-center border border-warning">
+          The Kitchen is not accepting orders at this time, please contact them directly to order
+      </div>
+    </div>
   <% end %>
 
   <% if @restaurant.is_open and (@restaurant.is_closing < @restaurant.opening_time.delay_time_minutes) %>
