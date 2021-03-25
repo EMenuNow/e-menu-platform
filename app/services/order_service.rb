@@ -13,8 +13,7 @@ class OrderService < ApplicationController
   def refund
     begin
       refund = Stripe::Refund.create({
-        payment_intent: @order.stripe_data['payment_intent'],
-        refund_application_fee: true
+        payment_intent: @order.stripe_data['payment_intent']
       })
       @order.refunds.create(stripe_data: refund)
       return true
