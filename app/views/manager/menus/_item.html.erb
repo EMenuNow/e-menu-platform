@@ -10,7 +10,7 @@
 
     %>
 
-    <li class='<%= available_css %> border p-1 m-1 <%= sub.node_type != 'item' ? "bg-secondary text-light pl-2" : "bg-light text-dark" %>'>
+    <li class='<%= available_css %> border p-1 m-1 <%= sub.node_type != 'item' ? "bg-secondary text-light pl-2" : "bg-light text-dark" %>' id='item-<%= sub.id %>'>
   
       <div class="row ">
         <% if sub.node_type != 'item' %>
@@ -55,15 +55,20 @@
         <div class="col management-description"> 
           <%=sub.description%>
         </div>
-        <div class="col-lg-1"> 
+        <div class="col-lg-1 switches"> 
 
-          <%= link_to 'toggle', manager_restaurant_menu_path(@restaurant, sub, menu: {available: !sub.available}, index: true),method: :put %>
-
-          <% if sub.available %>
-            <i class="fa fa-check available"> Available</i>
-          <% else %>
-            <i class="fa fa-times available"> Unavailable</i>
-          <% end %>
+          <%= check_box_tag dom_id(sub, :available), sub.id, sub.available, data: {
+                            remote: true,
+                            url: manager_restaurant_menu_toggle_active_path(@restaurant, sub),
+                            method: :post
+                            }, class: "available_menu" %>
+          <label for="<%= dom_id(sub, :available) %>">
+            <span id="available_<%= sub.id %>" class="management-description pr-2">
+              <%= sub.available ? "Available" : "Unavailable" %>
+            </span>
+            <span></span>
+          </label>
+          
         </div>
         <div class="col-lg-1"> 
           Position: <%= sub.position%>  
