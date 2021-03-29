@@ -5,6 +5,7 @@ module Manager
     before_action :authenticate_manager_restaurant_user!, except: [:index]
     before_action :set_restaurant, except: [:send_receipt, :orders_broadcast]
     before_action :set_item_screens, except: [:send_receipt, :orders_broadcast]
+    before_action :set_features, only: [:food, :drinks, :orders]
     
     layout :layout_chooser
 
@@ -82,6 +83,10 @@ module Manager
     def set_item_screens
 
       @item_screens = ItemScreen.where(restaurant_id: @restaurant.id)
+    end
+    def set_features
+      @features = Feature.all
+      @services = Feature.find([12,9,11,10])
     end
 
   end

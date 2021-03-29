@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_16_164931) do
+ActiveRecord::Schema.define(version: 2021_03_24_071958) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -443,6 +443,7 @@ ActiveRecord::Schema.define(version: 2021_03_16_164931) do
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
     t.boolean "group_order"
+    t.string "processing_status", default: "pending"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"
     t.index ["restaurant_id"], name: "index_receipts_on_restaurant_id"
