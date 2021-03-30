@@ -132,13 +132,15 @@ class ReceiptsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_receipt
-      @receipt = Receipt.find(params[:id])
-    end
+  
+  # Use callbacks to share common setup or constraints between actions.
+  def set_receipt
+    @receipt = Receipt.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def receipt_params
-      params.require(:receipt).permit(:uuid, :restaurant_id, :basket_total, :email, :stripe_token, :is_ready, :name, items: {}, status: {})
-    end
+  # Only allow a list of trusted parameters through.
+  def receipt_params
+    params.require(:receipt).permit(:uuid, :restaurant_id, :basket_total, :email, :stripe_token, :is_ready, :name, items: {}, status: {})
+  end
+
 end
