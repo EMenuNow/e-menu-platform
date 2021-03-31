@@ -122,6 +122,7 @@ Rails.application.routes.draw do
 
     get 'live_tables/:restaurant_id' => 'live#tables', as: :live_tables
     get 'live_items/:restaurant_id' => 'live#items', as: :live_items
+    get 'live_orders/:restaurant_id/kitchen' => 'live#kitchen', as: :live_orders_kitchen
     get 'live_orders/:restaurant_id' => 'live#orders', as: :live_orders
     get 'live_orders/broadcast/:restaurant_id' => 'live#orders_broadcast', as: :live_orders_broadcast
     get 'live_food/:restaurant_id' => 'live#food', as: :live_food

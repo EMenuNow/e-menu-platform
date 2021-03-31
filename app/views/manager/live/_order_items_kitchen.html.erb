@@ -1,0 +1,160 @@
+<% content_for :js do %>
+  <script>
+    $(function() {
+      $(".receipt-ready").on('confirm:complete', function(e) {
+        if (e.originalEvent.detail[0]) {
+          var receiptId = this.id.match(/\d+/);
+          $(`#receipt-${receiptId}-card`).hide();
+        };
+      });
+    });
+  </script>
+<% end %> 
+
+<% @restaurant = Restaurant.where(id: restaurant.id).first if @restaurant.blank? %>
+
+<div id="receipt-group" class="bg-dark pt-3 container-fluid">
+  <div class="col-12">
+    <div class="row my-1">
+      <% @restaurant.receipts.where(is_ready: false, source: :takeaway).sort_by{|x|x.created_at}.reverse.uniq(&:uuid).group_by{|x|x.table_number}.each do |g, receipts| %>
+        <% Receipt.group_by_time(receipts).each do |t, receipts| %>
+          <% receipt = receipts.first %>
+          <div class="col-4 p-0">
+            <div class="bg-light rounded m-1" style="height: 400px">
+              <div class="row m-0 py-3">
+                <div class="col-2">
+                  <h5 style="font-size:0.8em;" class="text-center m-0">#<%=receipt.uuid.truncate(4, omission: '')%></h5>
+                </div>
+                <div class="col-8 text-center">
+                  <h5 style="font-size:0.8em;" class="text-left m-0"><%=receipt.name%> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
+                </div>
+                <div class="col-2">
+                  <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
+                </div>
+              </div>
+              <hr class="m-0" />
+              <div class="row m-0" style="height:330px;overflow-y: auto;">
+                <div class="col">
+                  <div class="row mt-3">
+                    <div class="col-8">
+                      <a class="btn btn-warning p-0 px-1 "><%= receipt.processing_status %></a>
+                      <% if receipt&.order&.refunds.present? %>
+                        <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
+                      <% else %>
+                        <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
+                        <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>
+                      <% end %>
+                      <% printers.each do |printer|%>
+                        <%# binding.pry %>
+                        <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-1' %>
+                      <% end %>
+                    </div>
+                    <div class="col-4 text-right">
+                      <h5 style="font-size:0.8em;" class="text-center m-0 d-inline-block"><%=receipt.collection_time.presence || "ASAP" %></h5>
+                    </div>
+                  </div>
+                  <hr class="" />
+                  <% if receipt.delivery_or_collection == "delivery" %>
+                    <div class="row pb-2">
+                      <div class="col-12">
+                        <%= "Deliver to: #{receipt.address}" %>
+                      </div>
+                    </div>
+                  <% end %>
+                  <% receipts.each do |receipt| %>
+                    <% receipt.items['items'].each do |item| %>
+                      <div class="row pb-2">
+                        <div class="col-8">
+                          <%= item['item'].html_safe %>
+                        </div>
+                        <div class="col-4">
+                          <small>
+                            <%= item['optionals'].join('<br> ').html_safe%>
+                            <br />
+                            <% if item['note'].present? %>
+                              <strong>Note: </strong> <%=item['note']%>
+                            <% end %>
+                          </small>
+                        </div>
+                      </div>
+                      <hr class="m-0 mb-2" />
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+              <div class="row m-0">
+                <div class="col-9 px-1">
+                  <h5 style="font-size:0.8em;"><i class="fa fa-1x fa-clock"></i> <%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
+                </div>
+                <div class="col-3 px-1">
+                  <h5 style="font-size:0.8em;">QUICK ACTION</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+            <%
+=begin%>
+      <div class="col-12">
+        <div class="row">
+          <% Receipt.group_by_time(receipts).each do |t, receipts| %>
+ <% if g.present? && receipts.select{|x|x.group_order}.present? %>
+              <div class="col-md-12">
+                <h4 class="pb-2 pt-3">Deliver together</h4>
+              </div>
+            <% else %>
+              <div class="col-md-12">
+                <h4 class="pb-2 pt-3">Deliver based on requested time</h4>
+              </div>
+            <% end %> 
+<%
+=end%>
+            <%
+=begin%>
+ <% receipts.each do |receipt| %>
+              <div class="card-body border col-md-12 my-1">
+                <div id="receipt-<%= receipt.id %>-card" class="">
+                  <% if false %>
+                  <p class="card-text">
+                    <ul class="list-group">
+                      <% receipt.items['items'].each do |item| %>
+                        <li class="list-group-item">
+                          <div class="row">
+                            <div class="col"><%= item['item'].html_safe%></div>
+                          </div>
+                          <div class="row">
+                            <div class="col"><small><%= item['optionals'].join('<br> ').html_safe%></small></div>
+                          </div>
+                          <% if item['note'].present? %>
+                            <div class="row">
+                              <div class="col"><strong>Note: </strong><%=item['note']%></div>
+                            </div>
+                          <% end %>
+                        </li>
+                      <% end %>
+                    </ul>
+                  </p>
+                  <% if receipt&.order&.refunds.present? %>
+                    <div class="btn btn-warning mt-3">Order has been refunded</div>
+                  <% else %>
+                    <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning mt-3 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
+                    <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info mt-3', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>
+                  <% end %>
+                  <%= link_to "creation_broadcast",receipt_creation_broadcast_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-danger mt-3' if Rails.env=='development' %>
+                  <% printers.each do |printer|%>
+                    <%# binding.pry %>
+                    <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info  mt-3' %>
+                  <% end %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %> 
+          <% end %>
+        </div>
+      </div>
+<%
+=end%>
+      <% end %>
+    </div>
+  </div>
+</div>

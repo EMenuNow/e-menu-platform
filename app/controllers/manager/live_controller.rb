@@ -5,7 +5,8 @@ module Manager
     before_action :authenticate_manager_restaurant_user!, except: [:index]
     before_action :set_restaurant, except: [:send_receipt, :orders_broadcast]
     before_action :set_item_screens, except: [:send_receipt, :orders_broadcast]
-    before_action :set_features, only: [:food, :drinks, :orders]
+    before_action :set_features, only: [:food, :drinks, :orders, :kitchen]
+    before_action :set_printers, only: [:orders, :kitchen]
     
     layout :layout_chooser
 
@@ -14,7 +15,6 @@ module Manager
       if ['food','drinks','orders'].include?(params[:action])
         'live_screen_manager'
       end
-      
     end
 
     def tables
@@ -27,8 +27,10 @@ module Manager
     def order
       
     end
+    def kitchen
+      
+    end
     def orders
-      @printers = Printer.where(restaurant_id: @restaurant.id)
     end
     def food
       item_screens = ItemScreen.where(restaurant_id: @restaurant.id).joins(:item_screen_type).where("item_screen_types.key = 'FOOD'")
@@ -80,13 +82,17 @@ module Manager
       Receipt.last.broadcast
     end
 
-    def set_item_screens
+    private
 
+    def set_item_screens
       @item_screens = ItemScreen.where(restaurant_id: @restaurant.id)
     end
     def set_features
       @features = Feature.all
       @services = Feature.find([12,9,11,10])
+    end
+    def set_printers
+      @printers = Printer.where(restaurant_id: @restaurant.id)
     end
 
   end

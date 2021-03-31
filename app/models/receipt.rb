@@ -14,6 +14,10 @@ class Receipt < ApplicationRecord
   #   @@my_logger ||= Logger.new("#{Rails.root}/log/mylog.log")
   # end
 
+  def order_id
+    uuid.truncate(4, omission: '')
+  end
+
   def group_item_breakdown
   end
 
@@ -217,7 +221,7 @@ class Receipt < ApplicationRecord
   end
 
   def self.group_by_time(receipts, seconds = 300)
-    receipts.group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc && x.group_order }.sort_by{|x,y|y.first.created_at}
+    receipts.group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc && (x.group_order ? true : rand(1..100000) ) }.sort_by{|x,y|y.first.created_at}
   end
 
 end

@@ -1,0 +1,154 @@
+<% receipt = receipts.first %>
+<div class="modal fade" id="modal<%= receipt.order_id %>" tabindex="-1" role="dialog" aria-labelledby="<%= receipt.order_id %>" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered rounded" role="document">
+    <div class="modal-content overflow-hidden" style="border-radius: 15px!important;">
+      <div class="modal-header text-center bg-dark text-white p-0">
+        <div class="row m-0 py-3 w-100">
+          <div class="col-3 text-left">
+            <h5 style="font-size:1em;" class="text-left m-0">#<%=receipt.uuid.truncate(4, omission: '')%></h5>
+          </div>
+          <div class="col-6 text-center">
+            <h5 style="font-size:1em;" class="text-left m-0"><%=receipt.name%> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
+          </div>
+          <div class="col-3 text-right">
+            <h5 style="font-size:1em;" class="text-right m-0"><%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body text-center px-0">
+        <div class="row m-0" style="height:330px;overflow-y: auto;">
+          <div class="col">
+            <div class="row">
+              <div class="col-8 text-left">
+                <a class="btn btn-warning p-0 px-1 "><%= receipt.processing_status %></a>
+              </div>
+              <div class="col-4 text-right">
+                <h5 style="font-size:0.8em;" class="text-center m-0 d-inline-block"><%=receipt.collection_time.presence || "ASAP" %></h5>
+              </div>
+            </div>
+            <hr class="" />
+            <div class="row">
+              <div class="col-12 text-left">
+                <div class="btn bg-secondary text-white p-0 px-1"><%= receipt.items['items'].size %> items</div>
+              </div>
+            </div>
+            <hr class="" />
+            <% if receipt.delivery_or_collection == "delivery" %>
+              <div class="row pb-2">
+                <div class="col-12">
+                  <%= "Deliver to: #{receipt.address}" %>
+                </div>
+              </div>
+            <% end %>
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item w-50">
+                <a class="nav-link active" id="order-tab" data-toggle="tab" href="#ordertab<%= receipt.order_id %>" role="tab" aria-controls="order" aria-selected="true">Order</a>
+              </li>
+              <li class="nav-item w-50">
+                <a class="nav-link" id="detail-tab" data-toggle="tab" href="#detailtab<%= receipt.order_id %>" role="tab" aria-controls="detail" aria-selected="false">Details</a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="ordertab<%= receipt.order_id %>" role="tabpanel" aria-labelledby="order-tab">
+                <% receipts.each do |receipt| %>
+                  <% receipt.items['items'].each do |item| %>
+                    <div class="row py-3 text-left">
+                      <div class="col-8">
+                        <%= item['item'].html_safe %>
+                      </div>
+                      <div class="col-4">
+                        <small>
+                          <%= item['optionals'].join('<br> ').html_safe%>
+                          <br />
+                          <% if item['note'].present? %>
+                            <strong>Note: </strong> <%=item['note']%>
+                          <% end %>
+                        </small>
+                      </div>
+                    </div>
+                    <hr class="m-0 mb-2" />
+                  <% end %>
+                <% end %>
+              </div>
+              <div class="tab-pane fade py-3" id="detailtab<%= receipt.order_id %>" role="tabpanel" aria-labelledby="detail-tab">
+                <div class="row">
+                  <div class="col-5 text-right">
+                    <h5><b>Placed</b></h5>
+                  </div>
+                  <div class="col-7">
+                    <h5 style="font-size:1em;"><i class="fa fa-1x fa-clock"></i> <%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
+                  </div>
+                </div>
+                <div class="row pt-3">
+                  <div class="col-5 text-right">
+                    <h5><b>Due</b></h5>
+                  </div>
+                  <div class="col-7">
+                    <h5 style="font-size:1em;" class="text-center m-0 d-inline-block"><%=receipt.collection_time.presence || "ASAP" %></h5>
+                  </div>
+                </div>
+                <div class="row pt-3">
+                  <div class="col-5 text-right">
+                    <h5><b>Type</b></h5>
+                  </div>
+                  <div class="col-7">
+                    <h5 style="font-size:1em;" class="text-center m-0"><%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
+                  </div>
+                </div>
+                <div class="row pt-3">
+                  <div class="col-5 text-right">
+                    <h5><b>Payment</b></h5>
+                  </div>
+                  <div class="col-7">
+                    <h5 style="font-size:1em;" class="text-center m-0"><%= receipt.order&.stripe_data.try(:[], "payment_status")&.titleize %></h5>
+                  </div>
+                </div>
+                <div class="row pt-3">
+                  <div class="col-5 text-right">
+                    <h5><b>Customer name</b></h5>
+                  </div>
+                  <div class="col-7">
+                    <h5 style="font-size:1em;" class="text-center m-0"><%=receipts.map{|x|x&.name}.compact.join(",").gsub(",",", ")%></h5>
+                  </div>
+                </div>
+                <div class="row pt-3">
+                  <div class="col-5 text-right">
+                    <h5><b>Customer email</b></h5>
+                  </div>
+                  <div class="col-7">
+                    <h5 style="font-size:1em;" class="text-center m-0"><%=receipts.map{|x|x&.order&.email}.compact.join(",").gsub(",",", ")%></h5>
+                  </div>
+                </div>
+                <div class="row pt-3">
+                  <div class="col-5 text-right">
+                    <h5><b>Customer phone</b></h5>
+                  </div>
+                  <div class="col-7">
+                    <h5 style="font-size:1em;" class="text-center m-0"><%=receipts.map{|x|x&.telephone}.compact.join(",").gsub(",",", ")%></h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row m-0">
+          <div class="col-4 text-left pt-2">
+            <h5 style="font-size:0.8em;"><i class="fa fa-1x fa-clock"></i> <%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
+          </div>
+          <div class="col-8 text-right">
+            <% if receipt&.order&.refunds.present? %>
+              <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
+            <% else %>
+              <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
+              <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>
+            <% end %>
+            <% printers.each do |printer|%>
+              <%# binding.pry %>
+              <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-1' %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

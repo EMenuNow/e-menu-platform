@@ -14,7 +14,7 @@
       });
     });
     
-    window.addEventListener("#dismiss-loader", function() {
+    window.addEventListener("click", function() {
       order_bell = new Audio("<%= asset_path("order-bell.wav") %>");
       order_bell.play().then(() => { order_bell.pause()} )
     });
@@ -31,6 +31,6 @@
   </div>
 </div>
 
-<div id='current-orders' class="pt-5">
-  <%= render 'manager/live/order_items', printers: @printers %>
+<div class='bg-dark pt-5' id='current-orders'>
+  <%= render 'manager/live/order_items_kitchen', printers: @printers %>
 </div>
