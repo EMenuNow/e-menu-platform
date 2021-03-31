@@ -123,7 +123,7 @@
 
             
               <input type='hidden' value='<%=required_lists.uniq.join(',')%>' id="required-lists-<%= main_item %>">
-              <%= text_field_tag "notes-#{main_item}", nil,  placeholder: "Tell the Kitchen: Allergies etc...", class: 'form-control selection-item ', 'data-scope' => main_item, 'data-start_price' => start_price %>
+              <%= text_field_tag "notes-#{main_item}", nil,  placeholder: "Tell the Kitchen: Allergies etc...", class: 'form-control ', 'data-scope' => main_item, 'data-start_price' => start_price %>
               
             </div>
 

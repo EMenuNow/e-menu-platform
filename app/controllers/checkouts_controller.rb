@@ -40,8 +40,8 @@ class CheckoutsController < ApplicationController
   private
 
   def stripe_parameters
-    @parameters = params.slice(:service_type, :total, :price, :service_type, :collection_time, :table_number, :name, :telephone, :email, :house_number,
-    :street, :postcode, :basket, :delivery_fee, :apple_and_google, :stripe_success_token, :group_order)
+    @parameters = params.slice(:service_type, :total, :price, :service_type, :collection_time, :due_date, :table_number, :name, :telephone, :email, :house_number,
+    :street, :postcode, :basket, :delivery_fee, :apple_and_google, :stripe_success_token)
   end
 
   def get_restaurant
