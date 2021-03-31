@@ -29,10 +29,15 @@
       <td><%=@receipt.delivery_or_collection%></td>
     </tr>
     <% if @receipt.delivery_or_collection != 'tableservice'  %>
-    <tr>
-      <td style='text-align: right;'>Time:</td>
-      <td><%=@receipt.collection_time%></td>
-    </tr>
+      <% d = @receipt.due_date.in_time_zone(@restaurant.time_zone) %>
+      <tr>
+        <td style='text-align: right;'>Date:</td>
+        <td><%= d.strftime("%A, #{d.day.ordinalize} %B %Y") %></td>
+      </tr>
+      <tr>
+        <td style='text-align: right;'>Time:</td>
+        <td><%=@receipt.collection_time%></td>
+      </tr>
     <% end %>
     <% if @receipt.email.present? %> <tr>
       <td style='text-align: right;'>Email:</td>

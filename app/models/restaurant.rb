@@ -118,7 +118,13 @@ class Restaurant < ApplicationRecord
     # For next 7 days
     (0..6).each do |i|
       d = t + i.day
-      day_name = d.strftime("%A").titleize
+      if i == 0
+        day_name = "Today"
+      elsif i == 1
+        day_name = d.strftime("Tomorrow, #{d.day.ordinalize} %B")
+      else
+        day_name = d.strftime("%A, #{d.day.ordinalize} %B")
+      end
       # Add day to options if able to take order
       days << {value: i, text: day_name} unless self.available_times(i).empty?
     end
@@ -177,7 +183,7 @@ class Restaurant < ApplicationRecord
   def availability
     availability = []
     available_days.each do |i|
-      availability << {day: i[:text], times: available_times(i[:value])}
+      availability << {day: i[:value], times: available_times(i[:value])}
     end
     availability
   end

@@ -446,8 +446,8 @@ ActiveRecord::Schema.define(version: 2021_03_30_152021) do
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
     t.boolean "group_order"
-    t.string "processing_status", default: "pending"
     t.datetime "due_date"
+    t.string "processing_status", default: "pending"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"
     t.index ["restaurant_id"], name: "index_receipts_on_restaurant_id"
