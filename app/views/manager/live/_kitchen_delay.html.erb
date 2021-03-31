@@ -9,10 +9,6 @@
   </script>
 <% end %> 
 
-<% Stripe.api_key = @restaurant.stripe_sk_api_key %>
-<% available = 0 || Stripe::Balance.retrieve(stripe_account: @restaurant.stripe_connected_account_id)["available"].first %>
-
-
 <div class='p-3 position-fixed w-100 bg-dark' style='z-index:100;left:0;'>
   <%
     redirect_path = params[:action]

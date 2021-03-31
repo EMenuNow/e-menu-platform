@@ -54,6 +54,7 @@ Rails.application.routes.draw do
 
   resources :receipts do 
     post 'is_ready'
+    post :send_to_kitchen
     post 'is_item_ready/:screen_item_id', to: 'receipts#is_item_ready', as: :screen_item_ready
     post 'is_items_ready/:receipt_id/item_screen_type_key/:item_screen_type_key', to: 'receipts#is_items_ready', as: :screen_items_ready
     post 'item_creation_broadcast'
@@ -92,6 +93,7 @@ Rails.application.routes.draw do
       get 'menu_item/:id', to: 'menu#menu_item'
       get 'menu_optionals', to: 'menu#menu_optionals'
       get 'menu_optionals/:items', to: 'menu#menu_optionals'
+      resources :receipts, only: [:update]
     end
   end
   namespace :manager do

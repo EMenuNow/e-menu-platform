@@ -1,3 +1,4 @@
+
 <div class="modal fade" id="singleModal" tabindex="-1" role="dialog" aria-labelledby="singleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered rounded" role="document">
     <div class="modal-content overflow-hidden" style="border-radius: 15px!important;">
@@ -10,7 +11,15 @@
       <div class="modal-body text-center">
         <% case type %>
         <% when "settings" %>
+          <% Stripe.api_key = @restaurant.stripe_sk_api_key %>
+          <% available = Stripe::Balance.retrieve(stripe_account: @restaurant.stripe_connected_account_id)["available"].first %>
           <%= render partial: "manager/restaurants/settings" %>
+          <div class="row mb-0">
+            <div class="col-8 offset-2 text-left pt-3 pb-3">
+              <p class="m-0">Your restaurant's available balance: <%= number_to_currency(available["amount"] / 100.0, unit: @restaurant.currency_symbol) %></p>
+              <p>Top up your balance in stripe account setup by your EMenu service representative</p>
+            </div>
+          </div>
         <% when "orders" %>
           <%= render partial: "manager/live/order_modals" %>
         <% end %>

@@ -20,7 +20,15 @@
           <div class="col">
             <div class="row">
               <div class="col-8 text-left">
-                <a class="btn btn-warning p-0 px-1 "><%= receipt.processing_status %></a>
+                <a class="btn bg-secondary text-white p-0 px-1 "><%= receipt.processing_status.titleize %></a>
+                <% if receipt.processing_status == "pending" %>
+                  <%= link_to "Accept order",receipt_send_to_kitchen_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 send-to-kitchen', :id => "acceptorder#{receipt.order_id}" %>
+                  <script type="text/javascript">
+                    $('#<%="acceptorder#{receipt.order_id}"%>').on('ajax:success', function(ev) {
+                      $(this).text("Accepted")
+                    })
+                  </script>
+                <% end %>
               </div>
               <div class="col-4 text-right">
                 <h5 style="font-size:0.8em;" class="text-center m-0 d-inline-block"><%=receipt.collection_time.presence || "ASAP" %></h5>
@@ -32,7 +40,7 @@
                 <div class="btn bg-secondary text-white p-0 px-1"><%= receipt.items['items'].size %> items</div>
               </div>
             </div>
-            <hr class="" />
+            <hr class="mb-0" />
             <% if receipt.delivery_or_collection == "delivery" %>
               <div class="row pb-2">
                 <div class="col-12">

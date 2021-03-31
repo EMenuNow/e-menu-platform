@@ -16,7 +16,7 @@
 <div id="receipt-group" class="bg-dark pt-3 container-fluid">
   <div class="col-12">
     <div class="row my-1">
-      <% @restaurant.receipts.where(is_ready: false, source: :takeaway).sort_by{|x|x.created_at}.reverse.uniq(&:uuid).group_by{|x|x.table_number}.each do |g, receipts| %>
+      <% @restaurant.receipts.where(is_ready: false, source: :takeaway).where.not(processing_status: "pending").sort_by{|x|x.created_at}.reverse.uniq(&:uuid).group_by{|x|x.table_number}.each do |g, receipts| %>
         <% Receipt.group_by_time(receipts).each do |t, receipts| %>
           <% receipt = receipts.first %>
           <div class="col-4 p-0">
@@ -87,7 +87,6 @@
                   <h5 style="font-size:0.8em;"><i class="fa fa-1x fa-clock"></i> <%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
                 </div>
                 <div class="col-3 px-1">
-                  <h5 style="font-size:0.8em;">QUICK ACTION</h5>
                 </div>
               </div>
             </div>
@@ -154,6 +153,10 @@
       </div>
 <%
 =end%>
+      <% end.empty? && begin %>
+        <div class="col pt-5 my-3 text-white text-center">
+          <h3>No orders to view</h3>
+        </div>
       <% end %>
     </div>
   </div>

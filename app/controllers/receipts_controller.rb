@@ -37,6 +37,14 @@ class ReceiptsController < ApplicationController
     # @receipt.broadcast
     # redirect_to manager_live_orders_path(@restaurant.id)
   end
+  def send_to_kitchen
+    @receipt = Receipt.find(params[:receipt_id])
+    @receipt.processing_status = "accepted"
+    @receipt.save
+    @restaurant = @receipt.restaurant
+    # @receipt.broadcast
+    # redirect_to manager_live_orders_path(@restaurant.id)
+  end
 
 
   def is_item_ready
