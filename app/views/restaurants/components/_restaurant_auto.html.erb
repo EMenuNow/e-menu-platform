@@ -65,7 +65,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
     </div>
     <div class='col-sm-4 basket-body'>
       <div class='col-sm-auto'>
-        <%= render 'restaurants/components/basket' if enable_checkout?(@restaurant) %>
+        <%= render 'restaurants/components/basket' if is_takeaway_or_delivery?(@restaurant) %>
       </div>
     </div>
   </div>

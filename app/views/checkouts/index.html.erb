@@ -4,149 +4,160 @@
 
 <script type="text/javascript">
 
+var availability = <%= @delivery_availability.to_json.html_safe %>;
 
 function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);
 }
 
-    $('.validation_check').on("keyup change", function() {   
-       validate();
+$('.validation_check').on("keyup change", function() {   
+    validate();
 
-    });
+});
 
-    function validate(){
+function validate(){
 
-      $('.pay-now-payment').addClass('disabled')
+  $('.pay-now-payment').addClass('disabled')
 
-      val_time = $('#collection_time').val()
-      val_name = $('#name').val()
-      val_telephone = $('#telephone').val()
-      val_email = $('#email').val()
-      val_table_number = $('#table_number').val()
+  val_date = $('#date_offset').val()
+  val_time = $('#collection_time').val()
+  val_name = $('#name').val()
+  val_telephone = $('#telephone').val()
+  val_email = $('#email').val()
+  val_table_number = $('#table_number').val()
 
-      valid_time = false
-      valid_name = false
-      valid_telephone = false
-      valid_email = false
-      valid_table_number = false
-      valid_address_house_number = false
-      valid_address_street = false
-      valid_address_postcode = false
-
-
-      <% if is_delivery?(@restaurant)%>
-      val_address_house_number = $('#house_number').val()
-      val_address_street = $('#street').val()
-      val_address_postcode_prefix = $('#postcode_prefix').val()
-      val_address_postcode_suffix = $('#postcode_suffix').val()
-        
-      // alert('val')
-      if (val_address_house_number.length < 1){
-        // alert("Please enter a name");
-        $('#house_number_required').html('*');  
-        valid_address_house_number = false      
-      } else {
-        $('#house_number_required').html('');
-        valid_address_house_number = true
-      }
-
-      if (val_address_street.length < 3){
-        // alert("Please enter a name");
-        $('#street_required').html('*');  
-        valid_address_street = false      
-      } else {
-        $('#street_required').html('');
-        valid_address_street = true
-      }
-
-      if (val_address_postcode_suffix.length < 3 || val_address_postcode_prefix.length < 1){
-        // alert("Please enter a name");
-        $('#postcode_required').html('*');  
-        valid_address_postcode = false      
-      } else {
-        $('#postcode_required').html('');
-        valid_address_postcode = true
-      }
-
-      <% end %>
+  valid_date = false
+  valid_time = false
+  valid_name = false
+  valid_telephone = false
+  valid_email = false
+  valid_table_number = false
+  valid_address_house_number = false
+  valid_address_street = false
+  valid_address_postcode = false
 
 
-      // alert('val')
-      if (!val_time){
-        // alert("Please enter a time");
-        $('#time_required').html('*');  
-        valid_time = false      
-      } else {
-        $('#time_required').html('');
-        valid_time = true
-      }
+  <% if is_delivery?(@restaurant)%>
+  val_address_house_number = $('#house_number').val()
+  val_address_street = $('#street').val()
+  val_address_postcode_prefix = $('#postcode_prefix').val()
+  val_address_postcode_suffix = $('#postcode_suffix').val()
+    
+  // alert('val')
+  if (val_address_house_number.length < 1){
+    // alert("Please enter a name");
+    $('#house_number_required').html('*');  
+    valid_address_house_number = false      
+  } else {
+    $('#house_number_required').html('');
+    valid_address_house_number = true
+  }
 
-      if (val_name.length < 2){
-        // alert("Please enter a name");
-        $('#name_required').html('*');  
-        valid_name = false      
-      } else {
-        $('#name_required').html('');
-        valid_name = true
-      }
+  if (val_address_street.length < 3){
+    // alert("Please enter a name");
+    $('#street_required').html('*');  
+    valid_address_street = false      
+  } else {
+    $('#street_required').html('');
+    valid_address_street = true
+  }
 
-      if (val_telephone.length < 10){
-        $('#telephone_required').html('*');  
-        valid_telephone = false      
-      } else {
-        $('#telephone_required').html('');
-        valid_telephone = true
-      }
+  if (val_address_postcode_suffix.length < 3 || val_address_postcode_prefix.length < 1){
+    // alert("Please enter a name");
+    $('#postcode_required').html('*');  
+    valid_address_postcode = false      
+  } else {
+    $('#postcode_required').html('');
+    valid_address_postcode = true
+  }
 
-      if (val_table_number.length < 1){
-        $('#table_number_required').html('*'); 
-        valid_table_number = false      
-      } else {
-        $('#table_number_required').html('');
-        valid_table_number = true
-      }
-
-      if (!validateEmail(val_email)) {
-        $('#email_required').html('*');  
-        valid_email = false      
-      } else {
-        $('#email_required').html('');
-        valid_email = true
-      }
+  <% end %>
 
 
-      if (valid_address_house_number & valid_address_street & valid_address_postcode){
-        $('#address_required').html('');
-      } else {
-        $('#address_required').html('*');
-      }
+  if (!val_date){
+    // alert("Please select a day");
+    $('#date_required').html('*');  
+    valid_date = false      
+  } else {
+    $('#date_required').html('');
+    valid_date = true
+  }
 
-      service_type = $('#service_type').val();
-      // console.log(service_type);
-      if (service_type == 'tableservice'){
-        if (valid_table_number & valid_email){
-            $('#pay-now-button').show();
-        } else {
-            $('#pay-now-button').hide();
-        }
-      } else if (service_type == 'delivery'){    
-        prefix = $("#postcode_prefix option:selected").text();
-        suffix = $("#postcode_suffix").val().toUpperCase();
-        $("#postcode").val( prefix + ' ' + suffix  );
-        if (valid_address_house_number & valid_address_street & valid_address_postcode & valid_telephone & valid_time & valid_name & valid_email){   
-           $('#pay-now-button').show();
-        } else {
-           $('#pay-now-button').hide();
-        }
-      } else if (service_type == 'collection') {
-        if (valid_telephone & valid_time & valid_name & valid_email){
-           $('#pay-now-button').show();
-        } else {
-           $('#pay-now-button').hide();
-        }
-      }
+  if (!val_time){
+    // alert("Please enter a time");
+    $('#time_required').html('*');  
+    valid_time = false      
+  } else {
+    $('#time_required').html('');
+    valid_time = true
+  }
+
+  if (val_name.length < 2){
+    // alert("Please enter a name");
+    $('#name_required').html('*');  
+    valid_name = false      
+  } else {
+    $('#name_required').html('');
+    valid_name = true
+  }
+
+  if (val_telephone.length < 10){
+    $('#telephone_required').html('*');  
+    valid_telephone = false      
+  } else {
+    $('#telephone_required').html('');
+    valid_telephone = true
+  }
+
+  if (val_table_number.length < 1){
+    $('#table_number_required').html('*'); 
+    valid_table_number = false      
+  } else {
+    $('#table_number_required').html('');
+    valid_table_number = true
+  }
+
+  if (!validateEmail(val_email)) {
+    $('#email_required').html('*');  
+    valid_email = false      
+  } else {
+    $('#email_required').html('');
+    valid_email = true
+  }
+
+
+  if (valid_address_house_number & valid_address_street & valid_address_postcode){
+    $('#address_required').html('');
+  } else {
+    $('#address_required').html('*');
+  }
+
+  service_type = $('#service_type').val();
+  // console.log(service_type);
+  if (service_type == 'tableservice'){
+    if (valid_table_number & valid_email){
+        $('#pay-now-button').show();
+    } else {
+        $('#pay-now-button').hide();
     }
+  } else if (service_type == 'delivery'){    
+    prefix = $("#postcode_prefix option:selected").text();
+    suffix = $("#postcode_suffix").val().toUpperCase();
+    $("#postcode").val( prefix + ' ' + suffix  );
+    if (valid_address_house_number & valid_address_street & valid_address_postcode & valid_telephone & valid_time & valid_name & valid_email){   
+        $('#pay-now-button').show();
+    } else {
+        $('#pay-now-button').hide();
+    }
+  } else if (service_type == 'collection') {
+    if (valid_telephone & valid_time & valid_name & valid_email){
+        $('#pay-now-button').show();
+    } else {
+        $('#pay-now-button').hide();
+    }
+  }
+}
 
 
 
@@ -167,90 +178,106 @@ $(function(){
 
   });
 
-$('#service_type').change(function(){
-  service_type = $(this).val();
-//  console.log(service_type)
-  validate();
-if (service_type == 'delivery'){
+  $('#date_offset').change(function(){
+    var offset = $(this).val();
 
-  $('#time-field').show();
-  $('#table-number-field').hide();
-  $('#name-field').show();
-  $('#telephone-field').show();
-  $('#email-field').show();
-  $('#address-field').show();
-  $('#payment-info').show();
-  $('#delivery-fee').show();
-  $('#total-info').show();
-  $('#basket-total').show();
-  $('#delivery-info').show();
-  $('#pay-now-button').hide();
-  $('#help-info').hide();
-  $('#kitchen-delay').hide();
-  $('.delivery_fee_calculate').change();
+    // var newDay = availability.find(o => o.day === offset);
+    var newDay = $.grep(availability, function(o) { return o.day == offset });
+    var newTimes = newDay[0].times;
+    console.log(newTimes);
+    var $el = $("#collection_time");
+    $el.empty(); // remove old options
+    $el.append($("<option></option>").attr("value", "").text("Select Time")); // add placeholder
+    $.each(newTimes, function(key,value) {
+      $el.append($("<option></option>")
+      .attr("value", value.value).text(value.text));
+    });
 
-} else if (service_type == 'collection') {
+    console.log("change day. offset: " + offset );
+  });
 
-  $('#time-field').show();
-  $('#table-number-field').hide();
-  $('#name-field').show();
-  $('#telephone-field').show();
-  $('#email-field').show();
-  $('#address-field').hide();
-  $('#payment-info').show();
-  $('#delivery-fee').hide();
-  $('#basket-total').show();
-  $('#delivery-info').hide();
-  $('#pay-now-button').hide();
-  $('#help-info').hide();
-  $('#kitchen-delay').hide();
-  $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
-  $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
 
-} else if (service_type == 'tableservice') {
+  $('#service_type').change(function(){
+    service_type = $(this).val();
+  //  console.log(service_type)
+    validate();
+    if (service_type == 'delivery'){
 
+      $('#date-field').show();
+      $('#time-field').show();
+      $('#table-number-field').hide();
+      $('#name-field').show();
+      $('#telephone-field').show();
+      $('#email-field').show();
+      $('#address-field').show();
+      $('#payment-info').show();
+      $('#delivery-fee').show();
+      $('#total-info').show();
+      $('#basket-total').show();
+      $('#delivery-info').show();
+      $('#pay-now-button').hide();
+      $('#help-info').hide();
+      $('#kitchen-delay').hide();
+      $('.delivery_fee_calculate').change();
+
+    } else if (service_type == 'collection') {
+
+      $('#date-field').show();
+      $('#time-field').show();
+      $('#table-number-field').hide();
+      $('#name-field').show();
+      $('#telephone-field').show();
+      $('#email-field').show();
+      $('#address-field').hide();
+      $('#payment-info').show();
+      $('#delivery-fee').hide();
+      $('#basket-total').show();
+      $('#delivery-info').hide();
+      $('#pay-now-button').hide();
+      $('#help-info').hide();
+      $('#kitchen-delay').hide();
+      $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
+      $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
+
+    } else if (service_type == 'tableservice') {
+
+      $('#date-field').hide();
+      $('#time-field').hide();
+      $('#table-number-field').show();
+      $('#group-order-boolean').show();
+      $('#name-field').hide();
+      $('#telephone-field').hide();
+      $('#email-field').show();
+      $('#address-field').hide();
+      $('#payment-info').show();
+      $('#delivery-fee').hide();
+      $('#basket-total').show();
+      $('#delivery-info').hide();
+      $('#pay-now-button').hide();
+      $('#help-info').hide();
+      $('#kitchen-delay').show();
+      $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
+      $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
+
+    }
+
+  });
+
+  //$('#help-info').hide();
+  $('#date-field').hide();
   $('#time-field').hide();
-  $('#table-number-field').show();
-  $('#group-order-boolean').show();
+  $('#table-number-field').hide();
+  $('#group-order-boolean').hide();
   $('#name-field').hide();
   $('#telephone-field').hide();
-  $('#email-field').show();
+  $('#email-field').hide();
   $('#address-field').hide();
-  $('#payment-info').show();
+  // $('#payment-info').hide();
   $('#delivery-fee').hide();
-  $('#basket-total').show();
-  $('#delivery-info').hide();
+  // $('#basket-total').hide();
   $('#pay-now-button').hide();
-  $('#help-info').hide();
-  $('#kitchen-delay').show();
-  $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
-  $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
-
-
-}
-
-
-});
-
-
-
-//$('#help-info').hide();
-$('#time-field').hide();
-$('#table-number-field').hide();
-$('#group-order-boolean').hide();
-$('#name-field').hide();
-$('#telephone-field').hide();
-$('#email-field').hide();
-$('#address-field').hide();
-// $('#payment-info').hide();
-$('#delivery-fee').hide();
-// $('#basket-total').hide();
-$('#pay-now-button').hide();
-$('#delivery-info').hide();
-$('#kitchen-delay').hide();
-
-
-
+  $('#delivery-info').hide();
+  $('#kitchen-delay').hide();
 
 });
 
@@ -321,6 +348,12 @@ $('#kitchen-delay').hide();
                     </div>
                   </div>
                   <% end %>
+                  <div class="row" id='date-field'>
+                    <div class='col-sm-12 col-md-12 text-left mb-3'>
+                      <b><%= label_tag :date %> <strong id='date_required' class='text-danger'>*</strong></b>
+                      <%= select_tag :date_offset, options_for_select(@delivery_day_options.map{|s| [s[:text], s[:value]]}), { class: "border p-2 bg-light form-control validation_check"} %>
+                    </div>
+                  </div>
                   <div class="row" id='time-field'>
                     <div class='col-sm-12 col-md-12 text-left mb-3'>
                       <b><%= label_tag :time %> <strong id='time_required' class='text-danger'>*</strong></b>

@@ -172,6 +172,7 @@ Rails.application.routes.draw do
 
       resources :menus do
         post :clone
+        post 'toggle_active', action: :toggle_active
       end
       resources :restaurant_tables do
         collection do
@@ -179,7 +180,9 @@ Rails.application.routes.draw do
         end
       end
       resources :custom_lists do 
-        resources :custom_list_items
+        resources :custom_list_items do
+          post 'toggle_active', action: :toggle_active
+        end
         post :up
         post :down
       end
