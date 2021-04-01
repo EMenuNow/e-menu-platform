@@ -1,9 +1,9 @@
 <% receipt.items['items'].each do |item| %>
-<% i = item['item'].gsub("<i>","").gsub("</i>","").gsub("<strong>","").gsub("</strong>","").split(" - ")%>
+<% i = item['item'].gsub("<i>","").gsub("</i>","").gsub("<strong>","").gsub("ñ","n").gsub("</strong>","").split(" - ")%>
 <%= i[0]%>
 <%= i[1]%>
 <% item['optionals'].each do |optional| %>
-- <%= optional.gsub("<i>","").gsub("</i>","").gsub("<strong>","").gsub("</strong>","")%>
+- <%= optional.gsub("<i>","").gsub("</i>","").gsub("<strong>","").gsub("ñ","n").gsub("</strong>","")%>
 <% end %>
 
 <% if item['note'].present? %>
@@ -11,3 +11,4 @@ Note: <%=item['note']%>
 <% end %>
 -----------------------------------------
 <% end %>
+
