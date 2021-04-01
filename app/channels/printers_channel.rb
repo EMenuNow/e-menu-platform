@@ -20,8 +20,19 @@ class PrintersChannel < ApplicationCable::Channel
   end
 
   def speak(data)
-    # puts data.inspect
+     puts data.inspect
+
   end
+  def print_confirm(data)
+
+    receipt = Receipt.find(data['receipt_id'])
+    receipt.update_print_status(data['print_status'])
+
+
+
+
+  end
+  
   def lsusb(data)
     pi_interface = PiInterface.find_by(server_token: data['server_token'], restaurant_id: data['restaurant_id']) 
     pi_interface.lsusb = data['message']

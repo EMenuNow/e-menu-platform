@@ -17,6 +17,7 @@
       <th>Item</th>
       
       <th>Email</th>
+      <th>Status</th>
     </tr>
   </thead>
 
@@ -46,6 +47,7 @@
         <td><ul><%= items.html_safe %></ul></td>
    
         <td><%= receipt.email %></td>
+        <td><%= receipt.print_status %></td>
         <td><% if receipt.email.present? %><%= link_to 'Send Again', manager_send_receipts_path(receipt.id) %><% end %></td>
         <td><% if @printers.present? %>
         
@@ -56,6 +58,7 @@
         <% end %>
         
         </td>
+
       </tr>
     <% end %>
   </tbody>

@@ -14,6 +14,13 @@ class Receipt < ApplicationRecord
   #   @@my_logger ||= Logger.new("#{Rails.root}/log/mylog.log")
   # end
 
+  def update_print_status(status)
+    self.print_status = status
+    self.save
+  end
+  
+
+
   def item_breakdown
 
     item_screens = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key <> 'FULL'")
@@ -92,9 +99,10 @@ class Receipt < ApplicationRecord
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
     header << "\n\n"
-    data = {print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
+    data = {receipt_id: id, print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
 
     ActionCable.server.broadcast("printers_channel_#{restaurant_id}_#{printer.pi_interface_server_token}", data)
+    update_print_status('Sent to printer')
   end
 
   def email_receipt
@@ -133,9 +141,10 @@ class Receipt < ApplicationRecord
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
     header << "\n\n"
-    data = {print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
+    data = {receipt_id: id, print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
    # mylogger.debug("PRINTING PRIMARY: #{printer.inspect}")
     ActionCable.server.broadcast("printers_channel_#{restaurant_id}_#{printer.pi_interface_server_token}", data)
+    update_print_status('Sent to printer')
   end
 
   def secondary_creation_print_grouped(secondary_item_screen_type_key)
@@ -168,9 +177,10 @@ class Receipt < ApplicationRecord
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
     header << "\n\n"
-    data = {print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
+    data = {receipt_id: id, print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
   #  mylogger.debug("PRINTING SECONDARY: #{printer.inspect}")
     ActionCable.server.broadcast("printers_channel_#{restaurant_id}_#{printer.pi_interface_server_token}", data)
+    update_print_status('Sent to printer')
   end
 
   def zreport
