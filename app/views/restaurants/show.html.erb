@@ -149,7 +149,7 @@
     <% if is_takeaway?(@restaurant) or is_delivery?(@restaurant) %>
       <div class="row">
         <div class="col text-warning text-center border border-warning">
-          The Kitchen is currently closed, but you can still order takeaway for next available open time
+          The Kitchen is currently closed<% if @restaurant.availability.any? %>, but you can still order takeaway for next available open time<% end %>
         </div>
       </div>
     <% else %>

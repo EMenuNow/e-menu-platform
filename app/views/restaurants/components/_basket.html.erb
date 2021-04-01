@@ -66,7 +66,7 @@
         <div class="col">
           <%
             disable_basket_link = true
-            if @basket_service.get_basket_item_count.present? and @basket_service.get_basket_item_total > 0
+            if @basket_service.get_basket_item_count.present? and @basket_service.get_basket_item_total > 0 and enable_checkout?(@restaurant) and @restaurant.availability.any?
               disable_basket_link = false 
             end
             %>
