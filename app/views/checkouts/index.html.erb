@@ -13,7 +13,6 @@ function validateEmail(email) {
 
 $('.validation_check').on("keyup change", function() {   
     validate();
-
 });
 
 function validate(){
@@ -159,7 +158,61 @@ function validate(){
   }
 }
 
-
+function selectService(service_type) {
+  if (service_type == 'delivery'){
+    $('#date-field').show();
+    $('#time-field').show();
+    $('#table-number-field').hide();
+    $('#name-field').show();
+    $('#telephone-field').show();
+    $('#email-field').show();
+    $('#address-field').show();
+    $('#payment-info').show();
+    $('#delivery-fee').show();
+    $('#total-info').show();
+    $('#basket-total').show();
+    $('#delivery-info').show();
+    $('#pay-now-button').hide();
+    $('#help-info').hide();
+    $('#kitchen-delay').hide();
+    $('.delivery_fee_calculate').change();
+  } else if (service_type == 'collection') {
+    $('#date-field').show();
+    $('#time-field').show();
+    $('#table-number-field').hide();
+    $('#name-field').show();
+    $('#telephone-field').show();
+    $('#email-field').show();
+    $('#address-field').hide();
+    $('#payment-info').show();
+    $('#delivery-fee').hide();
+    $('#basket-total').show();
+    $('#delivery-info').hide();
+    $('#pay-now-button').hide();
+    $('#help-info').hide();
+    $('#kitchen-delay').hide();
+    $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
+    $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
+  } else if (service_type == 'tableservice') {
+    $('#date-field').hide();
+    $('#time-field').hide();
+    $('#table-number-field').show();
+    $('#group-order-boolean').show();
+    $('#name-field').hide();
+    $('#telephone-field').hide();
+    $('#email-field').show();
+    $('#address-field').hide();
+    $('#payment-info').show();
+    $('#delivery-fee').hide();
+    $('#basket-total').show();
+    $('#delivery-info').hide();
+    $('#pay-now-button').hide();
+    $('#help-info').hide();
+    $('#kitchen-delay').show();
+    $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
+    $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
+  };
+};
 
 
 $(function(){
@@ -175,16 +228,13 @@ $(function(){
     $('#delivery_fee').val(parseFloat(fee).toFixed(2));
     $('#total').val(parseFloat(new_basket));
     validate();
-
   });
 
   $('#date_offset').change(function(){
     var offset = $(this).val();
 
-    // var newDay = availability.find(o => o.day === offset);
     var newDay = $.grep(availability, function(o) { return o.day == offset });
     var newTimes = newDay[0].times;
-    console.log(newTimes);
     var $el = $("#collection_time");
     $el.empty(); // remove old options
     $el.append($("<option></option>").attr("value", "").text("Select Time")); // add placeholder
@@ -192,76 +242,15 @@ $(function(){
       $el.append($("<option></option>")
       .attr("value", value.value).text(value.text));
     });
-
-    console.log("change day. offset: " + offset );
   });
 
 
   $('#service_type').change(function(){
     service_type = $(this).val();
-  //  console.log(service_type)
+    selectService(service_type);
     validate();
-    if (service_type == 'delivery'){
-
-      $('#date-field').show();
-      $('#time-field').show();
-      $('#table-number-field').hide();
-      $('#name-field').show();
-      $('#telephone-field').show();
-      $('#email-field').show();
-      $('#address-field').show();
-      $('#payment-info').show();
-      $('#delivery-fee').show();
-      $('#total-info').show();
-      $('#basket-total').show();
-      $('#delivery-info').show();
-      $('#pay-now-button').hide();
-      $('#help-info').hide();
-      $('#kitchen-delay').hide();
-      $('.delivery_fee_calculate').change();
-
-    } else if (service_type == 'collection') {
-
-      $('#date-field').show();
-      $('#time-field').show();
-      $('#table-number-field').hide();
-      $('#name-field').show();
-      $('#telephone-field').show();
-      $('#email-field').show();
-      $('#address-field').hide();
-      $('#payment-info').show();
-      $('#delivery-fee').hide();
-      $('#basket-total').show();
-      $('#delivery-info').hide();
-      $('#pay-now-button').hide();
-      $('#help-info').hide();
-      $('#kitchen-delay').hide();
-      $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
-      $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
-
-    } else if (service_type == 'tableservice') {
-
-      $('#date-field').hide();
-      $('#time-field').hide();
-      $('#table-number-field').show();
-      $('#group-order-boolean').show();
-      $('#name-field').hide();
-      $('#telephone-field').hide();
-      $('#email-field').show();
-      $('#address-field').hide();
-      $('#payment-info').show();
-      $('#delivery-fee').hide();
-      $('#basket-total').show();
-      $('#delivery-info').hide();
-      $('#pay-now-button').hide();
-      $('#help-info').hide();
-      $('#kitchen-delay').show();
-      $('#basket-total-value').html('<%=@restaurant.currency_symbol%>'+'<%=@basket_service.get_basket_item_total.to_f%>');
-      $('#total').val(<%=@basket_service.get_basket_item_total.to_f%>);
-
-    }
-
   });
+
 
   //$('#help-info').hide();
   $('#date-field').hide();
@@ -279,6 +268,7 @@ $(function(){
   $('#delivery-info').hide();
   $('#kitchen-delay').hide();
 
+  selectService($('#service_type').val());
 });
 
 
