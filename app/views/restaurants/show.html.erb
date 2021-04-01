@@ -68,6 +68,14 @@
       calculate_price(start_price, scope)
     });
 
+    $('.note-field').on("change keyup change keydowb", function() {
+      item = $(this) // custom list item clicked
+      scope = item.data('scope') // menu item id of item clicked
+
+      start_price = item.data('start_price') * 1
+      calculate_price(start_price, scope)
+    });
+
     $('.placeholder-to-basket').click(function(e) {
       e.preventDefault()
 
