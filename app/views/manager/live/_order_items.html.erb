@@ -90,7 +90,7 @@
                   <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.collection_time.presence || "ASAP" %></h5>
                 </div>
                 <div class="col-2 px-1">
-                  <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Deliver to: #{receipt.address}" : ""%></h5>
+                  <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.collection_time.presence ? "Collection" : ""%> <%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Deliver to: #{receipt.address}" : ""%></h5>
                 </div>
                 <div class="col-1 px-1">
                   <h5 style="font-size:0.8em;" class="text-center m-0"><%= receipt.order&.stripe_data.try(:[], "payment_status")&.titleize %></h5>
