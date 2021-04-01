@@ -2,6 +2,8 @@ class OpeningTime < ApplicationRecord
   belongs_to :restaurant
 
   validates_uniqueness_of :restaurant_id, on: [:create, :update], message: "must be unique"
+  validates_numericality_of :cut_off_days, on: [:create, :update], less_than: :advanced_order_days
+  validates_numericality_of :advanced_order_days, on: [:create, :update], greater_than: :cut_off_days
 
 
 

@@ -58,6 +58,24 @@
           </div>
         </div>
 
+        <div class="row">
+      		<div class="col-sm-4 text-right  pb-1">
+            Advanced order cut-off days
+          </div>
+       		<div class="col-sm-6  pb-1">
+            <%=@manager_opening_time.cut_off_days%> days
+          </div>
+        </div>
+
+        <div class="row">
+      		<div class="col-sm-4 text-right  pb-1">
+            Advanced order maximum days
+          </div>
+       		<div class="col-sm-6  pb-1">
+            <%=@manager_opening_time.advanced_order_days%> days
+          </div>
+        </div>
+
     <%= link_to 'Edit', edit_manager_restaurant_opening_time_path(@restaurant, @manager_opening_time) %> 
 
 

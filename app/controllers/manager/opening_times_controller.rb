@@ -79,7 +79,9 @@ class Manager::OpeningTimesController < Manager::BaseController
       end
     end
     def set_time_settings
-        @time_settings = [0,15,30,45,60]
+      @time_settings = [0,15,30,45,60]
+      @cut_off_settings = [0,1,2,3,4,5,6]
+      @advanced_settings = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
     end
 
 
@@ -87,6 +89,6 @@ class Manager::OpeningTimesController < Manager::BaseController
 
     # Only allow a list of trusted parameters through.
     def manager_opening_time_params
-      params.require(:opening_time).permit(:restaurant_id, :delay_time_minutes, :kitchen_delay_minutes, times: {})
+      params.require(:opening_time).permit(:restaurant_id, :delay_time_minutes, :kitchen_delay_minutes, :cut_off_days, :advanced_order_days, times: {})
     end
 end

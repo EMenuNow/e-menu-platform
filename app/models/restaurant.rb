@@ -32,7 +32,7 @@ class Restaurant < ApplicationRecord
   delegate :name, to: :cuisine, prefix: true
   delegate :ids, to: :features, prefix: true
   delegate :live_menus, to: :menus, prefix: true
-  delegate :times, :delay_time_minutes, :kitchen_delay_minutes, :open_early, :close_early, to: :opening_time, prefix: true
+  delegate :times, :delay_time_minutes, :kitchen_delay_minutes, :open_early, :close_early, :cut_off_days, :advanced_order_days, to: :opening_time, prefix: true
   delegate :color_primary, :color_secondary, :css_font_url, :font_primary, :font_weight_primary, :text_transform_primary, :font_style_primary, :font_secondary, :font_weight_secondary, :text_transform_secondary, :font_style_secondary, :dark_theme, :custom_css, to: :theme, prefix: true
   delegate :name, :code, :symbol, to: :currency, prefix: true
 
@@ -115,8 +115,11 @@ class Restaurant < ApplicationRecord
     round_down_t = Time.parse("#{t.year}-#{t.month}-#{t.day} #{t.hour}:#{t.min/15*15}:00")
     rounded_t = round_down_t + 15.minutes
     
+    cod = opening_time_cut_off_days
+    aod = opening_time_advanced_order_days - 1
+
     # For next 7 days
-    (0..6).each do |i|
+    (cod..aod).each do |i|
       d = t + i.day
       if i == 0
         day_name = "Today"

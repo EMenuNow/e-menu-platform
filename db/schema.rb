@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_30_152021) do
+ActiveRecord::Schema.define(version: 2021_04_01_071350) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -265,6 +265,8 @@ ActiveRecord::Schema.define(version: 2021_03_30_152021) do
     t.integer "kitchen_delay_minutes", default: 0
     t.boolean "open_early", default: false
     t.boolean "close_early", default: false
+    t.integer "cut_off_days", default: 0
+    t.integer "advanced_order_days", default: 2
     t.index ["restaurant_id"], name: "index_opening_times_on_restaurant_id"
   end
 
