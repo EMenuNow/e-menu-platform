@@ -451,6 +451,7 @@ ActiveRecord::Schema.define(version: 2021_04_01_071350) do
     t.datetime "due_date"
     t.string "processing_status", default: "pending"
     t.string "first_print_status"
+    t.string "print_status"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"
     t.index ["restaurant_id"], name: "index_receipts_on_restaurant_id"

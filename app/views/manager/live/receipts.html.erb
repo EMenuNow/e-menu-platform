@@ -42,11 +42,9 @@
                 item_screen_type = "(#{item['item_screen_type_name']})" if item['item_screen_type_name'].present?
                 options = item['optionals']   
                 items << "<li>#{item['item']} #{item_screen_type} <br><strong>Note:</strong> #{item['note']}<br> #{options.join('<br> ')}</li>"
-
               end
               %>
               <td><ul><%= items.html_safe %></ul></td>
-        
               <td><%= receipt.email %></td>
               <td>
                 <% if receipt.email.present? %><%= link_to 'Send Again', manager_send_receipts_path(receipt.id), class: "btn btn-info" %><% end %>
