@@ -9,29 +9,39 @@
   </script>
 <% end %> 
 
-<% Stripe.api_key = @restaurant.stripe_sk_api_key %>
-<% available = Stripe::Balance.retrieve(stripe_account: @restaurant.stripe_connected_account_id)["available"].first %>
-
-<div class="row mb-0">
-  <div class="col-lg-12 pt-3 pb-3">
-    <p class="m-0">Your restaurant's available balance: <%= number_to_currency(available["amount"] / 100.0, unit: @restaurant.currency_symbol) %></p>
-    <p>Top up your balance in stripe account setup by your EMenu service representative</p>
-  </div>
-</div>
-
-<div class='row mt-2'>
-  <div id="current-delay" class='col-sm-3 text-center'>
-    Current Delay: <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes 
-  </div>
+<div class='p-3 position-fixed w-100 bg-dark' style='z-index:100;left:0;'>
   <%
     redirect_path = params[:action]
   %>
 
-  <div class='col text-center'>
-    <%= link_to 'Clear Delay', manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-success btn-sm delay-button', id: 'delay-0-button'%> | 
-    <%= link_to 'Delay 15 Mins', manager_restaurant_set_delay_path(@restaurant, value: 15, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-15-button'%> | 
-    <%= link_to 'Delay 30 Mins', manager_restaurant_set_delay_path(@restaurant, value: 30, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-30-button'%> | 
-    <%= link_to 'Delay 45 Mins', manager_restaurant_set_delay_path(@restaurant, value: 45, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-45-button'%> | 
-    <%= link_to 'Delay 60 Mins', manager_restaurant_set_delay_path(@restaurant, value: 60, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-60-button'%> | 
+  <div class='row'>
+    <div class='col-3'>
+      <%= link_to manager_live_orders_path(@restaurant), class: "border rounded p-2 text-white #{'text-muted' if params[:action] != 'orders'}" do %>
+        <i class="fa fa-1x fa-bars"></i> Manager
+      <% end %>
+      <%= link_to manager_live_orders_kitchen_path(@restaurant), class: "ml-1 border rounded p-2 text-white #{'text-muted' if params[:action] != 'kitchen'}" do %>
+        <i class="fa fa-1x fa-th"></i> Kitchen
+      <% end %>
+      <%
+=begin%>
+  <%= link_to manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: "border rounded p-2 ml-2 text-white #{'text-muted' if params[:action] != 'kitchen_orders'}" do %>
+        <i class="fa fa-1x fa-th"></i> Kitchen
+      <% end %> 
+  <%
+=end%>
+    </div>
+    <div class='col-6 text-center'>
+      <%= link_to 'Clear Delay', manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-success btn-sm delay-button', id: 'delay-0-button'%> | 
+      <%= link_to 'Delay 15 Mins', manager_restaurant_set_delay_path(@restaurant, value: 15, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-15-button'%> | 
+      <%= link_to 'Delay 30 Mins', manager_restaurant_set_delay_path(@restaurant, value: 30, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-30-button'%> | 
+      <%= link_to 'Delay 45 Mins', manager_restaurant_set_delay_path(@restaurant, value: 45, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-45-button'%> | 
+      <%= link_to 'Delay 60 Mins', manager_restaurant_set_delay_path(@restaurant, value: 60, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-60-button'%> | 
+    </div>
+    <div class='col-3 text-right'>
+      <%= link_to "#", class: "bg-secondary rounded p-2 text-white", data: { toggle: "modal", target: "#singleModal" } do %>
+        <i class="fa fa-1x fa-cog pr-2"></i> Settings
+      <% end %>
+    </div>
   </div>
 </div>
+<%= render partial: "manager/live/modal_container", locals: { title: "Restaurant Settings", type: "settings" } %>

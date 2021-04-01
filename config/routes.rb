@@ -54,6 +54,7 @@ Rails.application.routes.draw do
 
   resources :receipts do 
     post 'is_ready'
+    post :send_to_kitchen
     post 'is_item_ready/:screen_item_id', to: 'receipts#is_item_ready', as: :screen_item_ready
     post 'is_items_ready/:receipt_id/item_screen_type_key/:item_screen_type_key', to: 'receipts#is_items_ready', as: :screen_items_ready
     post 'item_creation_broadcast'
@@ -92,6 +93,7 @@ Rails.application.routes.draw do
       get 'menu_item/:id', to: 'menu#menu_item'
       get 'menu_optionals', to: 'menu#menu_optionals'
       get 'menu_optionals/:items', to: 'menu#menu_optionals'
+      resources :receipts, only: [:update]
     end
   end
   namespace :manager do
@@ -122,6 +124,7 @@ Rails.application.routes.draw do
 
     get 'live_tables/:restaurant_id' => 'live#tables', as: :live_tables
     get 'live_items/:restaurant_id' => 'live#items', as: :live_items
+    get 'live_orders/:restaurant_id/kitchen' => 'live#kitchen', as: :live_orders_kitchen
     get 'live_orders/:restaurant_id' => 'live#orders', as: :live_orders
     get 'live_orders/broadcast/:restaurant_id' => 'live#orders_broadcast', as: :live_orders_broadcast
     get 'live_food/:restaurant_id' => 'live#food', as: :live_food

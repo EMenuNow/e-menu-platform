@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_31_124110) do
+ActiveRecord::Schema.define(version: 2021_04_01_071350) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -263,6 +263,10 @@ ActiveRecord::Schema.define(version: 2021_03_31_124110) do
     t.datetime "updated_at", null: false
     t.integer "delay_time_minutes", default: 30
     t.integer "kitchen_delay_minutes", default: 0
+    t.boolean "open_early", default: false
+    t.boolean "close_early", default: false
+    t.integer "cut_off_days", default: 0
+    t.integer "advanced_order_days", default: 2
     t.index ["restaurant_id"], name: "index_opening_times_on_restaurant_id"
   end
 
@@ -295,6 +299,8 @@ ActiveRecord::Schema.define(version: 2021_03_31_124110) do
     t.boolean "chargeback_enabled", default: false
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
+    t.boolean "group_order"
+    t.datetime "due_date"
     t.index ["restaurant_id"], name: "index_orders_on_restaurant_id"
   end
 
@@ -441,6 +447,10 @@ ActiveRecord::Schema.define(version: 2021_03_31_124110) do
     t.boolean "chargeback_enabled", default: false
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
+    t.boolean "group_order"
+    t.datetime "due_date"
+    t.string "processing_status", default: "pending"
+    t.string "first_print_status"
     t.string "print_status"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"

@@ -32,7 +32,7 @@ class Restaurant < ApplicationRecord
   delegate :name, to: :cuisine, prefix: true
   delegate :ids, to: :features, prefix: true
   delegate :live_menus, to: :menus, prefix: true
-  delegate :times, :delay_time_minutes, :kitchen_delay_minutes, to: :opening_time, prefix: true
+  delegate :times, :delay_time_minutes, :kitchen_delay_minutes, :open_early, :close_early, :cut_off_days, :advanced_order_days, to: :opening_time, prefix: true
   delegate :color_primary, :color_secondary, :css_font_url, :font_primary, :font_weight_primary, :text_transform_primary, :font_style_primary, :font_secondary, :font_weight_secondary, :text_transform_secondary, :font_style_secondary, :dark_theme, :custom_css, to: :theme, prefix: true
   delegate :name, :code, :symbol, to: :currency, prefix: true
 
@@ -108,9 +108,90 @@ class Restaurant < ApplicationRecord
     
   end
   
+  def available_days
+    days = []
+
+    t = Time.new.in_time_zone(time_zone)
+    round_down_t = Time.parse("#{t.year}-#{t.month}-#{t.day} #{t.hour}:#{t.min/15*15}:00")
+    rounded_t = round_down_t + 15.minutes
+    
+    cod = opening_time_cut_off_days
+    aod = opening_time_advanced_order_days - 1
+
+    # For next 7 days
+    (cod..aod).each do |i|
+      d = t + i.day
+      if i == 0
+        day_name = "Today"
+      elsif i == 1
+        day_name = d.strftime("Tomorrow, #{d.day.ordinalize} %B")
+      else
+        day_name = d.strftime("%A, #{d.day.ordinalize} %B")
+      end
+      # Add day to options if able to take order
+      days << {value: i, text: day_name} unless self.available_times(i).empty?
+    end
+
+    days
+  end
   
+  def available_times(offset = 0)
+    # Delay time minutes
+    dtm = opening_time_delay_time_minutes.minutes
+    dtm = 30.minutes if dtm.blank?
+    
+    # Busy time minutes
+    btm = opening_time_kitchen_delay_minutes.minutes
+    
+    t = Time.new.in_time_zone(time_zone) + offset.day
+    round_down_t = Time.parse("#{t.year}-#{t.month}-#{t.day} #{t.hour}:#{t.min/15*15}:00")
+    rounded_t = round_down_t + 15.minutes
+    
+    delivery_time_options = []
+    
+    day = t.strftime("%A").downcase
+    opening_time = opening_time_times[day]['open']
+    closing_time = opening_time_times[day]['close']
+    
+    time_opening = Time.parse("#{t.year}-#{t.month}-#{t.day} #{opening_time}:00")
+    time_closing = Time.parse("#{t.year}-#{t.month}-#{t.day} #{closing_time}:00")
+    
+    delivery_time_options << {value: "ASAP", text: "ASAP"} if is_open and (round_down_t + dtm < closing_time) and !opening_time_close_early
+    
+    # Set first available time
+    if offset == 0 and (rounded_t > time_opening or opening_time_open_early)
+      next_time = rounded_t + dtm + (offset == 0 ? btm : 0)
+    else
+      next_time = time_opening + dtm
+    end
+
+    if offset == 0 and !opening_time_close_early
+      until rounded_t > time_closing - btm
+        if rounded_t >= next_time
+          delivery_time_options << {value: rounded_t.strftime("%H:%M"), text: "#{rounded_t.strftime("%H:%M")}"}
+        end
+        rounded_t = rounded_t + 15.minutes
+      end
+    elsif offset > 0
+      until next_time > time_closing
+        delivery_time_options << {value: next_time.strftime("%H:%M"), text: "#{next_time.strftime("%H:%M")}"} 
+        next_time = next_time + 15.minutes
+      end
+
+    end
+    
+    delivery_time_options
+  end
+
+  def availability
+    availability = []
+    available_days.each do |i|
+      availability << {day: i[:value], times: available_times(i[:value])}
+    end
+    availability
+  end
   
-  def available_times
+  def available_times_old
     # Delay time minutes
     dtm = opening_time_delay_time_minutes.minutes
     dtm = 30.minutes if dtm.blank?
@@ -177,6 +258,14 @@ class Restaurant < ApplicationRecord
 
   def clear_kitchen_delay
     self.opening_time.update(kitchen_delay_minutes: 0)
+  end
+
+  def clear_open_early
+    self.opening_time.update(open_early: false)
+  end
+
+  def clear_close_early
+    self.opening_time.update(close_early: false)
   end
 
   private

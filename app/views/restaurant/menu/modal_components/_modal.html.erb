@@ -1,7 +1,7 @@
         <% if sub.node_type == 'item' %>
           <!-- Modal -->
           <div class="modal fade" id="item-<%=sub.id%>" tabindex="-1" role="dialog" aria-labelledby="item-<%=sub.id%>-label" aria-hidden="true">
-            <div class="modal-dialog  modal-lg" role="document">
+            <div class="modal-dialog override modal-lg" role="document">
               <%#= form_tag table_add_item_path(table.id,sub.id), remote: true do %>
               <div class="modal-content">
                 <div class="modal-header">

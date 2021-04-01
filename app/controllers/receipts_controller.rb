@@ -37,6 +37,14 @@ class ReceiptsController < ApplicationController
     # @receipt.broadcast
     # redirect_to manager_live_orders_path(@restaurant.id)
   end
+  def send_to_kitchen
+    @receipt = Receipt.find(params[:receipt_id])
+    @receipt.processing_status = "accepted"
+    @receipt.save
+    @restaurant = @receipt.restaurant
+    # @receipt.broadcast
+    # redirect_to manager_live_orders_path(@restaurant.id)
+  end
 
 
   def is_item_ready
@@ -132,13 +140,15 @@ class ReceiptsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_receipt
-      @receipt = Receipt.find(params[:id])
-    end
+  
+  # Use callbacks to share common setup or constraints between actions.
+  def set_receipt
+    @receipt = Receipt.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def receipt_params
-      params.require(:receipt).permit(:uuid, :restaurant_id, :basket_total, :email, :stripe_token, :is_ready, :name, items: {}, status: {})
-    end
+  # Only allow a list of trusted parameters through.
+  def receipt_params
+    params.require(:receipt).permit(:uuid, :restaurant_id, :basket_total, :email, :stripe_token, :is_ready, :name, items: {}, status: {})
+  end
+
 end

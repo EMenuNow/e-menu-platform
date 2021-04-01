@@ -68,6 +68,14 @@
       calculate_price(start_price, scope)
     });
 
+    $('.note-field').on("change keyup change keydowb", function() {
+      item = $(this) // custom list item clicked
+      scope = item.data('scope') // menu item id of item clicked
+
+      start_price = item.data('start_price') * 1
+      calculate_price(start_price, scope)
+    });
+
     $('.placeholder-to-basket').click(function(e) {
       e.preventDefault()
 
@@ -145,11 +153,11 @@
 </script>
 <% end %>
 <div class="container-fluid">
-  <% if !@restaurant.is_open and enable_checkout?(@restaurant) %>
+  <% if (!@restaurant.is_open or @restaurant.opening_time_close_early) and !@restaurant.opening_time_open_early and enable_checkout?(@restaurant) %>
     <% if is_takeaway?(@restaurant) or is_delivery?(@restaurant) %>
       <div class="row">
         <div class="col text-warning text-center border border-warning">
-          The Kitchen is currently closed, but you can still order takeaway for next available open time
+          The Kitchen is currently closed<% if @restaurant.availability.any? %>, but you can still order takeaway for next available open time<% end %>
         </div>
       </div>
     <% else %>
@@ -159,7 +167,7 @@
         </div>
       </div>
     <% end %>
-  <% elsif @restaurant.is_open and !enable_checkout?(@restaurant) %>
+  <% elsif !enable_checkout?(@restaurant) %>
     <div class="row">
       <div class="col text-warning text-center border border-warning">
           The Kitchen is not accepting orders at this time, please contact them directly to order

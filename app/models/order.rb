@@ -16,6 +16,7 @@ class Order < ApplicationRecord
         email: self.email,
         name: self.name,
         collection_time: self.collection_time,
+        due_date: self.due_date,
         stripe_token: self.stripe_token || {},
         status: self&.stripe_data.try("payment_status", :[]) || {},
         is_ready: false,
@@ -31,7 +32,8 @@ class Order < ApplicationRecord
         emenu_commission: self.emenu_commission,
         chargeback_fee: self.chargeback_fee,
         chargeback_enabled: self.chargeback_enabled,
-        emenu_vat_charge: self.emenu_vat_charge
+        emenu_vat_charge: self.emenu_vat_charge,
+        group_order: self.group_order
       )
     end
 

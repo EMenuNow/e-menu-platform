@@ -8,7 +8,9 @@ class CheckoutsController < ApplicationController
   def index
     checkout_service = CheckoutService.new(@restaurant, @parameters, @basket_service)
 
-    @delivery_time_options = @restaurant.available_times
+    @delivery_day_options = @restaurant.available_days
+    @delivery_availability = @restaurant.availability
+    @delivery_time_options = @delivery_availability[0][:times]
 
     if @basket
       @basket_item_count = @basket_service.get_basket_item_count
@@ -17,6 +19,17 @@ class CheckoutsController < ApplicationController
   end
 
   def create
+    t = Time.new
+    offset = @parameters["date_offset"].to_i
+    due_time = @parameters["collection_time"]
+    dtm = @restaurant.opening_time_delay_time_minutes.minutes
+    btm = @restaurant.opening_time_kitchen_delay_minutes.minutes
+    if due_time == "ASAP"
+      @parameters["due_date"] = t + dtm + btm
+    else
+      d = t + offset.day
+      @parameters["due_date"] = Time.parse("#{d.year}-#{d.month}-#{d.day} #{due_time}:00").in_time_zone(@restaurant.time_zone) + t.utc_offset - t.in_time_zone(@restaurant.time_zone).utc_offset
+    end
     @checkout_service = CheckoutService.new(@restaurant, @parameters, @basket_service)
 
     render json: @checkout_service.create_checkout_session
@@ -40,7 +53,7 @@ class CheckoutsController < ApplicationController
   private
 
   def stripe_parameters
-    @parameters = params.slice(:service_type, :total, :price, :service_type, :collection_time, :table_number, :name, :telephone, :email, :house_number,
+    @parameters = params.slice(:service_type, :total, :price, :service_type, :collection_time, :date_offset, :table_number, :name, :telephone, :email, :house_number,
     :street, :postcode, :basket, :delivery_fee, :apple_and_google, :stripe_success_token)
   end
 

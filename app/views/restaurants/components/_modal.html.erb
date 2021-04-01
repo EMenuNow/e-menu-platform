@@ -2,7 +2,7 @@
 <% start_price = item[:price_a].to_f %>
 
 <div class="modal fade" id="item-<%=item[:id]%>" tabindex="-1" role="dialog" aria-labelledby="<%=item[:name]%>" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog override" role="document">
     
     <% if Rails.env == 'development'%>
       <h1>DEVELOPMENT</h1>
@@ -123,7 +123,7 @@
 
             
               <input type='hidden' value='<%=required_lists.uniq.join(',')%>' id="required-lists-<%= main_item %>">
-              <%= text_field_tag "notes-#{main_item}", nil,  placeholder: "Tell the Kitchen: Allergies etc...", class: 'form-control ', 'data-scope' => main_item, 'data-start_price' => start_price %>
+              <%= text_field_tag "notes-#{main_item}", nil,  placeholder: "Tell the Kitchen: Allergies etc...", class: 'form-control note-field', 'data-scope' => main_item, 'data-start_price' => start_price %>
               
             </div>
 
