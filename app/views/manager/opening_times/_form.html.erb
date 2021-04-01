@@ -4,7 +4,13 @@
 
     var closedDays = [];
 
-    
+    for (const [key, value] of Object.entries(openingTimes)) {
+      var open = parseInt(value.open.replace(/\D/g,''));
+      var close = parseInt(value.close.replace(/\D/g,''));
+      if (open >= close) {
+        closedDays.push(key);
+      };
+    };
 
     $(document).ready(function () {
 
@@ -44,11 +50,14 @@
         }
       };
 
+      closedDays.forEach(function(day) {
+        $(`#${day}-closed`).prop('checked', true);
+        closedDay(`${day}`, 'checked');
+      });
+
       $('.closed-day').on( "click", function() {closedDay($(this).val(), $(this).prop('checked'))} )
 
       $('.validate-item').on("change", validate);
-
-      console.log(openingTimes);
 
       validate();
 
