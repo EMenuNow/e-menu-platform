@@ -1,0 +1,36 @@
+<h1>Busy Times</h1>
+
+<% if manager_busy_times.any? %>
+
+  <% bts = manager_busy_times.group_by{|x| x.busy_time.strftime("%A, #{x.busy_time.day.ordinalize} %B")}.map{|k,v| {k => v}} %>
+  <% bts.each do |bt| %>
+  <%# debugger %>
+    <div class="row pt-2">
+      <div class="col-lg-3">
+        <% date = bt.keys[0] %>
+        <h5><%= date %></h5>
+      </div>
+    </div>
+    <% times = bt[date] %>
+    <% times.each do |t| %>
+      <div class="row justify-content-start">
+        <div class="col-6 col-sm-4 col-md-2 text-right">
+          <% dt = t.busy_time.in_time_zone(@restaurant.time_zone) %>
+          <small><i class="far fa-clock"></i></small><%= dt.strftime(" %H:%M") %>
+        </div>
+        <div class="col-6 col-sm-8 col-md-10">
+          <%= link_to "Delete", manager_restaurant_busy_time_path(t.restaurant, t), :method=>:delete, :confirm => "Are you sure?" %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+<% else %>
+
+  <div class="row">
+    <div class="col-sm-2 pb-5">
+      <strong>No busy times allocated.</strong>
+    </div>
+  </div>
+
+<% end %>

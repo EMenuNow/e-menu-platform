@@ -237,10 +237,10 @@ $(function(){
     var newTimes = newDay[0].times;
     var $el = $("#collection_time");
     $el.empty(); // remove old options
-    $el.append($("<option></option>").attr("value", "").text("Select Time")); // add placeholder
+    $el.append($("<option></option>").attr("value", "").text("Select time")); // add placeholder
     $.each(newTimes, function(key,value) {
       $el.append($("<option></option>")
-      .attr("value", value.value).text(value.text));
+      .attr("value", value.value).text(value.busy ? value.text + ` (Unavailable)` : value.text).attr("disabled", value.busy));
     });
   });
 
@@ -347,7 +347,7 @@ $(function(){
                   <div class="row" id='time-field'>
                     <div class='col-sm-12 col-md-12 text-left mb-3'>
                       <b><%= label_tag :time %> <strong id='time_required' class='text-danger'>*</strong></b>
-                      <%= select_tag :collection_time, options_for_select(@delivery_time_options.map{|s| [s[:text], s[:value]]}), { prompt: 'Select time', class: "border p-2 bg-light form-control validation_check"} %>
+                      <%= select_tag :collection_time, options_for_select(@delivery_time_options.map{|s| [(s[:busy] ? s[:text] + " (Unavailable)" : s[:text]), s[:value], disabled: s[:busy]]}), { prompt: 'Select time', class: "border p-2 bg-light form-control validation_check"} %>
                     </div>
                   </div>
                   <div class="row">
