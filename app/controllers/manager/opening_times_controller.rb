@@ -4,14 +4,15 @@ class Manager::OpeningTimesController < Manager::BaseController
   before_action :set_manager_opening_time, only: [:index, :show, :edit, :update, :destroy]
   before_action :set_time_settings, only: [:create, :edit, :update, :new]
 
-  
-    before_action :set_restaurant
+  before_action :set_restaurant
+
   # GET /manager/opening_times
   # GET /manager/opening_times.json
   def index
     @manager_opening_times = OpeningTime.where(restaurant_id: @restaurant.id)
+    @manager_busy_times = BusyTime.where(restaurant_id: @restaurant.id).in_future.order(:busy_time)
   end
-
+  
   # GET /manager/opening_times/1
   # GET /manager/opening_times/1.json
   def show
@@ -22,7 +23,6 @@ class Manager::OpeningTimesController < Manager::BaseController
   def new
     @manager_opening_time = OpeningTime.new
     @manager_opening_time.restaurant_id = @restaurant.id
-    
   end
 
   # GET /manager/opening_times/1/edit
@@ -70,25 +70,23 @@ class Manager::OpeningTimesController < Manager::BaseController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_manager_opening_time
-      if params[:id].present?
-        @manager_opening_time = OpeningTime.find(params[:id])
-      else
-        @manager_opening_time = OpeningTime.find_by(restaurant_id: params[:restaurant_id])
-      end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_manager_opening_time
+    if params[:id].present?
+      @manager_opening_time = OpeningTime.find(params[:id])
+    else
+      @manager_opening_time = OpeningTime.find_by(restaurant_id: params[:restaurant_id])
     end
-    def set_time_settings
-      @time_settings = [0,15,30,45,60]
-      @cut_off_settings = [0,1,2,3,4,5,6]
-      @advanced_settings = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
-    end
+  end
+  
+  def set_time_settings
+    @time_settings = [0,15,30,45,60]
+    @cut_off_settings = [0,1,2,3,4,5,6]
+    @advanced_order_settings = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+  end
 
-
-    
-
-    # Only allow a list of trusted parameters through.
-    def manager_opening_time_params
-      params.require(:opening_time).permit(:restaurant_id, :delay_time_minutes, :kitchen_delay_minutes, :cut_off_days, :advanced_order_days, times: {})
-    end
+  # Only allow a list of trusted parameters through.
+  def manager_opening_time_params
+    params.require(:opening_time).permit(:restaurant_id, :delay_time_minutes, :kitchen_delay_minutes, :cut_off_days, :advanced_order_days, times: {})
+  end
 end

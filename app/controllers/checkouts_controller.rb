@@ -24,7 +24,7 @@ class CheckoutsController < ApplicationController
     due_time = @parameters["collection_time"]
     dtm = @restaurant.opening_time_delay_time_minutes.minutes
     btm = @restaurant.opening_time_kitchen_delay_minutes.minutes
-    if due_time == "ASAP"
+    if due_time == "ASAP" or @parameters["service_type"] == 'tableservice'
       @parameters["due_date"] = t + dtm + btm
     else
       d = t + offset.day

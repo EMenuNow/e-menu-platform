@@ -14,6 +14,17 @@ namespace :kitchen_delay do
 
 end
 
+namespace :busy_times do
+
+  desc "Clear busy times from the past"
+  task clear: :environment do
+
+    BusyTime.where("DATE(busy_time) < ?", Date.today - 1.week).destroy_all
+
+  end
+
+end
+
 namespace :opening_times do
 
   desc "Clears open early attribute, unless restaurant is closed"
