@@ -290,7 +290,7 @@ $('#kitchen-delay').hide();
         </div>
         <% if @restaurant.opening_time_kitchen_delay_minutes > 0 %>
         <div class="row bg-dark  border border-danger " id='kitchen-delay'>
-          <div class='col-sm-12 col-md-12 text-center text-danger pb-2'>
+          <div class='col-sm-12 col-md-12 mb-3 text-center text-danger'>
             Please Note: The kitchen is busy and there could be up to <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes delay
           </div>
         </div>

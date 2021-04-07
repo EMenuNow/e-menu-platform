@@ -19,8 +19,10 @@ class Receipt < ApplicationRecord
   end
 
   def update_print_status(status)
-    self.print_status = status
-    self.save
+    self.find_grouped_receipts.each do |x|
+      x.print_status = status
+      x.save
+    end
   end
 
   def item_breakdown

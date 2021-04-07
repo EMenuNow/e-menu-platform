@@ -332,9 +332,9 @@ $(function(){
                     </div>
                   </div>
                   <% if @restaurant.opening_time_kitchen_delay_minutes > 0 %>
-                  <div class="row border border-danger " id='kitchen-delay'>
-                    <div class='col-sm-12 col-md-12 text-center text-danger pb-2'>
-                      Please Note: The kitchen is busy and there could be up to <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes delay
+                  <div class="row mb-4" id='kitchen-delay'>
+                    <div class='col-sm-12 col-md-12 text-center text-danger'>
+                      <span class="border border-danger d-block">Please Note: The kitchen is busy and there could be up to <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes delay</span>
                     </div>
                   </div>
                   <% end %>
