@@ -43,7 +43,7 @@ class CheckoutsController < ApplicationController
 
     if @order.stripe_data["payment_status"] == "paid"
       @receipt = @order.first_or_create_receipt
-      @receipt.broadcast(message: "New")
+      @receipt.broadcast(message: "New") if !@receipt.persisted?
       flash[:notice] = "Payment successfully processed"
     else
       redirect_to resturant_path(@path), alert: "Payment Error: please try again"
