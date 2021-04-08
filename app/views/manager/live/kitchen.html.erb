@@ -6,14 +6,6 @@
 <% content_for :js do%>
   <script>
     var order_bell;
-    
-    $(function() {
-      $("#accept-button").on('click', function() {
-        $('body').removeClass('bg-danger');
-        $("#accept-button").hide();
-      });
-    });
-    
     document.getElementById("dismiss-loader").addEventListener("click", function() {
       order_bell = new Audio("<%= asset_path("order-bell.wav") %>");
       order_bell.play().then(() => { order_bell.pause()} )
@@ -23,14 +15,10 @@
 
 <%= hidden_field_tag :restaurant_id, @restaurant.id%>
 
-<%= render 'manager/live/kitchen_delay' %>
+<div class='container-fluid'>
+  <%= render 'manager/live/kitchen_delay' %>
 
-<div class='row'>
-  <div class='col'>
-    <%= link_to 'Accept', '#', class: 'btn btn-block btn-warning', id: 'accept-button', style: 'display:none;' %>
+  <div class='row bg-dark" id='current-orders'>
+    <%= render 'manager/live/order_items_kitchen', printers: @printers %>
   </div>
-</div>
-
-<div class='row bg-dark pt-5' id='current-orders'>
-  <%= render 'manager/live/order_items_kitchen', printers: @printers %>
 </div>

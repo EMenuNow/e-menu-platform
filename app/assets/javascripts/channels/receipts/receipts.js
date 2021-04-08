@@ -15,12 +15,17 @@ App.snippets = App.cable.subscriptions.create(
    // console.log(data);
   },
   received: function (data) {
-   console.log("Received data from ReceiptsChannel");
-   $("#current-orders").html(data.html);
-   $("body").addClass("bg-danger");
-   $("#accept-button").show();
-   order_bell.play();
-   setTimeout((order_bell.currentTime = 0), 1000);
+    console.log(data);
+    console.log("Received data from ReceiptsChannel");
+    $(".modal").modal('hide');
+    $("body").removeClass("modal-open");
+    $("body").css("padding-right","");
+    $(".modal-backdrop").remove();
+    $("#current-orders").html(data.html);
+    if (data.message == "New") {
+      order_bell.play();
+      setTimeout((order_bell.currentTime = 0), 1000);
+    }
 
    $(".receipt-ready").on("confirm:complete", function (e) {
     if (e.originalEvent.detail[0]) {

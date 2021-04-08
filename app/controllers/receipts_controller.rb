@@ -34,7 +34,7 @@ class ReceiptsController < ApplicationController
     @receipt.is_ready = !@receipt.is_ready?
     @receipt.save
     @restaurant = @receipt.restaurant
-    # @receipt.broadcast
+    @receipt.broadcast(message: "Ready")
     # redirect_to manager_live_orders_path(@restaurant.id)
   end
   def send_to_kitchen
@@ -42,7 +42,7 @@ class ReceiptsController < ApplicationController
     @receipt.processing_status = "accepted"
     @receipt.save
     @restaurant = @receipt.restaurant
-    # @receipt.broadcast
+    @receipt.broadcast(message: "Accepted")
     # redirect_to manager_live_orders_path(@restaurant.id)
   end
 

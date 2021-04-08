@@ -16,11 +16,15 @@ App.snippets = App.cable.subscriptions.create(
   },
   received: function (data) {
    console.log("Received data from FoodItemsChannel");
+  $(".modal").modal('hide');
+  $("body").removeClass("modal-open");
+  $("body").css("padding-right","");
+  $(".modal-backdrop").remove();
    $("#current-orders").html(data.html);
-   $("body").addClass("bg-danger");
-   $("#accept-button").show();
-   order_bell.play();
-   setTimeout((order_bell.currentTime = 0), 1000);
+    if (data.message == "New") {
+      order_bell.play();
+      setTimeout((order_bell.currentTime = 0), 1000);
+    }
 
    $(".receipt-ready").on("confirm:complete", function (e) {
     if (e.originalEvent.detail[0]) {

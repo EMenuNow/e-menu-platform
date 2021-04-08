@@ -12,11 +12,6 @@
 <% end %> 
 
 <% @restaurant = Restaurant.find(restaurant) if @restaurant.blank? %>
-<div class="row text-right">
-  <div class='col'>
-    refreshed at: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
-  </div>
-</div>
 
 <div id="receipt-group" class="row m-2">
   <% @screen_items = [] %>

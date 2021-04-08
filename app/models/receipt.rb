@@ -15,7 +15,7 @@ class Receipt < ApplicationRecord
   # end
 
   def order_id
-    uuid.truncate(4, omission: '')
+    id.to_s.truncate(4, omission: '')
   end
 
   def update_print_status(status)
@@ -47,15 +47,15 @@ class Receipt < ApplicationRecord
     item_screen_food = item_screen_foods.first if item_screen_foods.present?
     if item_screen_food.present?
     
-     html_food  = ApplicationController.render(partial: "manager/live/order_items_screen_specific", locals: {grouped: item_screen_food.grouped,  printers: @printers, restaurant: restaurant_id, item_screen_type_key: 'FOOD' })
-      ActionCable.server.broadcast("food_items_channel_#{restaurant_id}", {html: html_food})
+     html_food  = ApplicationController.render(partial: "manager/live/order_items", locals: {grouped: item_screen_food.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'FOOD' })
+      ActionCable.server.broadcast("food_items_channel_#{restaurant_id}", {html: html_food, message: "New"})
     end 
 
     item_screen_drinks = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key = 'DRINK'")
     item_screen_drink = item_screen_drinks.first if item_screen_drinks.present?
     if item_screen_drink.present?
-      html_drinks  = ApplicationController.render(partial: "manager/live/order_items_screen_specific", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant: restaurant_id, item_screen_type_key: 'DRINK' })
-      ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks})
+      html_drinks  = ApplicationController.render(partial: "manager/live/order_items", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'DRINK' })
+      ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks, message: "New"})
     end
   end
 
@@ -77,11 +77,11 @@ class Receipt < ApplicationRecord
     end
   end
 
-  def broadcast
+  def broadcast(message: "Refresh")
     @printers = Printer.where(restaurant_id: restaurant_id)
     html  = ApplicationController.render(partial: "manager/live/order_items", locals: { printers: @printers, restaurant: Restaurant.find(restaurant_id) })
     # binding.pry
-    data = {html: html, sound_file_path: ActionController::Base.helpers.asset_path('order-bell.wav')}   
+    data = {html: html, sound_file_path: ActionController::Base.helpers.asset_path('order-bell.wav'), message: message}   
     ActionCable.server.broadcast("receipts_channel_#{restaurant_id}", data)
   end
 
@@ -217,8 +217,6 @@ class Receipt < ApplicationRecord
       delivery_or_collection: delivery_or_collection,
       delivery_fee: delivery_fee
     }
-
-
   end
 
   def find_grouped_receipts(seconds = 300)
