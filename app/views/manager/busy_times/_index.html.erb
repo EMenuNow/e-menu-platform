@@ -1,5 +1,7 @@
 <h1>Busy Times</h1>
 
+<p>Allocated busy times will be unavailable for customers to place orders for</p>
+
 <% if manager_busy_times.any? %>
 
   <% bts = manager_busy_times.group_by{|x| x.busy_time.strftime("%A, #{x.busy_time.day.ordinalize} %B")}.map{|k,v| {k => v}} %>
@@ -19,7 +21,7 @@
           <small><i class="far fa-clock"></i></small><%= dt.strftime(" %H:%M") %>
         </div>
         <div class="col-6 col-sm-8 col-md-10">
-          <%= link_to "Delete", manager_restaurant_busy_time_path(t.restaurant, t), :method=>:delete, :confirm => "Are you sure?" %>
+          <%= link_to "Delete", manager_restaurant_busy_time_path(t.restaurant, t), method: :delete, data: { confirm: "Are you sure?" } %>
         </div>
       </div>
     <% end %>

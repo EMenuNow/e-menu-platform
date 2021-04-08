@@ -163,6 +163,8 @@ function selectService(service_type) {
     $('#date-field').show();
     $('#time-field').show();
     $('#table-number-field').hide();
+    $('#group_order').prop('checked', false);
+    $('#group-order-boolean').hide();
     $('#name-field').show();
     $('#telephone-field').show();
     $('#email-field').show();
@@ -180,6 +182,8 @@ function selectService(service_type) {
     $('#date-field').show();
     $('#time-field').show();
     $('#table-number-field').hide();
+    $('#group_order').prop('checked', false);
+    $('#group-order-boolean').hide();
     $('#name-field').show();
     $('#telephone-field').show();
     $('#email-field').show();
@@ -242,6 +246,7 @@ $(function(){
       $el.append($("<option></option>")
       .attr("value", value.value).text(value.busy ? value.text + ` (Unavailable)` : value.text).attr("disabled", value.busy));
     });
+    validate();
   });
 
 

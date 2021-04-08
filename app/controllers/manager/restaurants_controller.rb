@@ -21,10 +21,7 @@ module Manager
     # GET /restaurants/1/edit
     def edit
       connect_service = ConnectService.new(@restaurant)
-      if session[:account_id]
-        @restaurant.update_attribute(:stripe_connected_account_id, session[:account_id])
-        @connect = connect_service.refresh_account(session[:account_id])
-      elsif @restaurant.stripe_connected_account_id
+      if @restaurant.stripe_connected_account_id
         @connect = connect_service.refresh_account(@restaurant.stripe_connected_account_id)
       else
         create_account = connect_service.create_account
