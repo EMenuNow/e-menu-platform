@@ -9,7 +9,7 @@
             <h5 style="font-size:1em;" class="text-left m-0 badge badge-pill <%= new_order ? 'badge-danger' : 'badge-light' %>">#<%=receipt.order_id%></h5>
           </div>
           <div class="col-6 text-center">
-            <h5 style="font-size:1em;" class="text-left m-0"><%=receipt.name%> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
+            <h5 style="font-size:1em;" class="d-inline m-0"><%=receipt.name%> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
           </div>
           <div class="col-3 text-right">
             <h5 style="font-size:1em;" class="text-right m-0"><%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>

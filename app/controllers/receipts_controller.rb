@@ -32,6 +32,8 @@ class ReceiptsController < ApplicationController
   def is_ready
     @receipt = Receipt.find(params[:receipt_id])
     @receipt.is_ready = !@receipt.is_ready?
+    @receipt.processing_status = 'done' if @receipt.is_ready?
+    @receipt.processing_status = 'accepted' if !@receipt.is_ready?
     @receipt.save
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Ready")
