@@ -13,9 +13,10 @@
 
 <%
   item_screen_type_key ||= nil
+  restaurant_id ||= nil
 %>
 
-<% @restaurant = Restaurant.where(id: restaurant.id).first if @restaurant.blank? %>
+<% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
 <div class="row text-left text-white bg-dark">
   <div id="refreshed-time" class='col-12'>
     Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
@@ -24,7 +25,7 @@
 <div id="receipt-group" class="row bg-dark pb-3">
   <div class="col-12">
     <div class="row my-1 m-0">
-      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).order(id: :DESC).limit(70)).reverse %>
+      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(:screen_items, order: :refunds).order(id: :DESC).limit(70)).reverse %>
       <% @data.each do |t, receipts| %>
         <% items = nil %>
         <% receipts.each do |receipt| %>
@@ -35,11 +36,12 @@
         <% end %>
         <% next if items.blank? %>
         <% receipt = receipts.first %>
+        <% new_order = item_screen_type_key.present? ? receipt.screen_items.select{|x|x.item_screen_type_key == item_screen_type_key}.map{|x|x.ready}.none? : !receipt.is_ready? %>
+        <% next if !new_order %>
         <div class="col-lg-4 p-0">
           <div class="bg-light rounded m-1" style="height: 400px">
             <div class="row m-0 py-3">
               <div class="col-2">
-                <% new_order = !receipt.is_ready? %>
                 <h5 style="font-size:0.8em;" class="text-center m-0 badge badge-pill <%= new_order ? 'badge-danger' : 'badge-light' %>">#<%=receipt.order_id%></h5>
               </div>
               <div class="col-7 text-center">
@@ -54,11 +56,16 @@
               <div class="col">
                 <div class="row mt-3">
                   <div class="col-8">
-                    <a class="btn btn-warning p-0 px-1 "><%= receipt.processing_status %></a>
+                    <% if !new_order %><a class="btn btn-warning p-0 px-1 "><% if item_screen_type_key.blank? %>Order <% end %>Complete</a><% end %>
+                    <% if item_screen_type_key.blank? %><a class="btn btn-warning p-0 px-1 "><%= receipt.processing_status %></a><% end %>
                     <% if receipt&.order&.refunds.present? %>
                       <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
-                    <% elsif params[:controller] == "kitchen" %>
-                      <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
+                    <% elsif params[:controller] == "manager/live" && new_order == true %>
+                      <% if item_screen_type_key.present? %>
+                        <%= link_to "Ready?",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: 'Are you sure?' } %>
+                      <% else %>
+                        <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
+                      <% end %>
                       <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt&.order&.stripe_data&.present? %>
                     <% end %>
                     <% printers.each do |printer|%>
@@ -78,9 +85,11 @@
                     </div>
                   </div>
                 <% end %>
+                <% sis = receipt.screen_items %>
                 <% items.each do |item| %>
                   <div class="row pb-2">
                     <div class="col-8">
+                      <h5 style="font-size:0.8em;" class="text-left m-0"><i><u><%= sis.select{|x|x.uuid == item['uuid']}.first&.ready ? "Ready" : "Not ready" %></u></i></h5>
                       <%= item['item'].html_safe %>
                     </div>
                     <div class="col-4">

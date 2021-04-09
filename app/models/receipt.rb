@@ -40,22 +40,22 @@ class Receipt < ApplicationRecord
     end
   end
 
-  def broadcast_items
+  def broadcast_items(message: "Refresh")
     @printers = Printer.where(restaurant_id: restaurant_id)
 
     item_screen_foods = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key = 'FOOD'")
     item_screen_food = item_screen_foods.first if item_screen_foods.present?
     if item_screen_food.present?
     
-     html_food  = ApplicationController.render(partial: "manager/live/order_items", locals: {grouped: item_screen_food.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'FOOD' })
-      ActionCable.server.broadcast("food_items_channel_#{restaurant_id}", {html: html_food, message: "New"})
+     html_food  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: {grouped: item_screen_food.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'FOOD' })
+      ActionCable.server.broadcast("food_items_channel_#{restaurant_id}", {html: html_food, message: "Refresh"})
     end 
 
     item_screen_drinks = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key = 'DRINK'")
     item_screen_drink = item_screen_drinks.first if item_screen_drinks.present?
     if item_screen_drink.present?
-      html_drinks  = ApplicationController.render(partial: "manager/live/order_items", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'DRINK' })
-      ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks, message: "New"})
+      html_drinks  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'DRINK' })
+      ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks, message: "Refresh"})
     end
   end
 
@@ -94,6 +94,7 @@ class Receipt < ApplicationRecord
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
+    header << "Order ID: #{order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
@@ -140,6 +141,7 @@ class Receipt < ApplicationRecord
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
+    header << "Order ID: #{order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
