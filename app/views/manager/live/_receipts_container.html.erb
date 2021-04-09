@@ -5,7 +5,7 @@
       <div class="modal-header text-center bg-dark text-white p-0">
         <div class="row m-0 py-3 w-100">
           <div class="col-3 text-left">
-            <h5 style="font-size:1em;" class="text-left m-0">#<%=receipt.uuid.truncate(4, omission: '')%></h5>
+            <h5 style="font-size:1em;" class="text-left m-0">#<%=receipt.order_id%></h5>
           </div>
           <div class="col-6 text-center">
             <h5 style="font-size:1em;" class="text-left m-0"><%=receipt.name%> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>

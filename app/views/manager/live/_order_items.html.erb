@@ -15,12 +15,12 @@
   restaurant_id ||= nil
 %>
 
+<% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
 <div class="row text-left text-white">
   <div id="refreshed-time" class='col-12'>
     Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
   </div>
 </div>
-<% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
 <%
 =begin%>
  <div class="row text-right">
