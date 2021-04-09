@@ -28,19 +28,19 @@
           <div id="current-delay" class='text-center pb-3'>
             Current Delay: <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes 
           </div>
-          <%= link_to 'Set 0 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-success btn-sm delay-button', id: 'delay-0-button'%>
+          <%= link_to 'Set 0 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-success btn-sm delay-button', id: 'delay-0-button', data: { dismiss: "modal" }%>
           <br />
           <br />
-          <%= link_to 'Set 15 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 15, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-15-button'%>
+          <%= link_to 'Set 15 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 15, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-15-button', data: { dismiss: "modal" }%>
           <br />
           <br />
-          <%= link_to 'Set 30 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 30, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-30-button'%>
+          <%= link_to 'Set 30 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 30, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-30-button', data: { dismiss: "modal" }%>
           <br />
           <br />
-          <%= link_to 'Set 45 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 45, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-45-button'%>
+          <%= link_to 'Set 45 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 45, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-45-button', data: { dismiss: "modal" }%>
           <br />
           <br />
-          <%= link_to 'Set 60 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 60, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-60-button'%>
+          <%= link_to 'Set 60 mins delay', manager_restaurant_set_delay_path(@restaurant, value: 60, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-60-button', data: { dismiss: "modal" }%>
         <% when "orders" %>
           <%= render partial: "manager/live/order_modals" %>
         <% end %>

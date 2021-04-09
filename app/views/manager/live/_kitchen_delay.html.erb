@@ -4,6 +4,8 @@
       $(".delay-button").on("click", function() {
         var delay = this.id.match(/\d+/);
         $("#current-delay").text("Current Delay: " + delay + " minutes");
+        delay == 0 ? $("#kitchen-delay").text("Kitchen Delay") : $("#kitchen-delay").text(delay + " min. Delay");
+        
       });
     });
   </script>
@@ -17,17 +19,17 @@
 
     <div class='row'>
       <div class='col-md-8 pb-1'>
-        <%= link_to manager_live_orders_path(@restaurant), class: "d-inline-block border rounded p-2 text-white #{'text-muted' if params[:action] != 'orders'}" do %>
-          <i class="fa fa-1x fa-bars"></i> Manager
+        <%= link_to manager_live_orders_path(@restaurant), class: "d-inline-block border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'orders'}" do %>
+          <i class="fa fa-1x fa-bars text-white <%='text-muted' if params[:action] != 'orders'%>"></i> Manager
         <% end %>
-        <%= link_to manager_live_orders_kitchen_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-white #{'text-muted' if params[:action] != 'kitchen'}" do %>
-          <i class="fa fa-1x fa-th"></i> Kitchen
+        <%= link_to manager_live_orders_kitchen_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'kitchen'}" do %>
+          <i class="fa fa-1x fa-th text-white <%='text-muted' if params[:action] != 'kitchen'%>"></i> Kitchen
         <% end %>
-        <%= link_to manager_live_food_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-white #{'text-muted' if params[:action] != 'food'}" do %>
-          <i class="fa fa-1x fa-utensils"></i> Food
+        <%= link_to manager_live_food_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'food'}" do %>
+          <i class="fa fa-1x fa-utensils text-white <%='text-muted' if params[:action] != 'food'%>"></i> Food
         <% end %>
-        <%= link_to manager_live_drinks_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-white #{'text-muted' if params[:action] != 'drinks'}" do %>
-          <i class="fa fa-1x fa-coffee"></i> Drink
+        <%= link_to manager_live_drinks_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'drinks'}" do %>
+          <i class="fa fa-1x fa-coffee text-white <%='text-muted' if params[:action] != 'drinks'%>"></i> Drink
         <% end %>
         <%
 =begin%>
@@ -38,10 +40,10 @@
 =end%>
       </div>
       <div class='col-md-4 text-right pb-1'>
-        <%= link_to "#", class: "d-inline-block bg-secondary rounded p-2 mr-1 text-white", data: { toggle: "modal", target: "#kitchen_delayModal" } do %>
-          <i class="fa fa-1x fa-cog pr-2"></i> Change kitchen delay
+        <%= link_to "#", class: "d-inline-block bg-warning rounded p-2 text-uppercase mr-1 text-white", data: { toggle: "modal", target: "#kitchen_delayModal" } do %>
+          <i class="fa fas fa-stopwatch pr-2 text-white"></i> <span id="kitchen-delay"><%= @restaurant.opening_time_kitchen_delay_minutes == 0 ? "Kitchen Delay" : "#{@restaurant.opening_time_kitchen_delay_minutes} min. Delay" %></span>
         <% end %>
-        <%= link_to "#", class: "d-inline-block bg-secondary rounded p-2 text-white", data: { toggle: "modal", target: "#settingsModal" } do %>
+        <%= link_to "#", class: "d-inline-block bg-secondary rounded p-2 text-uppercase text-white", data: { toggle: "modal", target: "#settingsModal" } do %>
           <i class="fa fa-1x fa-cog pr-2"></i> Settings
         <% end %>
       </div>

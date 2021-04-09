@@ -1,0 +1,8 @@
+    :root {
+
+    <% if @restaurant and @restaurant.theme&.colors_set? %>
+    --col-primary: <%=@restaurant.theme.color_primary%>;
+    --col-secondary: <%=@restaurant.theme.color_secondary%>;
+    <% end %>
+
+    }
