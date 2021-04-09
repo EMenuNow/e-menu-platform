@@ -81,7 +81,7 @@
       </div>
     </div>
     <%# .each do |receipts| %>
-      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds)).reverse %>
+      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).order(id: :DESC).limit(70)).reverse %>
       <% @data.each do |t, receipts| %>
         <% receipt = receipts.first %>
         <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>
@@ -100,10 +100,10 @@
                   <h5 style="font-size:0.8em;" class="text-center m-0">#<%=receipt.order_id%></h5>
                 </div>
                 <div class="col-md-2 px-1">
-                  <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.name%> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
+                  <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.name.presence || "Table: #{receipt.table_number}" %> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
                 </div>
                 <div class="col-md-1 px-1">
-                  <h5 style="font-size:0.8em;" class="text-center m-0"><%= receipt.items['items'].size %> items</h5>
+                  <h5 style="font-size:0.8em;" class="text-center m-0"><%= receipts.sum{|x|x.items['items'].size || 0} %> items</h5>
                 </div>
                 <div class="col-md-1 px-1">
                   <h5 style="font-size:0.8em;" class="text-center m-0"><%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
@@ -115,10 +115,10 @@
                   <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.collection_time.present? ? "#{receipt.delivery_or_collection.titleize} #{receipt.collection_time}" : ""%> <%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Deliver to: #{receipt.address}" : ""%></h5>
                 </div>
                 <div class="col-md-1 px-1">
-                  <h5 style="font-size:0.8em;" class="text-center m-0"><%= receipt.order&.stripe_data.try(:[], "payment_status")&.titleize %></h5>
+                  <h5 style="font-size:0.8em;" class="text-center m-0"><%= receipt&.order&.stripe_data.try(:[], "payment_status")&.titleize %></h5>
                 </div>
                 <div class="col-md-1 px-1">
-                  <h5 style="font-size:0.8em;" class="text-center m-0"><%= number_to_currency((receipts.sum{|x|x.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></h5>
+                  <h5 style="font-size:0.8em;" class="text-center m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></h5>
                 </div>
                 <div class="col-md-1 px-1">
                   <h5 style="font-size:0.8em;" class="text-center m-0"><%= receipt.processing_status %></h5>

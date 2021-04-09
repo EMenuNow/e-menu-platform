@@ -25,7 +25,7 @@
 <div id="receipt-group" class="row bg-dark pb-3">
   <div class="col-12">
     <div class="row my-1 m-0">
-      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds)).reverse %>
+      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).order(id: :DESC).limit(70)).reverse %>
       <% @data.each do |t, receipts| %>
         <% items = nil %>
         <% receipts.each do |receipt| %>
