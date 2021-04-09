@@ -38,7 +38,7 @@
             <hr class="" />
             <div class="row">
               <div class="col-12 text-left">
-                <div class="btn bg-secondary text-white p-0 px-1"><%= receipts.map{|x|x.items['items']}.size %> items</div>
+                <div class="btn bg-secondary text-white p-0 px-1"><%= pluralize(receipts.sum{|x|x.items['items'].size}, 'item') %></div>
               </div>
             </div>
             <hr class="mb-0" />

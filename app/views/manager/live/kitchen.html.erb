@@ -15,10 +15,8 @@
 
 <%= hidden_field_tag :restaurant_id, @restaurant.id%>
 
-<div class='container-fluid'>
   <%= render 'manager/live/kitchen_delay' %>
 
-  <div class='bg-dark" id='current-orders'>
+  <div class="mt-2 mb-2" id='current-orders'>
     <%= render 'manager/live/order_items_kitchen', printers: @printers %>
   </div>
-</div>
