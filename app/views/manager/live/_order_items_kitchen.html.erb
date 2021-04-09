@@ -17,11 +17,16 @@
 
 <% @restaurant = Restaurant.where(id: restaurant.id).first if @restaurant.blank? %>
 
-<div id="receipt-group" class="bg-dark pb-3 col-12">
+<div class="row text-left text-white bg-dark">
+  <div id="refreshed-time" class='col-12'>
+    Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
+  </div>
+</div>
+<div id="receipt-group" class="row bg-dark pb-3">
   <div class="col-12">
-    <div class="row my-1">
-      <% Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).where(is_ready: false, source: :takeaway, order: { refunds: { id: nil }})).reverse.each do |t, receipts| %>
-        <%= t.inspect %>
+    <div class="row my-1 m-0">
+      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds)).reverse %>
+      <% @data.each do |t, receipts| %>
         <% items = nil %>
         <% receipts.each do |receipt| %>
           <%
@@ -54,7 +59,7 @@
                       <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
                     <% elsif params[:controller] == "kitchen" %>
                       <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
-                      <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>
+                      <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt&.order&.stripe_data&.present? %>
                     <% end %>
                     <% printers.each do |printer|%>
                       <%# binding.pry %>
@@ -101,7 +106,8 @@
             </div>
           </div>
         </div>
-      <% end.empty? && begin %>
+      <% end %>
+      <% if @data.blank? %>
         <div class="col pt-5 my-3 text-white text-center">
           <h3>No orders to view</h3>
         </div>

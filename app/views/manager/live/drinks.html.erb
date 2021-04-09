@@ -16,6 +16,6 @@
 <%= hidden_field_tag :restaurant_id, @restaurant.id%>
 <%= render 'manager/live/kitchen_delay' %>
 
-<div class="row mt-2 mb-2" id='current-orders'>
+<div class="mt-2 mb-2" id='current-orders'>
   <%= render 'manager/live/order_items_kitchen', printers: @printers, item_screen_type_key: 'DRINK', grouped: @item_screen.grouped %>
 </div>
