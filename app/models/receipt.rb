@@ -226,7 +226,7 @@ class Receipt < ApplicationRecord
   end
 
   def self.group_by_time(receipts, seconds = 300)
-    receipts.group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc && (x.group_order ? true : rand(1..100000) ) }.sort_by{|x,y|y.first.created_at}
+    receipts.group_by {|x| (time = Time.at((x.created_at.to_f / seconds).round * seconds).utc).to_s + (x.group_order ? nil : x.id ).to_s }.sort_by{|x,y|y.first.created_at}
   end
 
 end
