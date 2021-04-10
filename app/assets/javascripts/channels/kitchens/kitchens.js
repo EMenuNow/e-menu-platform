@@ -17,6 +17,7 @@ App.snippets = App.cable.subscriptions.create(
   received: function (data) {
     console.log(data);
     console.log("Received data from KitchensChannel");
+    console.log("Received data from KitchensChannel");
     $("#current-orders").html(data.html);
     if (data.message == "New") {
       order_bell.play();

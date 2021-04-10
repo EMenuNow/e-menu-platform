@@ -17,6 +17,7 @@ class Receipt < ApplicationRecord
 
   def ding
     broadcast(message: "New")
+    broadcast_items(message: "New")
   end
 
   def order_id
@@ -53,18 +54,18 @@ class Receipt < ApplicationRecord
     if item_screen_food.present?
     
      html_food  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: {grouped: item_screen_food.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'FOOD' })
-      ActionCable.server.broadcast("food_items_channel_#{restaurant_id}", {html: html_food, message: "Refresh"})
+      ActionCable.server.broadcast("food_items_channel_#{restaurant_id}", {html: html_food, message: message})
     end 
 
     item_screen_drinks = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key = 'DRINK'")
     item_screen_drink = item_screen_drinks.first if item_screen_drinks.present?
     if item_screen_drink.present?
       html_drinks  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'DRINK' })
-      ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks, message: "Refresh"})
+      ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks, message: message})
     end
 
     html_kitchen  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: {printers: @printers, restaurant_id: restaurant_id })
-    ActionCable.server.broadcast("kitchens_channel_#{restaurant_id}", {html: html_kitchen, message: "Refresh"})
+    ActionCable.server.broadcast("kitchens_channel_#{restaurant_id}", {html: html_kitchen, message: message})
   end
 
   def creation_print

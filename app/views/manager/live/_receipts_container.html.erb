@@ -149,7 +149,7 @@
             <% if receipt&.order&.refunds.present? %>
               <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
             <% else %>
-              <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } if receipt.processing_status != "done" %>
+              <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } if !receipt.is_ready? %>
               <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt&.order&.stripe_data.present? %>
             <% end %>
             <% printers.each do |printer|%>

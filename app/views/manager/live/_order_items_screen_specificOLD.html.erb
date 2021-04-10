@@ -1,13 +1,5 @@
 <% content_for :js do %>
   <script>
-    $(function() {
-      $(".receipt-ready").on('confirm:complete', function(e) {
-        if (e.originalEvent.detail[0]) {
-          var receiptId = this.id.match(/\d+/);
-          $(`#receipt-${receiptId}-card`).hide();
-        };
-      });
-    });
   </script>
 <% end %> 
 
