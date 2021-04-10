@@ -96,15 +96,15 @@ class Receipt < ApplicationRecord
 
   def print_receipt(printer, action='print')
     print_receipt = ""
-    group = self.find_grouped_receipts
+    group = self.find_grouped_receipts.reverse
     group.each do |x|
-      print_receipt += ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: x, restaurant: restaurant_id })
+      print_receipt = ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: x, restaurant: restaurant_id })
     end.empty? and begin
       return
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
-    header << "#{'Group' if group.size > 1} Order ID: #{order_id}\n"
+    header << "#{'Group' if group.size > 1} Order ID: #{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
@@ -144,7 +144,7 @@ class Receipt < ApplicationRecord
 
   def print_receipt_grouped(printer, item_screen_type_key, action='print')
     print_receipt = ""
-    group = self.find_grouped_receipts
+    group = self.find_grouped_receipts.reverse
     group.each do |x|
       print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, item_screen_type_key: item_screen_type_key })
     end.empty? and begin
@@ -152,7 +152,7 @@ class Receipt < ApplicationRecord
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
-    header << "#{'Group' if group.size > 1} Order ID: #{order_id}\n"
+    header << "#{'Group' if group.size > 1} Order ID: #{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
