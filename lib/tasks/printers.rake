@@ -8,15 +8,11 @@ require 'json'
 namespace :printer do 
   task :print_failed => :environment do
     states = ["Printer Error", nil, "Sent to printer"]
-    rs = []
-    Receipt.where(print_status: states).each do |r|
-      rs += r.find_grouped_receipts
-    end
-    rs.flatten.uniq.each do |g|
-      is_new_group = rs.size > 1 && rs.first.created_at > 5.minutes.ago
-      if rs.size == 1 || (!is_new_group && states.include?(g.print_status))
-        g.creation_print
-        g.item_breakdown
+    Receipt.group_by_time(Receipt.where(print_status: states)).each do |k, v|
+      is_new_group = v.size > 1 && v.first.created_at > 5.minutes.ago
+      if v.size == 1 || (!is_new_group && states.include?(v.first.print_status))
+        v.first.creation_print
+        v.first.item_breakdown
       end
     end
   end
