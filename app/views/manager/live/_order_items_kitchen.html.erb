@@ -53,7 +53,7 @@
                     <% if receipt&.order&.refunds.present? %>
                       <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
                     <% end %>
-                    <% if ["manager/live"].include?(params[:controller]) && new_order == true %>
+                    <% if new_order == true %>
                       <% if item_screen_type_key.present? %>
                         <%= link_to "Ready?",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: 'Are you sure?' } %>
                       <% else %>
