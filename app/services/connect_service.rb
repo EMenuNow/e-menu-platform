@@ -2,7 +2,7 @@ class ConnectService < ApplicationController
 
   def initialize(restaurant)
     @restaurant = restaurant
-    Stripe.api_key = Rails.env == 'production' ? ENV['STRIPE_API_KEY'] : 'sk_test_hOj5WqYB26UV1v5uuqXsADSG'
+    Stripe.api_key = Rails.env == 'production' ? @restaurant.stripe_chargeback_enabled ? ENV['STRIPE_PRO_API_KEY'] : ENV['STRIPE_API_KEY'] : @restaurant.stripe_chargeback_enabled ? 'sk_test_51IEEKiJyyGTIkLikMKhhmkTY4raz9JHFXp9qiQYwvJNRviHXdBqwpIez4Kva9vtbw6iMaT5qZML5vvGAK1n71i0c0013EXKJPf' : 'sk_test_hOj5WqYB26UV1v5uuqXsADSG'
   end
 
   def create_account

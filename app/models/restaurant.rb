@@ -9,6 +9,7 @@ class Restaurant < ApplicationRecord
   has_many :delivery_postcodes
   has_many :receipts
   has_many :menus
+  has_many :busy_time
   belongs_to :currency
   has_many :restaurant_tables
   has_many :discount_codes
@@ -112,8 +113,6 @@ class Restaurant < ApplicationRecord
     days = []
 
     t = Time.new.in_time_zone(time_zone)
-    round_down_t = Time.parse("#{t.year}-#{t.month}-#{t.day} #{t.hour}:#{t.min/15*15}:00")
-    rounded_t = round_down_t + 15.minutes
     
     cod = opening_time_cut_off_days
     aod = opening_time_advanced_order_days - 1
@@ -146,7 +145,7 @@ class Restaurant < ApplicationRecord
     t = Time.new.in_time_zone(time_zone) + offset.day
     round_down_t = Time.parse("#{t.year}-#{t.month}-#{t.day} #{t.hour}:#{t.min/15*15}:00")
     rounded_t = round_down_t + 15.minutes
-    
+
     delivery_time_options = []
     
     day = t.strftime("%A").downcase
@@ -155,9 +154,13 @@ class Restaurant < ApplicationRecord
     
     time_opening = Time.parse("#{t.year}-#{t.month}-#{t.day} #{opening_time}:00")
     time_closing = Time.parse("#{t.year}-#{t.month}-#{t.day} #{closing_time}:00")
+    closed = time_opening >= time_closing
     
-    delivery_time_options << {value: "ASAP", text: "ASAP"} if is_open and (round_down_t + dtm < closing_time) and !opening_time_close_early
+    busy_times = self.busy_time.in_future
     
+    busy_now = round_down_t + dtm + round_down_t.utc_offset - t.utc_offset
+    delivery_time_options << {value: "ASAP", text: "ASAP"} if is_open and (round_down_t + dtm < closing_time) and !opening_time_close_early and busy_times.where(busy_time: busy_now).empty? and !closed
+
     # Set first available time
     if offset == 0 and (rounded_t > time_opening or opening_time_open_early)
       next_time = rounded_t + dtm + (offset == 0 ? btm : 0)
@@ -168,13 +171,15 @@ class Restaurant < ApplicationRecord
     if offset == 0 and !opening_time_close_early
       until rounded_t > time_closing - btm
         if rounded_t >= next_time
-          delivery_time_options << {value: rounded_t.strftime("%H:%M"), text: "#{rounded_t.strftime("%H:%M")}"}
+          is_busy = rounded_t + rounded_t.utc_offset - t.utc_offset
+          delivery_time_options << {value: rounded_t.strftime("%H:%M"), text: "#{rounded_t.strftime("%H:%M")}", busy: busy_times.where(busy_time: is_busy).any?} unless closed
         end
         rounded_t = rounded_t + 15.minutes
       end
     elsif offset > 0
       until next_time > time_closing
-        delivery_time_options << {value: next_time.strftime("%H:%M"), text: "#{next_time.strftime("%H:%M")}"} 
+        is_busy = next_time + rounded_t.utc_offset - t.utc_offset
+        delivery_time_options << {value: next_time.strftime("%H:%M"), text: "#{next_time.strftime("%H:%M")}", busy: busy_times.where(busy_time: is_busy).any?} unless closed
         next_time = next_time + 15.minutes
       end
 

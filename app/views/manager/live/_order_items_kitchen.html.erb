@@ -1,159 +1,121 @@
 <% content_for :js do %>
   <script>
-    $(function() {
-      $(".receipt-ready").on('confirm:complete', function(e) {
-        if (e.originalEvent.detail[0]) {
-          var receiptId = this.id.match(/\d+/);
-          $(`#receipt-${receiptId}-card`).hide();
-        };
-      });
-    });
   </script>
 <% end %> 
 
-<% @restaurant = Restaurant.where(id: restaurant.id).first if @restaurant.blank? %>
+<%
+  item_screen_type_key ||= nil
+  restaurant_id ||= nil
+%>
 
-<div id="receipt-group" class="bg-dark pt-3 container-fluid">
+<% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
+<div class="row text-left text-white bg-dark">
+  <div id="refreshed-time" class='col-12'>
+    Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
+  </div>
+</div>
+<div id="receipt-group" class="row bg-dark pb-3">
   <div class="col-12">
-    <div class="row my-1">
-      <% @restaurant.receipts.where(is_ready: false, source: :takeaway).where.not(processing_status: "pending").sort_by{|x|x.created_at}.reverse.uniq(&:uuid).group_by{|x|x.table_number}.each do |g, receipts| %>
-        <% Receipt.group_by_time(receipts).each do |t, receipts| %>
-          <% receipt = receipts.first %>
-          <div class="col-4 p-0">
-            <div class="bg-light rounded m-1" style="height: 400px">
-              <div class="row m-0 py-3">
-                <div class="col-2">
-                  <h5 style="font-size:0.8em;" class="text-center m-0">#<%=receipt.uuid.truncate(4, omission: '')%></h5>
-                </div>
-                <div class="col-8 text-center">
-                  <h5 style="font-size:0.8em;" class="text-left m-0"><%=receipt.name%> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
-                </div>
-                <div class="col-2">
-                  <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
-                </div>
+    <div class="row my-1 m-0">
+      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(:screen_items, order: :refunds).order(id: :DESC).limit(70)).reverse %>
+      <% @data.each do |t, receipts| %>
+        <% items = nil %>
+        <% receipts.each do |receipt| %>
+          <%
+            items = receipt.items['items']
+            items = receipt.items['items'].select{|d| d['item_screen_type_key'] == item_screen_type_key} if item_screen_type_key.present?
+          %>
+        <% end %>
+        <% next if items.blank? %>
+        <% receipt = receipts.first %>
+        <% new_order = item_screen_type_key.present? ? !receipt.screen_items.select{|x|x.item_screen_type_key == item_screen_type_key}.map{|x|x.ready}.all? : !receipt.is_ready? %>
+        <% next if !new_order %>
+        <div class="col-lg-4 p-0" id="receipt-<%= receipt.id %>-card">
+          <div class="bg-light rounded m-1" style="height: 400px">
+            <div class="row m-0 py-3">
+              <div class="col-2">
+                <h5 style="font-size:0.8em;" class="text-center m-0 badge badge-pill <%= new_order ? 'badge-danger' : 'badge-light' %>">#<%=receipt.order_id%></h5>
               </div>
-              <hr class="m-0" />
-              <div class="row m-0" style="height:330px;overflow-y: auto;">
-                <div class="col">
-                  <div class="row mt-3">
-                    <div class="col-8">
-                      <a class="btn btn-warning p-0 px-1 "><%= receipt.processing_status %></a>
-                      <% if receipt&.order&.refunds.present? %>
-                        <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
+              <div class="col-7 text-center">
+                <h5 style="font-size:0.8em;" class="text-left m-0"><%=receipt.name%> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
+              </div>
+              <div class="col-3">
+                <h5 style="font-size:0.8em;" class="text-center m-0"><%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
+              </div>
+            </div>
+            <hr class="m-0" />
+            <div class="row m-0" style="height:330px;overflow-y: auto;">
+              <div class="col">
+                <div class="row mt-3">
+                  <div class="col-8">
+                    <% if !new_order %><a class="btn btn-warning p-0 px-1 "><% if item_screen_type_key.blank? %>Order <% end %>Complete</a><% end %>
+                    <% if item_screen_type_key.blank? %><a class="btn btn-warning p-0 px-1 "><%= receipt.processing_status %></a><% end %>
+                    <% if receipt&.order&.refunds.present? %>
+                      <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
+                    <% end %>
+                    <% if new_order == true %>
+                      <% if item_screen_type_key.present? %>
+                        <%= link_to "Ready?",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: 'Are you sure?' } %>
                       <% else %>
                         <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
-                        <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>
                       <% end %>
-                      <% printers.each do |printer|%>
-                        <%# binding.pry %>
-                        <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-1' %>
-                      <% end %>
-                    </div>
-                    <div class="col-4 text-right">
-                      <h5 style="font-size:0.8em;" class="text-center m-0 d-inline-block"><%=receipt.collection_time.presence || "ASAP" %></h5>
+                      <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt&.order&.stripe_data&.present? %>
+                    <% end %>
+                    <% printers.each do |printer|%>
+                      <%# binding.pry %>
+                      <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-1' %>
+                    <% end %>
+                  </div>
+                  <div class="col-4 text-right">
+                    <h5 style="font-size:0.8em;" class="text-center m-0 d-inline-block"><%=receipt.collection_time.presence || "ASAP" %></h5>
+                  </div>
+                </div>
+                <hr class="" />
+                <% if receipt.delivery_or_collection == "delivery" %>
+                  <div class="row pb-2">
+                    <div class="col-12">
+                      <%= "Deliver to: #{receipt.address}" %>
                     </div>
                   </div>
-                  <hr class="" />
-                  <% if receipt.delivery_or_collection == "delivery" %>
+                <% end %>
+                <% receipts.each do |receipt| %>
+                  <% sis = receipt.screen_items %>
+                  <% items.each do |item| %>
+                    <%
+                      items = receipt.items['items']
+                      items = receipt.items['items'].select{|d| d['item_screen_type_key'] == item_screen_type_key} if item_screen_type_key.present?
+                    %>
                     <div class="row pb-2">
-                      <div class="col-12">
-                        <%= "Deliver to: #{receipt.address}" %>
+                      <div class="col-8">
+                        <h5 style="font-size:0.8em;" class="text-left m-0"><i><u><%= sis.select{|x|x.uuid == item['uuid']}.first&.ready ? "Ready" : "Not marked ready" %></u></i></h5>
+                        <%= item['item'].html_safe %>
+                      </div>
+                      <div class="col-4">
+                        <small>
+                          <%= item['optionals'].join('<br> ').html_safe%>
+                          <br />
+                          <% if item['note'].present? %>
+                            <strong>Note: </strong> <%=item['note']%>
+                          <% end %>
+                        </small>
                       </div>
                     </div>
+                    <hr class="m-0 mb-2" />
                   <% end %>
-                  <% receipts.each do |receipt| %>
-                    <% receipt.items['items'].each do |item| %>
-                      <div class="row pb-2">
-                        <div class="col-8">
-                          <%= item['item'].html_safe %>
-                        </div>
-                        <div class="col-4">
-                          <small>
-                            <%= item['optionals'].join('<br> ').html_safe%>
-                            <br />
-                            <% if item['note'].present? %>
-                              <strong>Note: </strong> <%=item['note']%>
-                            <% end %>
-                          </small>
-                        </div>
-                      </div>
-                      <hr class="m-0 mb-2" />
-                    <% end %>
-                  <% end %>
-                </div>
+                <% end %>
               </div>
-              <div class="row m-0">
-                <div class="col-9 px-1">
-                  <h5 style="font-size:0.8em;"><i class="fa fa-1x fa-clock"></i> <%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
-                </div>
-                <div class="col-3 px-1">
-                </div>
+            </div>
+            <div class="row m-0" style="position: absolute;width:100%;bottom:2px;left:10px;">
+              <div class="col-9 px-1">
+                <h5 style="font-size:0.8em;"><i class="fa fa-1x fa-clock"></i> <%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
+              </div>
+              <div class="col-3 px-1">
               </div>
             </div>
           </div>
-        <% end %>
-            <%
-=begin%>
-      <div class="col-12">
-        <div class="row">
-          <% Receipt.group_by_time(receipts).each do |t, receipts| %>
- <% if g.present? && receipts.select{|x|x.group_order}.present? %>
-              <div class="col-md-12">
-                <h4 class="pb-2 pt-3">Deliver together</h4>
-              </div>
-            <% else %>
-              <div class="col-md-12">
-                <h4 class="pb-2 pt-3">Deliver based on requested time</h4>
-              </div>
-            <% end %> 
-<%
-=end%>
-            <%
-=begin%>
- <% receipts.each do |receipt| %>
-              <div class="card-body border col-md-12 my-1">
-                <div id="receipt-<%= receipt.id %>-card" class="">
-                  <% if false %>
-                  <p class="card-text">
-                    <ul class="list-group">
-                      <% receipt.items['items'].each do |item| %>
-                        <li class="list-group-item">
-                          <div class="row">
-                            <div class="col"><%= item['item'].html_safe%></div>
-                          </div>
-                          <div class="row">
-                            <div class="col"><small><%= item['optionals'].join('<br> ').html_safe%></small></div>
-                          </div>
-                          <% if item['note'].present? %>
-                            <div class="row">
-                              <div class="col"><strong>Note: </strong><%=item['note']%></div>
-                            </div>
-                          <% end %>
-                        </li>
-                      <% end %>
-                    </ul>
-                  </p>
-                  <% if receipt&.order&.refunds.present? %>
-                    <div class="btn btn-warning mt-3">Order has been refunded</div>
-                  <% else %>
-                    <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning mt-3 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
-                    <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info mt-3', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>
-                  <% end %>
-                  <%= link_to "creation_broadcast",receipt_creation_broadcast_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-danger mt-3' if Rails.env=='development' %>
-                  <% printers.each do |printer|%>
-                    <%# binding.pry %>
-                    <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info  mt-3' %>
-                  <% end %>
-                  <% end %>
-                </div>
-              </div>
-            <% end %> 
-          <% end %>
         </div>
-      </div>
-<%
-=end%>
-      <% end.empty? && begin %>
+      <% end %>
+      <% if @data.blank? %>
         <div class="col pt-5 my-3 text-white text-center">
           <h3>No orders to view</h3>
         </div>

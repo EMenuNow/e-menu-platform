@@ -191,7 +191,7 @@
       <div class="col-sm-4 pb-1">
         <div class="form-group ">
           <%= form.label 'Advanced order maximum days' %>
-        <%= form.select :advanced_order_days, options_for_select(@advanced_settings, manager_opening_time.advanced_order_days), {prompt: 'Choose days'}, {class: 'form-control validate-item'} %>
+        <%= form.select :advanced_order_days, options_for_select(@advanced_order_settings, manager_opening_time.advanced_order_days), {prompt: 'Choose days'}, {class: 'form-control validate-item'} %>
         </div>
       </div>
     </div>

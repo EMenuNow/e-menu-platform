@@ -1,0 +1,99 @@
+<% content_for :js do %>
+  <script>
+    var availability = <%= @restaurant_availability.to_json.html_safe %>;
+
+    $(document).ready(function () {
+
+      function validate() {
+        var count = 0;
+
+        $('select').each(function(){
+          if($(this).val() == ""){
+            count ++;
+          };
+        });
+        if (count == 0) {
+          $('#validation-warning').hide();
+          $(':input[type="submit"]').prop('disabled', false);
+        } else {
+          $('#validation-warning').show();
+          $(':input[type="submit"]').prop('disabled', true);
+        }
+      };
+
+      $('#busy_time_date_offset').change(function(){
+        var offset = $(this).val();
+
+        var newDay = $.grep(availability, function(o) { return o.day == offset });
+        var newTimes = newDay[0].times;
+        var $el = $("#busy_time_busy_time");
+        $el.empty(); // remove old options
+        $el.append($("<option></option>").attr("value", "").text("Select time")); // add placeholder
+        $.each(newTimes, function(key,value) {
+          $el.append($("<option></option>")
+          .attr("value", value.value).text(value.busy ? value.text + ` (Unavailable)` : value.text).attr("disabled", value.busy));
+        });
+      });
+
+      $('select').on("change", validate);
+
+      validate();
+
+    });
+
+  </script>
+<% end %>
+
+<%= form_with(model: ['manager', @restaurant, manager_busy_time], local: true) do |form| %>
+  <% if manager_busy_time.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(manager_opening_time.errors.count, "error") %> prohibited this manager_busy_time from being saved:</h2>
+
+      <ul>
+      <% manager_busy_time.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form.hidden_field :restaurant_id, class: 'form-control' %>
+
+  <div class="row">
+    <div class="col mt-4 pb-1">
+      <div class="form-group">
+        <h5>Add Busy Time: </h5>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4 pb-1">
+      <div class="form-group">
+        <%= form.label 'Select upcoming day: ' %>
+        <%= form.select :date_offset, options_for_select(@busy_day_options.map{|s| [s[:text], s[:value]]}), { class: "border p-2 bg-light form-control validate-item" } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4 pb-1">
+      <div class="form-group">
+        <%= form.label 'Choose time: ' %>
+        <%= form.select :busy_time, options_for_select(@busy_time_options.map{|s| [(s[:busy] ? s[:text] + " (Unavailable)" : s[:text]), s[:value], disabled: s[:busy]]}), { prompt: 'Select time', class: "border p-2 bg-light form-control validate-item"}  %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4 pb-1">
+      <div id="validation-warning" class="form-group">
+        <%= form.label 'Please select both a day and a time' %>
+      </div>
+      <div class="form-group">
+        <%= form.submit nil, class: 'btn btn-primary', disabled: true %>
+      </div>
+    </div>
+  </div>
+
+<% end %>

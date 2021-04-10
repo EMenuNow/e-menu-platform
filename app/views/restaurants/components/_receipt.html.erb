@@ -2,7 +2,7 @@
   <div class="col mb-3">
     <h1><%=@restaurant.name%></h1>
     <div><strong>Payment Date: </strong><%= @receipt.created_at.in_time_zone(@restaurant.time_zone).strftime("%d %B %Y - %H:%M") %></div>
-    <div><strong>Receipt Number: </strong><%=@receipt.uuid%></div>
+    <div><strong>Order ID: </strong><%=@receipt.order_id%></div>
     <% if @receipt.delivery_or_collection != 'tableservice'  %><div><strong>Name: </strong><%=@receipt.name%></div><% end %>
     <div><strong>Type: </strong><%=@receipt.delivery_or_collection.camelcase%></div>
     <% d = @receipt.due_date.in_time_zone(@restaurant.time_zone) %>

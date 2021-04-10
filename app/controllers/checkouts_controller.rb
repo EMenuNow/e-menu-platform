@@ -24,7 +24,7 @@ class CheckoutsController < ApplicationController
     due_time = @parameters["collection_time"]
     dtm = @restaurant.opening_time_delay_time_minutes.minutes
     btm = @restaurant.opening_time_kitchen_delay_minutes.minutes
-    if due_time == "ASAP"
+    if due_time == "ASAP" or @parameters["service_type"] == 'tableservice'
       @parameters["due_date"] = t + dtm + btm
     else
       d = t + offset.day
@@ -54,7 +54,7 @@ class CheckoutsController < ApplicationController
 
   def stripe_parameters
     @parameters = params.slice(:service_type, :total, :price, :service_type, :collection_time, :date_offset, :table_number, :name, :telephone, :email, :house_number,
-    :street, :postcode, :basket, :delivery_fee, :apple_and_google, :stripe_success_token)
+    :street, :postcode, :basket, :delivery_fee, :apple_and_google, :stripe_success_token, :group_order)
   end
 
   def get_restaurant

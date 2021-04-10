@@ -33,7 +33,8 @@ class Order < ApplicationRecord
         chargeback_fee: self.chargeback_fee,
         chargeback_enabled: self.chargeback_enabled,
         emenu_vat_charge: self.emenu_vat_charge,
-        group_order: self.group_order
+        group_order: self.group_order,
+        processing_status: "accepted" # temporary until pending payments is built
       )
     end
 

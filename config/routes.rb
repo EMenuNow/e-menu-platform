@@ -154,6 +154,7 @@ Rails.application.routes.draw do
       get 'reporting/zreport_show/:daily_reporting_id', to: 'reporting#zreport_show', as: :zreport
 
       resources :opening_times
+      resources :busy_times, except: [:update]
       resources :delivery_postcodes
 
       resources :themes

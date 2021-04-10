@@ -12,7 +12,7 @@ module Manager
 
 
     def layout_chooser
-      if ['food','drinks','orders'].include?(params[:action])
+      if ['kitchen','food','drinks','orders'].include?(params[:action])
         'live_screen_manager'
       end
     end

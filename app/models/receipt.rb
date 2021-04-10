@@ -1,6 +1,7 @@
 class Receipt < ApplicationRecord
   belongs_to :restaurant
   belongs_to :order
+  after_create :ding
   after_create :broadcast
   after_create :creation_print
   after_create :item_breakdown
@@ -14,13 +15,20 @@ class Receipt < ApplicationRecord
   #   @@my_logger ||= Logger.new("#{Rails.root}/log/mylog.log")
   # end
 
+  def ding
+    broadcast(message: "New")
+    broadcast_items(message: "New")
+  end
+
   def order_id
-    uuid.truncate(4, omission: '')
+    id.to_s.truncate(4, omission: '')
   end
 
   def update_print_status(status)
-    self.print_status = status
-    self.save
+    self.find_grouped_receipts.each do |x|
+      x.print_status = status
+      x.save
+    end
   end
 
   def item_breakdown
@@ -38,23 +46,26 @@ class Receipt < ApplicationRecord
     end
   end
 
-  def broadcast_items
+  def broadcast_items(message: "Refresh")
     @printers = Printer.where(restaurant_id: restaurant_id)
 
     item_screen_foods = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key = 'FOOD'")
     item_screen_food = item_screen_foods.first if item_screen_foods.present?
     if item_screen_food.present?
     
-     html_food  = ApplicationController.render(partial: "manager/live/order_items_screen_specific", locals: {grouped: item_screen_food.grouped,  printers: @printers, restaurant: restaurant_id, item_screen_type_key: 'FOOD' })
-      ActionCable.server.broadcast("food_items_channel_#{restaurant_id}", {html: html_food})
+     html_food  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: {grouped: item_screen_food.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'FOOD' })
+      ActionCable.server.broadcast("food_items_channel_#{restaurant_id}", {html: html_food, message: message})
     end 
 
     item_screen_drinks = ItemScreen.where(restaurant_id: restaurant_id  ).joins(:item_screen_type).where("item_screen_types.key = 'DRINK'")
     item_screen_drink = item_screen_drinks.first if item_screen_drinks.present?
     if item_screen_drink.present?
-      html_drinks  = ApplicationController.render(partial: "manager/live/order_items_screen_specific", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant: restaurant_id, item_screen_type_key: 'DRINK' })
-      ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks})
+      html_drinks  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'DRINK' })
+      ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks, message: message})
     end
+
+    html_kitchen  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: {printers: @printers, restaurant_id: restaurant_id })
+    ActionCable.server.broadcast("kitchens_channel_#{restaurant_id}", {html: html_kitchen, message: message})
   end
 
   def creation_print
@@ -75,23 +86,25 @@ class Receipt < ApplicationRecord
     end
   end
 
-  def broadcast
+  def broadcast(message: "Refresh")
     @printers = Printer.where(restaurant_id: restaurant_id)
     html  = ApplicationController.render(partial: "manager/live/order_items", locals: { printers: @printers, restaurant: Restaurant.find(restaurant_id) })
     # binding.pry
-    data = {html: html, sound_file_path: ActionController::Base.helpers.asset_path('order-bell.wav')}   
+    data = {html: html, sound_file_path: ActionController::Base.helpers.asset_path('order-bell.wav'), message: message}   
     ActionCable.server.broadcast("receipts_channel_#{restaurant_id}", data)
   end
 
   def print_receipt(printer, action='print')
     print_receipt = ""
-    self.find_grouped_receipts.each do |x|
-      print_receipt += ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: x, restaurant: restaurant_id })
+    group = self.find_grouped_receipts.reverse
+    group.each do |x|
+      print_receipt = ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: x, restaurant: restaurant_id })
     end.empty? and begin
       return
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
+    header << "#{'Group' if group.size > 1} Order ID: #{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
@@ -131,13 +144,15 @@ class Receipt < ApplicationRecord
 
   def print_receipt_grouped(printer, item_screen_type_key, action='print')
     print_receipt = ""
-    self.find_grouped_receipts.each do |x|
+    group = self.find_grouped_receipts.reverse
+    group.each do |x|
       print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, item_screen_type_key: item_screen_type_key })
     end.empty? and begin
       return
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
+    header << "#{'Group' if group.size > 1} Order ID: #{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
@@ -170,8 +185,13 @@ class Receipt < ApplicationRecord
   end
 
   def secondary_print_receipt_grouped(printer, secondary_item_screen_type_key, action='print')
-    
-    print_receipt = ApplicationController.render(partial: "manager/live/order_item_screen_specific_print_secondary", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, secondary_item_screen_type_key: secondary_item_screen_type_key })
+    print_receipt = ""
+    group = self.find_grouped_receipts
+    group.each do |x|
+      print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print_secondary", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, secondary_item_screen_type_key: secondary_item_screen_type_key })
+    end.empty? and begin
+      return
+    end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
@@ -215,8 +235,6 @@ class Receipt < ApplicationRecord
       delivery_or_collection: delivery_or_collection,
       delivery_fee: delivery_fee
     }
-
-
   end
 
   def find_grouped_receipts(seconds = 300)
@@ -226,7 +244,7 @@ class Receipt < ApplicationRecord
   end
 
   def self.group_by_time(receipts, seconds = 300)
-    receipts.group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc && (x.group_order ? true : rand(1..100000) ) }.sort_by{|x,y|y.first.created_at}
+    receipts.group_by {|x| (time = Time.at((x.created_at.to_f / seconds).round * seconds).utc).to_s + (x.group_order ? nil : x.id ).to_s }.sort_by{|x,y|y.first.created_at}
   end
 
 end

@@ -51,7 +51,7 @@
                 <% if receipt&.order&.refunds.present? %>
                   <div class="mt-3">Order has been refunded</div>
                 <% else %>
-                  <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info mt-3', data: { confirm: "Are your sure?" } if receipt.order.stripe_data.present? %>
+                  <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info mt-3', data: { confirm: "Are your sure?" } if receipt&.order&.stripe_data.present? %>
                 <% end %>
               </td>
               <td><% if @printers.present? %>
