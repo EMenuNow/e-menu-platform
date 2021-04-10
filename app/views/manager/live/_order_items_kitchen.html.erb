@@ -36,7 +36,7 @@
         <% end %>
         <% next if items.blank? %>
         <% receipt = receipts.first %>
-        <% new_order = item_screen_type_key.present? ? receipt.screen_items.select{|x|x.item_screen_type_key == item_screen_type_key}.map{|x|x.ready}.none? : !receipt.is_ready? %>
+        <% new_order = item_screen_type_key.present? ? !receipt.screen_items.select{|x|x.item_screen_type_key == item_screen_type_key}.map{|x|x.ready}.all? : !receipt.is_ready? %>
         <% next if !new_order %>
         <div class="col-lg-4 p-0">
           <div class="bg-light rounded m-1" style="height: 400px">
@@ -60,7 +60,8 @@
                     <% if item_screen_type_key.blank? %><a class="btn btn-warning p-0 px-1 "><%= receipt.processing_status %></a><% end %>
                     <% if receipt&.order&.refunds.present? %>
                       <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
-                    <% elsif params[:controller] == "manager/live" && new_order == true %>
+                    <% end %>
+                    <% if ["manager/live"].include?(params[:controller]) && new_order == true %>
                       <% if item_screen_type_key.present? %>
                         <%= link_to "Ready?",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: 'Are you sure?' } %>
                       <% else %>
@@ -85,24 +86,26 @@
                     </div>
                   </div>
                 <% end %>
-                <% sis = receipt.screen_items %>
-                <% items.each do |item| %>
-                  <div class="row pb-2">
-                    <div class="col-8">
-                      <h5 style="font-size:0.8em;" class="text-left m-0"><i><u><%= sis.select{|x|x.uuid == item['uuid']}.first&.ready ? "Ready" : "Not ready" %></u></i></h5>
-                      <%= item['item'].html_safe %>
+                <% receipts.each do |receipt| %>
+                  <% sis = receipt.screen_items %>
+                  <% items.each do |item| %>
+                    <div class="row pb-2">
+                      <div class="col-8">
+                        <h5 style="font-size:0.8em;" class="text-left m-0"><i><u><%= sis.select{|x|x.uuid == item['uuid']}.first&.ready ? "Ready" : "Not marked ready" %></u></i></h5>
+                        <%= item['item'].html_safe %>
+                      </div>
+                      <div class="col-4">
+                        <small>
+                          <%= item['optionals'].join('<br> ').html_safe%>
+                          <br />
+                          <% if item['note'].present? %>
+                            <strong>Note: </strong> <%=item['note']%>
+                          <% end %>
+                        </small>
+                      </div>
                     </div>
-                    <div class="col-4">
-                      <small>
-                        <%= item['optionals'].join('<br> ').html_safe%>
-                        <br />
-                        <% if item['note'].present? %>
-                          <strong>Note: </strong> <%=item['note']%>
-                        <% end %>
-                      </small>
-                    </div>
-                  </div>
-                  <hr class="m-0 mb-2" />
+                    <hr class="m-0 mb-2" />
+                  <% end %>
                 <% end %>
               </div>
             </div>

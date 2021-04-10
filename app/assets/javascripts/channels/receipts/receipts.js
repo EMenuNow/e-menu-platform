@@ -27,12 +27,6 @@ App.snippets = App.cable.subscriptions.create(
       setTimeout((order_bell.currentTime = 0), 1000);
     }
 
-   $(".receipt-ready").on("confirm:complete", function (e) {
-    if (e.originalEvent.detail[0]) {
-     var receiptId = this.id.match(/\d+/);
-     $(`#receipt-${receiptId}-card`).hide();
-    }
-   });
    // console.log("Data received: " + data)
 
    // console.log(data);

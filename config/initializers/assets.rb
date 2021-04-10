@@ -19,6 +19,7 @@ Rails.application.config.assets.precompile +=
   home_mobile.js
   cable.js
   cable_food.js
+  cable_kitchen.js
   cable_drinks.js
   color_picker.js
   live_order_loader.js

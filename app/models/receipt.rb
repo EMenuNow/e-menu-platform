@@ -1,6 +1,7 @@
 class Receipt < ApplicationRecord
   belongs_to :restaurant
   belongs_to :order
+  after_create :ding
   after_create :broadcast
   after_create :creation_print
   after_create :item_breakdown
@@ -13,6 +14,10 @@ class Receipt < ApplicationRecord
   # def mylogger
   #   @@my_logger ||= Logger.new("#{Rails.root}/log/mylog.log")
   # end
+
+  def ding
+    broadcast(message: "New")
+  end
 
   def order_id
     id.to_s.truncate(4, omission: '')
@@ -57,6 +62,9 @@ class Receipt < ApplicationRecord
       html_drinks  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: { grouped: item_screen_drink.grouped,  printers: @printers, restaurant_id: restaurant_id, item_screen_type_key: 'DRINK' })
       ActionCable.server.broadcast("drink_items_channel_#{restaurant_id}", {html: html_drinks, message: "Refresh"})
     end
+
+    html_kitchen  = ApplicationController.render(partial: "manager/live/order_items_kitchen", locals: {printers: @printers, restaurant_id: restaurant_id })
+    ActionCable.server.broadcast("kitchens_channel_#{restaurant_id}", {html: html_kitchen, message: "Refresh"})
   end
 
   def creation_print
