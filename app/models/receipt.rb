@@ -80,7 +80,7 @@ class Receipt < ApplicationRecord
       action = 'print' if print
       action = 'buzz' if buzz
       action = 'print_buzz' if print and buzz
-      self.update_attributes(print_status: "No printer") if item_screen.printer.blank?
+      update_print_status("No printer") if item_screen.printer.blank?
       if action.present? and item_screen.printer.present?
         print_receipt(item_screen.printer, action)
       end
@@ -137,7 +137,7 @@ class Receipt < ApplicationRecord
       action = 'print' if print
       action = 'buzz' if buzz
       action = 'print_buzz' if print and buzz
-      self.update_attribute(print_status: "No printer") if item_screen.printer.blank?
+      update_print_status("No printer") if item_screen.printer.blank?
       if action.present? and item_screen.printer.present? and item_screen.grouped
         print_receipt_grouped(item_screen.printer, item_screen_type_key, action)
       end
