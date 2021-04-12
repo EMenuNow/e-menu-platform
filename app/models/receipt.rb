@@ -80,6 +80,7 @@ class Receipt < ApplicationRecord
       action = 'print' if print
       action = 'buzz' if buzz
       action = 'print_buzz' if print and buzz
+      self.update_attributes(print_status: "No printer") if item_screen.printer.blank?
       if action.present? and item_screen.printer.present?
         print_receipt(item_screen.printer, action)
       end
@@ -136,6 +137,7 @@ class Receipt < ApplicationRecord
       action = 'print' if print
       action = 'buzz' if buzz
       action = 'print_buzz' if print and buzz
+      self.update_attribute(print_status: "No printer") if item_screen.printer.blank?
       if action.present? and item_screen.printer.present? and item_screen.grouped
         print_receipt_grouped(item_screen.printer, item_screen_type_key, action)
       end
@@ -146,7 +148,7 @@ class Receipt < ApplicationRecord
     print_receipt = ""
     group = self.find_grouped_receipts.reverse
     group.each do |x|
-      print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, receipt: x, restaurant: restaurant_id, item_screen_type_key: item_screen_type_key })
+      print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, receipt: x, restaurant: restaurant_id, item_screen_type_key: "DRINK" })
     end.empty? and begin
       return
     end
