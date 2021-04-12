@@ -105,7 +105,7 @@
                   <h5 style="font-size:0.8em;" class="d-inline m-0"><%=receipt.collection_time.presence || "ASAP" %></h5>
                 </div>
                 <div class="col-md-3 px-1 text-center">
-                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%=receipt.collection_time.present? ? "#{receipt.delivery_or_collection.titleize} #{receipt.collection_time}" : ""%> <%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Deliver to: #{receipt.address}" : ""%></h5>
+                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%=receipt.collection_time.present? ? "#{receipt.delivery_or_collection&.titleize} #{receipt.collection_time}" : ""%> <%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Deliver to: #{receipt.address}" : ""%></h5>
                 </div>
                 <div class="col-md-1 px-1 text-center">
                   <% paid_status = receipt&.order&.stripe_data.try(:[], "payment_status") %>
