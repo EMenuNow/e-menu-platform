@@ -98,7 +98,7 @@ class Receipt < ApplicationRecord
     print_receipt = ""
     group = self.find_grouped_receipts.reverse
     group.each do |x|
-      print_receipt = ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: x, restaurant: restaurant_id })
+      print_receipt += ApplicationController.render(partial: "manager/live/order_items_print", locals: { receipt: x, restaurant: restaurant_id })
     end.empty? and begin
       return
     end
