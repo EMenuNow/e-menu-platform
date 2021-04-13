@@ -22,6 +22,12 @@
             <div class="row">
               <div class="col-8 text-left">
                 <a class="btn bg-secondary text-white p-0 px-1 "><%= receipt.processing_status.titleize %></a>
+                <% if receipt&.order&.refunds.present? %>
+                  <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
+                <% else %>
+                  <% refund_amount = number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %>
+                  <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Order ##{receipt.order_id} - Full refund? (#{refund_amount})" } if receipt&.order&.stripe_data.present? %>
+                <% end %>
                 <% if receipt.processing_status == "pending" %>
                   <%= link_to "Accept order",receipt_send_to_kitchen_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 send-to-kitchen', :id => "acceptorder#{receipt.order_id}" %>
                   <script type="text/javascript">
@@ -146,12 +152,7 @@
             <h5 style="font-size:0.8em;"><i class="fa fa-1x fa-clock"></i> <%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
           </div>
           <div class="col-8 text-right">
-            <% if receipt&.order&.refunds.present? %>
-              <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
-            <% else %>
-              <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } if !receipt.is_ready? %>
-              <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt&.order&.stripe_data.present? %>
-            <% end %>
+            <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } if !receipt.is_ready? %>
             <% printers.each do |printer|%>
               <%# binding.pry %>
               <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-1' %>

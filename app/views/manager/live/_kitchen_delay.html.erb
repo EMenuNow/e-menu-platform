@@ -25,12 +25,16 @@
         <%= link_to manager_live_orders_kitchen_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'kitchen'}" do %>
           <i class="fa fa-1x fa-th text-white <%='text-muted' if params[:action] != 'kitchen'%>"></i> Kitchen
         <% end %>
-        <%= link_to manager_live_food_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'food'}" do %>
-          <i class="fa fa-1x fa-utensils text-white <%='text-muted' if params[:action] != 'food'%>"></i> Food
+        <% if ItemScreen.where(restaurant_id: @restaurant).joins(:item_screen_type).where("item_screen_types.key = 'FOOD'").presence %>
+          <%= link_to manager_live_food_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'food'}" do %>
+            <i class="fa fa-1x fa-utensils text-white <%='text-muted' if params[:action] != 'food'%>"></i> Food
+          <% end %>
         <% end %>
-        <%= link_to manager_live_drinks_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'drinks'}" do %>
-          <i class="fa fa-1x fa-coffee text-white <%='text-muted' if params[:action] != 'drinks'%>"></i> Drink
-        <% end %>
+        <% if ItemScreen.where(restaurant_id: @restaurant).joins(:item_screen_type).where("item_screen_types.key = 'DRINK'").presence %>
+          <%= link_to manager_live_drinks_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'drinks'}" do %>
+            <i class="fa fa-1x fa-coffee text-white <%='text-muted' if params[:action] != 'drinks'%>"></i> Drink
+          <% end %>
+        <% end %>        
         <%
 =begin%>
   <%= link_to manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: "border rounded p-2 ml-2 text-white #{'text-muted' if params[:action] != 'kitchen_orders'}" do %>
@@ -49,6 +53,6 @@
       </div>
     </div>
   </div>
-  <%= render partial: "manager/live/modal_container", locals: { title: "Kitchen Delays", type: "settings" } %>
-  <%= render partial: "manager/live/modal_container", locals: { title: "Restaurant Settings", type: "kitchen_delay" } %>
+  <%= render partial: "manager/live/modal_container", locals: { title: "Settings", type: "settings" } %>
+  <%= render partial: "manager/live/modal_container", locals: { title: "Kitchen Delay", type: "kitchen_delay" } %>
 </div>
