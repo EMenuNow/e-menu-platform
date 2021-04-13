@@ -13,7 +13,7 @@ class Receipt < ApplicationRecord
 
   # def mylogger
   #   @@my_logger ||= Logger.new("#{Rails.root}/log/mylog.log")
-  # end
+  # end 
 
   def ding
     broadcast(message: "New")
@@ -148,7 +148,7 @@ class Receipt < ApplicationRecord
     print_receipt = ""
     group = self.find_grouped_receipts.reverse
     group.each do |x|
-      print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, receipt: x, restaurant: restaurant_id, item_screen_type_key: "DRINK" })
+      print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: {grouped: true, receipt: x, restaurant: restaurant_id, item_screen_type_key: item_screen_type_key })
     end.empty? and begin
       return
     end
