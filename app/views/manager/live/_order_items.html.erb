@@ -75,6 +75,7 @@
     <%# .each do |receipts| %>
       <% @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).order(id: :DESC).limit(70)).reverse %>
       <% @data.each do |t, receipts| %>
+        <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
         <% receipt = receipts.first %>
         <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>
         <div class="row m-0 my-1">
