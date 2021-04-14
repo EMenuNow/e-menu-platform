@@ -29,43 +29,43 @@
       <%
 =begin%>
  <div class="d-inline-block" style="width: 4%;">
-        <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0"><%= check_box_tag "Check" %></h5>
+        <p class="bg-secondary text-white text-center rounded m-0"><%= check_box_tag "Check" %></p>
       </div> 
 <%
 =end%>
       <div class="d-inline-block col-md-12" style="">
         <div class="row m-0">
           <div class="col-1 px-0">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">ORDER</h5>
+            <p class="bg-secondary text-white text-center rounded m-0">ORDER</p>
           </div>
-          <div class="col-2 px-1">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">NAME</h5>
+          <div class="col-2 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center rounded m-0">NAME</p>
           </div>
-          <div class="col-1 px-1">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">ITEMS</h5>
+          <div class="col-1 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center rounded m-0">ITEMS</p>
           </div>
-          <div class="col-1 px-1">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">PLACED</h5>
+          <div class="col-1 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center rounded m-0">PLACED</p>
           </div>
-          <div class="col-1 px-1">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">DUE</h5>
+          <div class="col-2 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center rounded m-0">DUE</p>
           </div>
-          <div class="col-3 px-1">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">SERVICE</h5>
+          <div class="col-2 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center rounded m-0">SERVICE</p>
           </div>
-          <div class="col-1 px-1">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">PAYMENT</h5>
-          </div>
-          <div class="col-1 px-1">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">TOTAL</h5>
+          <div class="col-1 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center rounded m-0">PAYMENT</p>
           </div>
           <div class="col-1 px-1">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">STATUS</h5>
+            <p class="bg-secondary text-white text-center rounded m-0">TOTAL</p>
+          </div>
+          <div class="col-1 px-0">
+            <p class="bg-secondary text-white text-center rounded m-0">STATUS</p>
           </div>
           <%
 =begin%>
  <div class="col-1 px-0">
-            <h5 style="font-size:0.8em;" class="bg-secondary text-white text-center rounded m-0">QUICK ACTION</h5>
+            <p class="bg-secondary text-white text-center rounded m-0">QUICK ACTION</p>
           </div> 
 <%
 =end%>
@@ -81,41 +81,45 @@
           <%
 =begin%>
  <div class="" style="width: 4%;">
-            <h5 style="font-size:0.8em;" class="text-center m-0 pt-2 d-none d-md-block"><%= check_box_tag "Check", class: "bg-secondary" %></h5>
+            <p class="text-center m-0 pt-2 d-none d-md-block"><%= check_box_tag "Check", class: "bg-secondary" %></p>
           </div> 
 <%
 =end%>
-          <%= link_to "#", class: "col-md-12 bg-light rounded py-2 text-dark", data: { toggle: "modal", target: "#modal#{receipt.order_id}" } do %>
+          <%= link_to "#", class: "col-md-12 bg-light rounded py-2 text-dark text-decoration-none", data: { toggle: "modal", target: "#modal#{receipt.order_id}" } do %>
             <div class="">
               <div class="row">
                 <div class="col-md-1 px-1 text-center">
                   <% new_order = !receipt.is_ready %>
-                  <h5 style="font-size:0.8em;" class="m-0 text-decoration-none badge badge-pill <%= new_order ? 'badge-danger' : 'badge-light' %>">#<%=receipt.order_id%></h5>
+                  <p style="font-size: 100%;" class="m-0 badge badge-pill <%= new_order ? 'badge-danger' : 'badge-light' %>">#<%=receipt.order_id%></p>
                 </div>
                 <div class="col-md-2 px-1 text-center">
-                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%=receipt.name.presence || "Table: #{receipt.table_number}" %> <%=receipt.telephone%> <%=receipt.group_order ? "(Group: table #{receipt.table_number})" : ""%></h5>
+                  <p class="d-inline m-0"><%=receipt.name.presence&.titleize || "Table #{receipt.table_number}" %> <%=receipt.group_order ? "(Group)" : ""%></p>
                 </div>
                 <div class="col-md-1 px-1 text-center">
-                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%= pluralize(receipts.sum{|x|x.items['items'].size || 0}, 'item') %></h5>
+                  <p class="d-inline m-0"><%= pluralize(receipts.sum{|x|x.items['items'].size || 0}, 'item') %></p>
                 </div>
                 <div class="col-md-1 px-1 text-center">
-                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</h5>
+                  <p class="d-inline m-0"><%= placed_datetime_format(receipt.created_at, @restaurant.time_zone) %></p>
                 </div>
-                <div class="col-md-1 px-1 text-center">
-                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%=receipt.collection_time.presence || "ASAP" %></h5>
+                <div class="col-md-2 px-1 text-center">
+                  <p class="d-inline m-0"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %><%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></p>
                 </div>
-                <div class="col-md-3 px-1 text-center">
-                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%=receipt.collection_time.present? ? "#{receipt.delivery_or_collection&.titleize} #{receipt.collection_time}" : ""%> <%=receipt.table_number.present? ? "Table: #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Deliver to: #{receipt.address}" : ""%></h5>
+                <div class="col-md-2 px-1 text-center">
+                  <p class="d-inline m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize%></p>
                 </div>
                 <div class="col-md-1 px-1 text-center">
                   <% paid_status = receipt&.order&.stripe_data.try(:[], "payment_status") %>
-                  <h5 style="font-size:0.8em;" class="d-inline m-0 text-decoration-none <%= paid_status == 'paid' ? 'badge badge-pill badge-success' : '' %>"><%= paid_status&.titleize %></h5>
+                  <p class="d-inline m-0 <%= paid_status == 'paid' ? 'badge badge-pill badge-success' : '' %>"><%= paid_status&.titleize %></p>
                 </div>
                 <div class="col-md-1 px-1 text-center">
-                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></h5>
+                  <p class="d-inline m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></p>
                 </div>
                 <div class="col-md-1 px-1 text-center">
-                  <h5 style="font-size:0.8em;" class="d-inline m-0"><%= receipt.processing_status %></h5>
+                  <% if receipt.processing_status == "accepted" %>
+                    <p class="d-inline m-0 badge badge-pill badge-info"><%= receipt.processing_status&.titleize %></p>
+                  <% elsif receipt.processing_status == "done" %>
+                    <p class="d-inline m-0 badge badge-pill badge-success">Complete</p>
+                  <% end %>
                 </div>
                 <%
 =begin%>
