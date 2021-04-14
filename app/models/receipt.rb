@@ -105,8 +105,8 @@ class Receipt < ApplicationRecord
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
-    header << "#{'Group' if group.size > 1} Order ID: #{group.first.order_id}\n"
-    header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
+    header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
+    header << "Name: #{name}\n" if delivery_or_collection != 'tableservice'
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
@@ -154,7 +154,7 @@ class Receipt < ApplicationRecord
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
-    header << "#{'Group' if group.size > 1} Order ID: #{group.first.order_id}\n"
+    header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
@@ -163,16 +163,16 @@ class Receipt < ApplicationRecord
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
     header << "\n\n"
     data = {receipt_id: id, print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
-   # mylogger.debug("PRINTING PRIMARY: #{printer.inspect}")
+    # mylogger.debug("PRINTING PRIMARY: #{printer.inspect}")
     ActionCable.server.broadcast("printers_channel_#{restaurant_id}_#{printer.pi_interface_server_token}", data)
     update_print_status('Sent to printer')
   end
-
+  
   def secondary_creation_print_grouped(secondary_item_screen_type_key)
     item_screens = ItemScreen.where(restaurant_id: restaurant_id).joins(:item_screen_type).where("item_screen_types.key = ?", secondary_item_screen_type_key)
     item_screen = nil
     item_screen = item_screens.first if item_screens.present?
-
+    
     if item_screen.present?
       buzz = item_screen.buzz_on_new
       print = item_screen.on_new
@@ -185,7 +185,7 @@ class Receipt < ApplicationRecord
       end
     end
   end
-
+  
   def secondary_print_receipt_grouped(printer, secondary_item_screen_type_key, action='print')
     print_receipt = ""
     group = self.find_grouped_receipts
@@ -196,6 +196,7 @@ class Receipt < ApplicationRecord
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
+    header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 

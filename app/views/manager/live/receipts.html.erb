@@ -47,11 +47,12 @@
               <td><ul><%= items.html_safe %></ul></td>
               <td><%= receipt.email %></td>
               <td>
-                <% if receipt.email.present? %><%= link_to 'Send Again', manager_send_receipts_path(receipt.id), class: "btn btn-info" %><% end %>
+                <% if receipt.email.present? %><%= link_to 'Send Again', manager_send_receipts_path(receipt.id), class: "btn btn-info m-1" %><% end %>
                 <% if receipt&.order&.refunds.present? %>
                   <div class="mt-3">Order has been refunded</div>
                 <% else %>
-                  <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info mt-3', data: { confirm: "Are your sure?" } if receipt&.order&.stripe_data.present? %>
+                  <% refund_amount = number_to_currency((receipt.order&.stripe_data.try(:[], "amount_total") || 0) / 100.0, unit: @restaurant.currency_symbol) %>
+                  <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info m-1', data: { confirm: "Order ##{receipt.order_id} - Full refund? (#{refund_amount})" } if receipt&.order&.stripe_data.present? %>
                 <% end %>
               </td>
               <td><% if @printers.present? %>
