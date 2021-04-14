@@ -16,8 +16,14 @@ class Receipt < ApplicationRecord
   # end 
 
   def ding
-    broadcast(message: "New")
-    broadcast_items(message: "New")
+    if !is_recent_group_order?
+      broadcast(message: "New")
+      broadcast_items(message: "New")
+    end
+  end
+
+  def is_recent_group_order?
+    self.group_order && self.created_at > 6.minutes.ago
   end
 
   def order_id

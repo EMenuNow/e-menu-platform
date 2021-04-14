@@ -78,7 +78,7 @@ end
   end
 
   def translate
-    TranslateJob.perform_later self
+    # TranslateJob.perform_later self
   end
 
 

@@ -30,6 +30,7 @@
         <% receipt = receipts.first %>
         <% new_order = item_screen_type_key.present? ? !receipt.screen_items.select{|x|x.item_screen_type_key == item_screen_type_key}.map{|x|x.ready}.all? : !receipt.is_ready? %>
         <% next if !new_order %>
+        <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
         <div class="col-lg-4 p-0" id="receipt-<%= receipt.id %>-card">
           <div class="bg-light rounded m-1" style="height: 400px">
             <div class="row m-0 py-3">

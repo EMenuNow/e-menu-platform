@@ -5,6 +5,7 @@ class BasketService < ApplicationController
                 :service_selected, :basket, :basket_key, :patron
 
   def initialize(restaurant, patron, basket)
+    return if restaurant.nil?
 
     @restaurant = restaurant
     @patron = patron
