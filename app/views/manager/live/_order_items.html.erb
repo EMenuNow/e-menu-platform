@@ -99,13 +99,13 @@
                   <p class="d-inline m-0"><%= pluralize(receipts.sum{|x|x.items['items'].size || 0}, 'item') %></p>
                 </div>
                 <div class="col-md-1 px-1 text-center">
-                  <p class="d-inline m-0"><%= time_ago_in_words(receipt.created_at, include_seconds: true) %> ago</p>
+                  <p class="d-inline m-0"><%= placed_datetime_format(receipt.created_at, @restaurant.time_zone) %></p>
                 </div>
                 <div class="col-md-2 px-1 text-center">
-                  <p class="d-inline m-0"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %><%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %><%#= receipt.collection_time.presence || "ASAP" %></p>
+                  <p class="d-inline m-0"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %><%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></p>
                 </div>
                 <div class="col-md-2 px-1 text-center">
-                  <p class="d-inline m-0"><%=receipt.collection_time.present? ? "#{receipt.delivery_or_collection&.titleize}" : ""%> <%=receipt.table_number.present? ? "Table #{receipt.table_number}" : ""%> <%= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Deliver to: #{receipt.address}" : ""%></p>
+                  <p class="d-inline m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize%></p>
                 </div>
                 <div class="col-md-1 px-1 text-center">
                   <% paid_status = receipt&.order&.stripe_data.try(:[], "payment_status") %>
