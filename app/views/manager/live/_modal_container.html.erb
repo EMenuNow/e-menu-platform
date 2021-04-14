@@ -14,6 +14,7 @@
           <% Stripe.api_key = @restaurant.stripe_sk_api_key %>
           <% available = Stripe::Balance.retrieve(stripe_account: @restaurant.stripe_connected_account_id)["available"].first %>
           <%= render partial: "manager/restaurants/settings" %>
+          <%= render partial: "manager/live/settings_links" %>
           <div class="row mb-0">
             <div class="col-8 offset-2 text-left pt-3 pb-3">
               <p class="m-0">Your restaurant's available balance: <%= number_to_currency(available["amount"] / 100.0, unit: @restaurant.currency_symbol) %></p>
