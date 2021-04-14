@@ -108,6 +108,7 @@ class Receipt < ApplicationRecord
     header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice'
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
+    header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
@@ -156,7 +157,8 @@ class Receipt < ApplicationRecord
     header = ""
     header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
-    header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
+    header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice'
+    header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
@@ -197,8 +199,9 @@ class Receipt < ApplicationRecord
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
     header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
-    header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
+    header << "Name: #{name}\n" if delivery_or_collection != 'tableservice'
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
+    header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
