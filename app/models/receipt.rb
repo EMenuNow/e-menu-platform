@@ -115,7 +115,8 @@ class Receipt < ApplicationRecord
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice'
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
-    header << "Type: #{delivery_or_collection}\n" 
+    header << "Type: #{delivery_or_collection}\n"
+    header << "Receipt Type: Full receipt\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
@@ -166,6 +167,7 @@ class Receipt < ApplicationRecord
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice'
     header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
+    header << "Receipt Type: #{item_screen_type_key}\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
@@ -196,7 +198,7 @@ class Receipt < ApplicationRecord
   
   def secondary_print_receipt_grouped(printer, secondary_item_screen_type_key, action='print')
     print_receipt = ""
-    group = self.find_grouped_receipts
+    group = self.find_grouped_receipts.reverse
     group.each do |x|
       print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print_secondary", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, secondary_item_screen_type_key: secondary_item_screen_type_key })
     end.empty? and begin
@@ -209,6 +211,7 @@ class Receipt < ApplicationRecord
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
     header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
+    header << "Receipt Type: #{secondary_item_screen_type_key}\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
