@@ -103,7 +103,7 @@
                   <p class="d-inline m-0"><%= placed_datetime_format(receipt.created_at, @restaurant.time_zone) %></p>
                 </div>
                 <div class="col-md-2 px-1 text-center">
-                  <p class="d-inline m-0"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %><%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></p>
+                  <p class="d-inline m-0"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></p>
                 </div>
                 <div class="col-md-2 px-1 text-center">
                   <p class="d-inline m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize%></p>
