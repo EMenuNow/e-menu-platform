@@ -254,7 +254,7 @@ class Receipt < ApplicationRecord
 
   def find_grouped_receipts(seconds = 300)
     return [self] if self.table_number.blank? || !self.group_order
-    receipts = self.restaurant.receipts.where(table_number: self.table_number, find_grouped_receipts: true).limit(100).group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc }.select{|x,y|y.map(&:id).include?(self.id)}&.values&.first&.uniq(&:uuid)&.sort_by{|x|x.created_at}
+    receipts = self.restaurant.receipts.where(table_number: self.table_number, group_order: true).limit(100).group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc }.select{|x,y|y.map(&:id).include?(self.id)}&.values&.first&.uniq(&:uuid)&.sort_by{|x|x.created_at}
     DateTime.now.to_i > receipts.first.created_at.to_i + seconds ? receipts : []
   end
 
