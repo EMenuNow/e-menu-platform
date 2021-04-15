@@ -9,8 +9,8 @@
       <td><%=@receipt.created_at.in_time_zone(@restaurant.time_zone).strftime("%d %B %Y - %H:%M")%></td>
     </tr>
     <tr>
-      <td style='text-align: right;'>Receipt Number:</td>
-      <td><%=@receipt.uuid%></td>
+      <td style='text-align: right;'>Order Number:</td>
+      <td>#<%=@receipt.order_id%></td>
     </tr>
     <% if @receipt.delivery_or_collection != 'tableservice'  %>
     <tr>

@@ -9,10 +9,12 @@ namespace :printer do
   task :print_failed => :environment do
     states = ["Printer Error", "Sent to printer", nil]
     Receipt.group_by_time(Receipt.where(print_status: states)).reverse.each do |k, v|
-      is_new_group = v.size > 1 && v.last.created_at > 5.minutes.ago
-      if (v.size == 1 || (!is_new_group && states.include?(v.first.print_status))) && v.first.created_at > 30.minutes.ago
-        v.first.creation_print
-        v.first.item_breakdown
+      if !v.last.is_recent_group_order? && states.include?(v.last.print_status) && v.last.created_at > 30.minutes.ago
+        v.last.creation_print
+        v.last.item_breakdown
+        v.each{|x|x.update_attributes(print_status: "Printed")} if Rails.env.development?
+        v.last.broadcast(message: "New") if v.last.group_order
+        v.last.broadcast_items(message: "New") if v.last.group_order
       end
     end
   end

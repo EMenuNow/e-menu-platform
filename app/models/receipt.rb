@@ -16,8 +16,14 @@ class Receipt < ApplicationRecord
   # end 
 
   def ding
-    broadcast(message: "New")
-    broadcast_items(message: "New")
+    if !is_recent_group_order?
+      broadcast(message: "New")
+      broadcast_items(message: "New")
+    end
+  end
+
+  def is_recent_group_order?
+    self.group_order && self.created_at > 6.minutes.ago
   end
 
   def order_id
@@ -105,10 +111,12 @@ class Receipt < ApplicationRecord
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
-    header << "#{'Group' if group.size > 1} Order ID: #{group.first.order_id}\n"
-    header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
+    header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
+    header << "Name: #{name}\n" if delivery_or_collection != 'tableservice'
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
-    header << "Type: #{delivery_or_collection}\n" 
+    header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
+    header << "Type: #{delivery_or_collection}\n"
+    header << "Receipt Type: Full receipt\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
@@ -154,25 +162,27 @@ class Receipt < ApplicationRecord
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
-    header << "#{'Group' if group.size > 1} Order ID: #{group.first.order_id}\n"
+    header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
     header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
-    header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
+    header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice'
+    header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
+    header << "Receipt Type: #{item_screen_type_key}\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
     header << "\n\n"
     data = {receipt_id: id, print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
-   # mylogger.debug("PRINTING PRIMARY: #{printer.inspect}")
+    # mylogger.debug("PRINTING PRIMARY: #{printer.inspect}")
     ActionCable.server.broadcast("printers_channel_#{restaurant_id}_#{printer.pi_interface_server_token}", data)
     update_print_status('Sent to printer')
   end
-
+  
   def secondary_creation_print_grouped(secondary_item_screen_type_key)
     item_screens = ItemScreen.where(restaurant_id: restaurant_id).joins(:item_screen_type).where("item_screen_types.key = ?", secondary_item_screen_type_key)
     item_screen = nil
     item_screen = item_screens.first if item_screens.present?
-
+    
     if item_screen.present?
       buzz = item_screen.buzz_on_new
       print = item_screen.on_new
@@ -185,20 +195,23 @@ class Receipt < ApplicationRecord
       end
     end
   end
-
+  
   def secondary_print_receipt_grouped(printer, secondary_item_screen_type_key, action='print')
     print_receipt = ""
-    group = self.find_grouped_receipts
+    group = self.find_grouped_receipts.reverse
     group.each do |x|
-      print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print_secondary", locals: {grouped: true, screen_item: self, restaurant: restaurant_id, secondary_item_screen_type_key: secondary_item_screen_type_key })
+      print_receipt += ApplicationController.render(partial: "manager/live/order_item_screen_specific_print_secondary", locals: {grouped: true, receipt: x, screen_item: self, restaurant: restaurant_id, secondary_item_screen_type_key: secondary_item_screen_type_key })
     end.empty? and begin
       return
     end
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
-    header << "Name: #{name}\n" if delivery_or_collection != 'tableservice' 
+    header << "#{'Group' if group.size > 1} Order ID: ##{group.first.order_id}\n"
+    header << "Name: #{name}\n" if delivery_or_collection != 'tableservice'
     header << "Time: #{collection_time}\n" if delivery_or_collection != 'tableservice' 
+    header << "Date: #{due_date.in_time_zone(restaurant.time_zone).to_date.to_formatted_s(:rfc822)}\n" if delivery_or_collection != 'tableservice' 
     header << "Type: #{delivery_or_collection}\n" 
+    header << "Receipt Type: #{secondary_item_screen_type_key}\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
     header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
@@ -241,7 +254,7 @@ class Receipt < ApplicationRecord
 
   def find_grouped_receipts(seconds = 300)
     return [self] if self.table_number.blank? || !self.group_order
-    receipts = self.restaurant.receipts.where(table_number: self.table_number).limit(100).group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc }.select{|x,y|y.map(&:id).include?(self.id)}&.values&.first&.uniq(&:uuid)&.sort_by{|x|x.created_at}
+    receipts = self.restaurant.receipts.where(table_number: self.table_number, group_order: true).limit(100).group_by {|x| Time.at((x.created_at.to_f / seconds).round * seconds).utc }.select{|x,y|y.map(&:id).include?(self.id)}&.values&.first&.uniq(&:uuid)&.sort_by{|x|x.created_at}
     DateTime.now.to_i > receipts.first.created_at.to_i + seconds ? receipts : []
   end
 

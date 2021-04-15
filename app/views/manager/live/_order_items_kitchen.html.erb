@@ -30,6 +30,7 @@
         <% receipt = receipts.first %>
         <% new_order = item_screen_type_key.present? ? !receipt.screen_items.select{|x|x.item_screen_type_key == item_screen_type_key}.map{|x|x.ready}.all? : !receipt.is_ready? %>
         <% next if !new_order %>
+        <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
         <div class="col-lg-4 p-0" id="receipt-<%= receipt.id %>-card">
           <div class="bg-light rounded m-1" style="height: 400px">
             <div class="row m-0 py-3">
@@ -55,11 +56,12 @@
                     <% end %>
                     <% if new_order == true %>
                       <% if item_screen_type_key.present? %>
-                        <%= link_to "Ready?",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: 'Are you sure?' } %>
+                        <%= link_to "Ready?",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark all #{item_screen_type_key.downcase} items as ready?" } %>
                       <% else %>
-                        <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Are your sure?" } %>
+                        <%= link_to "Ready?",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning p-0 px-1 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } %>
                       <% end %>
-                      <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Are your sure?" } if receipt&.order&.stripe_data&.present? %>
+                      <%# refund_amount = number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %>
+                      <%#= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-info p-0 px-1', data: { confirm: "Refund order? (#{refund_amount})" } if receipt&.order&.stripe_data&.present? %>
                     <% end %>
                     <% printers.each do |printer|%>
                       <%# binding.pry %>

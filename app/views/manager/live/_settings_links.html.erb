@@ -1,0 +1,28 @@
+<div class="row">
+  <div class="col-sm">
+    <ul class="switches d-inline-block">
+
+      <li class="row my-3">
+        <div class="col-9 text-left">Menu:</div>
+        <div class="col-3 text-right">
+          <%= link_to 'EDIT', manager_restaurant_menus_path(@restaurant), method: :post, class: 'btn btn-warning btn-sm btn-block delay-button' %>
+        </div>
+      </li>
+
+      <li class="row my-3">
+        <div class="col-9 text-left">Opening Times:</div>
+        <div class="col-3 text-right">
+          <%= link_to 'EDIT', edit_manager_restaurant_opening_time_path(@restaurant, @restaurant.opening_time), method: :post, class: 'btn btn-warning btn-sm btn-block delay-button' %>
+        </div>
+      </li>
+
+      <li class="row my-3">
+        <div class="col-9 text-left">Discount Codes:</div>
+        <div class="col-3 text-right">
+          <%= link_to 'ADD', new_manager_discount_code_path(@restaurant), method: :post, class: 'btn btn-info btn-sm btn-block delay-button' %>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+</div>
