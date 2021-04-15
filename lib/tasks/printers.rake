@@ -7,6 +7,15 @@ require 'json'
 
 namespace :printer do 
   task :print_failed => :environment do
+    print
+  end
+  task :print_failed_2 => :environment do
+    print
+  end
+
+  private
+
+  def print
     states = ["Printer Error", "Sent to printer", nil]
     Receipt.group_by_time(Receipt.where(print_status: states)).reverse.each do |k, v|
       if !v.last.is_recent_group_order? && states.include?(v.last.print_status) && v.last.created_at > 30.minutes.ago
