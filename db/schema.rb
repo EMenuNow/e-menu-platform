@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_06_101427) do
+ActiveRecord::Schema.define(version: 2021_04_15_142756) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -201,7 +201,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_101427) do
     t.text "icon"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type", default: "Allergen"
+    t.string "type", default: "allergen"
   end
 
   create_table "menu_item_categorisations_menus", id: false, force: :cascade do |t|
@@ -300,7 +300,6 @@ ActiveRecord::Schema.define(version: 2021_04_06_101427) do
     t.string "delivery_or_collection"
     t.string "delivery_fee", default: "0"
     t.string "table_number"
-    t.string "discount_code"
     t.integer "application_fee_amount", default: 0
     t.integer "emenu_commission", default: 0
     t.integer "chargeback_fee", default: 0
@@ -309,6 +308,8 @@ ActiveRecord::Schema.define(version: 2021_04_06_101427) do
     t.integer "stripe_processing_fee"
     t.boolean "group_order"
     t.datetime "due_date"
+    t.bigint "discount_code_id"
+    t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
     t.index ["restaurant_id"], name: "index_orders_on_restaurant_id"
   end
 
@@ -456,8 +457,8 @@ ActiveRecord::Schema.define(version: 2021_04_06_101427) do
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
     t.boolean "group_order"
-    t.datetime "due_date"
     t.string "processing_status", default: "pending"
+    t.datetime "due_date"
     t.string "first_print_status"
     t.string "print_status"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
@@ -614,6 +615,11 @@ ActiveRecord::Schema.define(version: 2021_04_06_101427) do
     t.text "custom_css"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "basket_colour", default: "#000"
+    t.string "item_colour", default: "#000"
+    t.string "basket_text_colour", default: "#fff"
+    t.string "item_text_colour", default: "#fff"
+    t.string "item_header_colour", default: "#000"
     t.index ["restaurant_id"], name: "index_themes_on_restaurant_id"
   end
 

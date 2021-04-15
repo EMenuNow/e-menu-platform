@@ -4,6 +4,7 @@ class Order < ApplicationRecord
     has_many :patron_orders, class_name: 'Patron::PatronOrder'
     has_many :patrons, through: :patron_orders
     belongs_to :restaurant
+    belongs_to :discount_code, optional: true
     has_many :receipts
     has_many :refunds
 
