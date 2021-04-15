@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_06_101427) do
+ActiveRecord::Schema.define(version: 2021_04_15_142756) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -300,7 +300,6 @@ ActiveRecord::Schema.define(version: 2021_04_06_101427) do
     t.string "delivery_or_collection"
     t.string "delivery_fee", default: "0"
     t.string "table_number"
-    t.string "discount_code"
     t.integer "application_fee_amount", default: 0
     t.integer "emenu_commission", default: 0
     t.integer "chargeback_fee", default: 0
@@ -309,6 +308,8 @@ ActiveRecord::Schema.define(version: 2021_04_06_101427) do
     t.integer "stripe_processing_fee"
     t.boolean "group_order"
     t.datetime "due_date"
+    t.bigint "discount_code_id"
+    t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
     t.index ["restaurant_id"], name: "index_orders_on_restaurant_id"
   end
 
