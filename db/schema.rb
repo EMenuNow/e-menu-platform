@@ -201,7 +201,7 @@ ActiveRecord::Schema.define(version: 2021_04_15_142756) do
     t.text "icon"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type", default: "allergen"
+    t.string "type", default: "Allergen"
   end
 
   create_table "menu_item_categorisations_menus", id: false, force: :cascade do |t|
@@ -457,8 +457,8 @@ ActiveRecord::Schema.define(version: 2021_04_15_142756) do
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
     t.boolean "group_order"
-    t.string "processing_status", default: "pending"
     t.datetime "due_date"
+    t.string "processing_status", default: "pending"
     t.string "first_print_status"
     t.string "print_status"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
@@ -615,11 +615,6 @@ ActiveRecord::Schema.define(version: 2021_04_15_142756) do
     t.text "custom_css"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "basket_colour", default: "#000"
-    t.string "item_colour", default: "#000"
-    t.string "basket_text_colour", default: "#fff"
-    t.string "item_text_colour", default: "#fff"
-    t.string "item_header_colour", default: "#000"
     t.index ["restaurant_id"], name: "index_themes_on_restaurant_id"
   end
 

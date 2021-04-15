@@ -41,7 +41,7 @@ class Receipt < ApplicationRecord
     item_screens = ItemScreen.where(restaurant_id: restaurant_id).joins(:item_screen_type).where("item_screen_types.key <> 'FULL'")
     if item_screens.present?
       items['items'].each do |item|
-        ScreenItem.create(restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['item_screen_type_key'], uuid: item['uuid'])
+        ScreenItem.create(restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['item_screen_type_key'], uuid: item['uuid']) if item['item_screen_type_key'].present?
         ScreenItem.create(secondary: true, restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['secondary_item_screen_type_key'], uuid: item['uuid']) if item['secondary_item_screen_type_key'].present?
       end
       broadcast_items
