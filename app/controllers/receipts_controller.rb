@@ -20,6 +20,7 @@ class ReceiptsController < ApplicationController
   # GET /receipts/1/edit
   def edit
   end
+
   def view_receipt
     @receipt = Receipt.find_by(uuid: params[:uuid])
     @restaurant = @receipt.restaurant
@@ -27,31 +28,69 @@ class ReceiptsController < ApplicationController
         format.html
         format.json 
     end
-
   end
-  def is_ready
+
+  def queue_order
     @receipt = Receipt.find(params[:receipt_id])
-    @receipt.is_ready = true
-    @receipt.processing_status = 'done' if @receipt.is_ready?
-    @receipt.save
+    receipts = @receipt.find_grouped_receipts
+    receipts.each do |r|
+      r.update(is_ready: false, processing_status: 'queued')
+    end
     @restaurant = @receipt.restaurant
-    @receipt.broadcast(message: "Ready")
+    @receipt.broadcast(message: "Queued")
     @receipt.broadcast_items
     # redirect_to manager_live_orders_path(@restaurant.id)
   end
+
   def send_to_kitchen
     @receipt = Receipt.find(params[:receipt_id])
-    @receipt.processing_status = "accepted"
-    @receipt.save
+    receipts = @receipt.find_grouped_receipts
+    receipts.each do |r|
+      r.update(is_ready: false, processing_status: 'accepted')
+    end
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Accepted")
     @receipt.broadcast_items
     # redirect_to manager_live_orders_path(@restaurant.id)
   end
 
+  def preparing
+    @receipt = Receipt.find(params[:receipt_id])
+    receipts = @receipt.find_grouped_receipts
+    receipts.each do |r|
+      r.update(is_ready: false, processing_status: 'preparing')
+    end
+    @restaurant = @receipt.restaurant
+    @receipt.broadcast(message: "Preparing")
+    @receipt.broadcast_items
+    # redirect_to manager_live_orders_path(@restaurant.id)
+  end
+
+  def is_ready
+    @receipt = Receipt.find(params[:receipt_id])
+    receipts = @receipt.find_grouped_receipts
+    receipts.each do |r|
+      r.update(is_ready: true, processing_status: 'ready')
+    end
+    @restaurant = @receipt.restaurant
+    @receipt.broadcast(message: "Ready")
+    @receipt.broadcast_items
+    # redirect_to manager_live_orders_path(@restaurant.id)
+  end
+
+  def complete
+    @receipt = Receipt.find(params[:receipt_id])
+    receipts = @receipt.find_grouped_receipts
+    receipts.each do |r|
+      r.update(is_ready: true, processing_status: 'complete')
+    end
+    @restaurant = @receipt.restaurant
+    @receipt.broadcast(message: "Complete")
+    @receipt.broadcast_items
+    # redirect_to manager_live_orders_path(@restaurant.id)
+  end
 
   def is_item_ready
-    
     @screen_item = ScreenItem.find(params[:screen_item_id])
     @receipt = @screen_item.receipt
     @screen_item.ready = !@screen_item.ready?
@@ -66,7 +105,6 @@ class ReceiptsController < ApplicationController
   end
 
   def is_items_ready
-    
     @receipt =Receipt.find(params[:receipt_id])
     @receipt.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: true)
     @restaurant = @receipt.restaurant
@@ -78,31 +116,20 @@ class ReceiptsController < ApplicationController
     # redirect_to path
   end
 
-
-  
-
-
   def item_creation_broadcast
-
     @receipt = Receipt.find(params[:receipt_id])
     @receipt.broadcast_items
 
     # redirect_to manager_live_orders_path(@receipt.restaurant_id)
-
-
   end
 
 
   def creation_broadcast
     @receipt = Receipt.find(params[:receipt_id])
     @receipt.creation_print
+
     redirect_to manager_live_orders_path(@receipt.restaurant_id)
-
-
   end
-
-  
-
 
   # POST /receipts
   # POST /receipts.json

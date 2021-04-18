@@ -53,8 +53,11 @@ Rails.application.routes.draw do
   end
 
   resources :receipts do 
-    post 'is_ready'
+    post :queue_order
     post :send_to_kitchen
+    post :preparing
+    post 'is_ready'
+    post :complete
     post 'is_item_ready/:screen_item_id', to: 'receipts#is_item_ready', as: :screen_item_ready
     post 'is_items_ready/:receipt_id/item_screen_type_key/:item_screen_type_key', to: 'receipts#is_items_ready', as: :screen_items_ready
     post 'item_creation_broadcast'
