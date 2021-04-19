@@ -7,9 +7,10 @@
 <% ready = receipt.processing_status == "ready" %>
 <% complete = receipt.processing_status == "complete" %>
 
-<% status_pill = 'badge-info' %>
+<% status_pill = 'badge-secondary' %>
 <% status_pill = 'badge-danger' if new_order %>
-<% status_pill = 'badge-secondary' if queued %>
+<% status_pill = 'badge-info' if preparing %>
+<% status_pill = 'badge-dark' if queued %>
 <% status_pill = 'badge-warning' if ready %>
 <% status_pill = 'badge-success' if complete %>
 
@@ -30,10 +31,10 @@
       <div class="modal-header text-center p-0" style="background-color: <%= header_color %>;">
         <div class="row m-0 px-0 py-2 w-100">
           <div class="col-3 my-auto px-2 text-left">
-            <p style="font-size: 100%;" class="text-left m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></p>
+            <div style="font-size: 100%;" class="text-left m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></div>
           </div>
           <div class="col-6 mt-auto px-0 text-center">
-            <h4 class="d-inline m-0"><%=receipt.group_order ? "Group Order" : receipt.name%></h4>
+            <h4 class="d-inline m-0"><%=receipt.group_order ? "Group Order" : receipt.name.present? ? receipt.name.titleize : receipt.table_number.present? ? "Table #{receipt.table_number}" : "" %></h4>
           </div>
           <div class="col-3 mt-auto px-2 text-right">
             <h5 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %> <%#= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
@@ -53,7 +54,7 @@
               <% if receipt&.email.present? %><%= link_to 'Send Receipt', manager_send_receipts_path(receipt.id), remote: true, class: "btn btn-warning text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - Re-send email receipt to #{receipt.group_order? ? "all in group" : receipt.email}?" } %><% end %>
             </div>
             <div class="col-6 px-2 mt-auto text-right">
-              <p class="text-center align-bottom m-0 d-inline-block"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></p>
+              <div class="text-center align-bottom m-0 d-inline-block"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
             </div>
           </div>
           <div class="row px-0 py-2 border-bottom">
@@ -181,14 +182,18 @@
           </div>
         </div>
         <div class="row m-0 px-0 py-2 w-100 border-top">
-          <div class="col-6 my-auto px-2 text-left">
-            <div><i class="far fa-clock"></i> <%= time_placed.strftime("%H:%M") %> &nbsp; <i class="far fa-calendar-alt"></i> <%= time_placed.strftime("%A, #{time_placed.day.ordinalize} %B") %> </div>
-          </div>
-          <div class="col-6 mt-auto px-2 text-right">
+          <div class="col mt-auto px-2 text-left">
             <% printers.each do |printer|%>
               <%# binding.pry %>
               <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-2' %>
             <% end %>
+          </div>
+        </div>
+        <div class="row m-0 px-0 py-2 w-100 border-top">
+          <div class="col-8 my-auto px-2 text-muted text-left">
+            <div><i class="far fa-clock"></i> <%= time_placed.strftime("%H:%M") %> &nbsp; <i class="far fa-calendar-alt"></i> <%= time_placed.strftime("%A, #{time_placed.day.ordinalize} %B") %> </div>
+          </div>
+          <div class="col-4 mt-auto px-2 text-right">
             <%= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } unless ready or complete %>
             <%= link_to "Complete",receipt_complete_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-success text-uppercase p-0 px-2', id: "receipt-#{receipt.id}-complete", data: { confirm: "Order ##{receipt.order_id} - Mark order as complete?" } if ready %>
           </div>
