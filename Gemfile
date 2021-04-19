@@ -8,6 +8,7 @@ ruby '2.6.6'
 gem 'dotenv-rails', groups: %i[development test]
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'httparty'
 gem 'jquery-rails'
 gem 'rails'#, '~> 5.2.0'
 gem 'active_model_serializers'
@@ -83,6 +84,7 @@ group :development, :test do
 
   # gem 'factory_girl_rails', '~> 4.5.0'
   gem 'rspec-rails'
+  gem 'webmock'
 
   gem 'capistrano'
   gem 'capistrano-rails'
