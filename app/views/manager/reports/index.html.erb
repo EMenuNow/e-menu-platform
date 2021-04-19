@@ -2,7 +2,7 @@
   total_value = (@receipts.sum(&:basket_total)/100.0)
   total_emenu_commission_value = (@receipts.sum(&:application_fee_amount)/100.0)
   total_revenue = number_to_currency(total_value, unit: @restaurant.currency_symbol)
-  dates = @restaurant.receipts.select(:created_at).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
+  dates = @restaurant.receipts.select(:created_at).order(created_at: :asc).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
 %>
 
 <main role="main">
