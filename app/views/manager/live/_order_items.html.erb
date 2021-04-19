@@ -73,11 +73,36 @@
       </div>
     </div>
     <%# .each do |receipts| %>
-      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).order(id: :DESC).limit(70)).reverse %>
-      <% @data.each do |t, receipts| %>
+      <%# @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).order(id: :DESC).limit(70)).reverse %> <%# Default full order set %>
+      <% first_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %> <%# Default not ready order set %>
+      <% second_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).includes(order: :refunds).order(id: :DESC)).reverse %> <%# Default ready order set %>
+      
+      <% @data = [] %>
+      <% @data += first_data if !params[:processing_status].present? %>
+      <% @data += second_data if params[:processing_status] = 'done' %>
+      
+      <% @data.take(50).each do |t, receipts| %>
         <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
         <% receipt = receipts.first %>
         <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>
+
+        <% new_order = receipt.processing_status == "new" %>
+        <% queued = receipt.processing_status == "queued" %>
+        <% accepted = receipt.processing_status == "accepted" %>
+        <% preparing = receipt.processing_status == "preparing" %>
+        <% ready = receipt.processing_status == "ready" %>
+        <% complete = receipt.processing_status == "complete" %>
+
+        <% status_pill = 'badge-info' %>
+        <% status_pill = 'badge-danger' if new_order %>
+        <% status_pill = 'badge-secondary' if queued %>
+        <% status_pill = 'badge-warning' if ready %>
+        <% status_pill = 'badge-success' if complete %>
+
+        <% order_pill = 'badge-light' %>
+        <% order_pill = 'badge-danger' if new_order or queued or accepted %>
+        <% order_pill = 'badge-warning' if preparing %>
+
         <div class="row m-0 my-1">
           <%
 =begin%>
@@ -90,8 +115,7 @@
             <div class="">
               <div class="row">
                 <div class="col-md-1 px-1 text-center">
-                  <% new_order = !receipt.is_ready %>
-                  <p style="font-size: 100%;" class="m-0 badge badge-pill <%= new_order ? 'badge-danger' : 'badge-light' %>">#<%=receipt.order_id%></p>
+                  <p style="font-size: 100%;" class="m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></p>
                 </div>
                 <div class="col-md-2 px-1 text-center">
                   <p class="d-inline m-0"><%=receipt.name.presence&.titleize || "Table #{receipt.table_number}" %> <%=receipt.group_order ? "(Group)" : ""%></p>
@@ -116,11 +140,7 @@
                   <p class="d-inline m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></p>
                 </div>
                 <div class="col-md-1 px-1 text-center">
-                  <% if receipt.processing_status == "accepted" %>
-                    <p class="d-inline m-0 badge badge-pill badge-info"><%= receipt.processing_status&.titleize %></p>
-                  <% elsif receipt.processing_status == "done" %>
-                    <p class="d-inline m-0 badge badge-pill badge-success">Complete</p>
-                  <% end %>
+                    <p class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></p>
                 </div>
                 <%
 =begin%>
