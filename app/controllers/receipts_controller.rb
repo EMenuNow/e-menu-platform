@@ -133,7 +133,10 @@ class ReceiptsController < ApplicationController
 
   def is_items_ready
     @receipt =Receipt.find(params[:receipt_id])
-    @receipt.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: true, processing_status: 'ready')
+    receipts = @receipt.find_grouped_receipts
+    receipts.each do |r|
+      r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: true, processing_status: 'ready')
+    end
     @restaurant = @receipt.restaurant
     path = manager_live_food_path(@restaurant) if params[:item_screen_type_key] == "FOOD"
     path = manager_live_drinks_path(@restaurant) if params[:item_screen_type_key] == "DRINK"
@@ -145,10 +148,13 @@ class ReceiptsController < ApplicationController
 
   def is_items_preparing
     @receipt =Receipt.find(params[:receipt_id])
-    if @receipt.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).where.not(processing_status: 'preparing').any?
-      @receipt.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'preparing')
-    else
-      @receipt.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'accepted')
+    receipts = @receipt.find_grouped_receipts
+    receipts.each do |r|
+      if r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).where.not(processing_status: 'preparing').any?
+        r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'preparing')
+      else
+        r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'accepted')
+      end
     end
     @restaurant = @receipt.restaurant
     path = manager_live_food_path(@restaurant) if params[:item_screen_type_key] == "FOOD"
