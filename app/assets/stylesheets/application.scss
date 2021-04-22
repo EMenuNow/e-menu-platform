@@ -53,6 +53,10 @@ body {
 
  font-family: var(--emenu-font-primary);
 
+ & #live-order {
+   min-height: calc(100vh - 48px);
+ }
+
  &.onboarding-layout {
   margin: 75px 0px 0px 0px;
   padding: 0px;
@@ -109,6 +113,11 @@ h4 {
 
 .field_with_errors {
  background-color: $red;
+}
+
+.badge-user {
+  color: var(--emenu-dark);
+  background-color: #B6F2B6;
 }
 
 .wrapper {
