@@ -83,14 +83,18 @@
             <div class="row m-0 px-0 py-2 w-100 border-bottom">
               <div class="col-6 px-2 my-auto text-left">
                 <div style="font-size:100%;" class="text-left m-0 badge badge-pill badge-light"><%= pluralize(receipts.sum{|x|x.items['items'].size}, 'item') %></div>
-                <div id="statuspill<%receipt.order_id%>" class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
+                <% if item_screen_type_key.present? %>
+                  <div id="statuspill<%receipt.order_id%>" class="d-inline m-0 badge badge-pill <%= receipt.screen_items.where(processing_status: 'preparing').any? ? 'badge-info' : receipt.screen_items.where.not(processing_status: 'ready').any? ? 'badge-secondary' : 'badge-warning' %>"><%= receipt.screen_items.where(processing_status: 'preparing').any? ? 'Preparing' : receipt.screen_items.where.not(processing_status: 'ready').any? ? 'Accepted' : 'Ready' %></div>
+                <% else %>
+                  <div id="statuspill<%receipt.order_id%>" class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
+                <% end %>
               </div>
               <div class="col-6 px-2 my-auto text-right">
                 <% if item_screen_type_key.present? %>
-                  <%#= link_to "Preparing",receipt_screen_items_preparing_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-success text-uppercase p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - Preparing item?" } unless item_preparing %>
+                  <%= link_to "Preparing",receipt_screen_items_preparing_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: "btn #{receipt.screen_items.where.not(processing_status: 'preparing').any? ? 'btn-success ' : 'btn-outline-success ' }text-uppercase p-0 px-2 receipt-ready", id: "receipt-#{receipt.id}-preparing", data: { confirm: "Order ##{receipt.order_id} - Mark all #{item_screen_type_key.downcase} items as #{receipt.screen_items.where.not(processing_status: 'preparing').any? ? 'preparing' : 'accepted' }?" } %>
                   <%#= link_to "Ready",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark all #{item_screen_type_key.downcase} items as ready?" } %>
                 <% else %>
-                  <%= link_to "Preparing",receipt_preparing_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-success text-uppercase p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - Preparing?" } unless preparing %>
+                  <%= link_to "Preparing",receipt_preparing_path(receipt.id, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - Preparing?" } %>
                   <%#= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } %>
                 <% end %>
               </div>
@@ -103,23 +107,56 @@
                     <%
                       items = receipt.items['items']
                       items = receipt.items['items'].select{|d| d['item_screen_type_key'] == item_screen_type_key} if item_screen_type_key.present?
+                      screen_item = sis.select{|x|x.uuid == item['uuid']}.first
                     %>
-                    <div class="row pb-2">
-                      <div class="col-8">
-                        <div style="" class="text-left m-0"><i><u><%= sis.select{|x|x.uuid == item['uuid']}.first&.ready ? "Ready" : "Not marked ready" %></u></i></div>
-                        <%= item['item'].html_safe %>
+                    <% si_accepted = screen_item&.processing_status == "accepted" %>
+                    <% si_preparing = screen_item&.processing_status == "preparing" %>
+                    <% si_ready = screen_item&.processing_status == "ready" %>
+
+                    <% si_status_pill = 'badge-secondary' %>
+                    <% si_status_pill = 'badge-info' if si_preparing %>
+                    <% si_status_pill = 'badge-warning' if si_ready %>
+
+                    <% menu_id = item['menu_id'] %>
+
+
+                      <div class="row border-bottom">
+                        <div class="col">
+                          <div class="row py-1">
+                            <div class="col-6 px-2 text-left">
+                              <small class="d-inline text-muted"><%= Menu.find_by(id: menu_id)&.ancestry&.split('/')&.map{|a| Menu.find_by(id: a)&.name&.titleize}&.join(' • ') %></small>
+                            </div>
+                            <div class="col-6 px-2 text-right">
+                              <% if screen_item.present? %>
+                                <%= link_to receipt_screen_item_process_path(receipt.id, screen_item.id, only_path: true), method: :post, remote: true, data: { confirm: "Order ##{receipt.order_id} - #{screen_item.processing_status == 'accepted' ? 'Preparing item?' : screen_item.processing_status == 'preparing' ? 'Mark item ready?' : 'Reset item status' }" } do %>
+                                  <div class="d-inline m-0 text-decoration-none badge badge-pill <%= si_status_pill %>"><%= screen_item&.processing_status&.titleize %></div>
+                                <% end %>
+                              <% end %>
+                              <% if receipt.name.present? %>
+                                <div class="d-inline m-0 badge badge-user"><%= receipt.name.split.first.titleize %> <i class="fas fa-user"></i></div>
+                              <% end %>
+                              <% if item_screen_type_key.present? %>
+                                <small class="d-inline text-muted"><%= item_screen_type_key.titleize %></small>
+                              <% end %>
+                            </div>
+                          </div>
+                          <div class="row pb-2">
+                            <div class="col-8">
+                              <%= item['item'].html_safe %>
+                            </div>
+                            <div class="col-4">
+                              <small>
+                                <%= item['optionals'].join('<br> ').html_safe %>
+                                <br />
+                                <% if item['note'].present? %>
+                                  <strong>Note: </strong> <%=item['note']%>
+                                <% end %>
+                              </small>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div class="col-4">
-                        <small>
-                          <%= item['optionals'].join('<br> ').html_safe%>
-                          <br />
-                          <% if item['note'].present? %>
-                            <strong>Note: </strong> <%=item['note']%>
-                          <% end %>
-                        </small>
-                      </div>
-                    </div>
-                    <hr class="m-0 mb-2" />
+
                   <% end %>
                 <% end %>
               </div>

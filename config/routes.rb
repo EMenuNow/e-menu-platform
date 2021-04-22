@@ -59,7 +59,9 @@ Rails.application.routes.draw do
     post 'is_ready'
     post :complete
     post 'is_item_ready/:screen_item_id', to: 'receipts#is_item_ready', as: :screen_item_ready
+    post 'is_item_process/:screen_item_id', to: 'receipts#is_item_process', as: :screen_item_process
     post 'is_items_ready/:receipt_id/item_screen_type_key/:item_screen_type_key', to: 'receipts#is_items_ready', as: :screen_items_ready
+    post 'is_items_preparing/:receipt_id/item_screen_type_key/:item_screen_type_key', to: 'receipts#is_items_preparing', as: :screen_items_preparing
     post 'item_creation_broadcast'
     post 'creation_broadcast'
     collection do 
