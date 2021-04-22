@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_15_142756) do
+ActiveRecord::Schema.define(version: 2021_04_22_082459) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -557,6 +557,7 @@ ActiveRecord::Schema.define(version: 2021_04_15_142756) do
     t.datetime "updated_at", null: false
     t.string "uuid"
     t.boolean "secondary", default: false
+    t.string "processing_status", default: "pending"
     t.index ["menu_id"], name: "index_screen_items_on_menu_id"
     t.index ["receipt_id"], name: "index_screen_items_on_receipt_id"
     t.index ["restaurant_id"], name: "index_screen_items_on_restaurant_id"
