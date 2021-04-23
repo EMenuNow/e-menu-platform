@@ -15,8 +15,7 @@ App.snippets = App.cable.subscriptions.create(
    // console.log(data);
   },
   received: function (data) {
-    console.log(data);
-    console.log("Received data from KitchensChannel");
+    // console.log(data);
     console.log("Received data from KitchensChannel");
     $("#current-orders").html(data.html);
     if (data.message == "New") {

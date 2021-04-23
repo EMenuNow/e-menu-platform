@@ -5,7 +5,7 @@ module Manager
     before_action :authenticate_manager_restaurant_user!
 
     before_action :set_restaurant_new, only: %i[show edit update]
-    before_action :set_restaurant, only: %i[active toggle_active set_delay]
+    before_action :set_restaurant, only: %i[active toggle_active set_delay open_early close_early]
     before_action :set_cuisine, only: %i[new create show edit update]
     before_action :get_stripe_account, only: %i[show edit update]
 
@@ -140,7 +140,47 @@ module Manager
     
    
       respond_to do |format|
-        format.html { redirect_to path, notice: 'Kitchen Delay Updated' }
+        format.html { redirect_to path, notice: 'Kitchen delay updated' }
+      end
+   
+    end
+
+    def open_early
+   
+      # restaurant_id = params[:restaurant_id]
+      redirect_path = params[:redirect_path]
+
+      ot = @restaurant.opening_time
+      ot.toggle!(:open_early)
+      ot.update(close_early: false)
+      
+      path = manager_live_orders_path(@restaurant) if redirect_path == 'orders'
+      path = manager_live_food_path(@restaurant) if redirect_path == 'food'
+      path = manager_live_drinks_path(@restaurant) if redirect_path == 'drinks'
+      
+      
+      respond_to do |format|
+        format.html { redirect_to path, notice: 'Now accepting orders for today' }
+      end
+      
+    end
+    
+    def close_early
+      
+      # restaurant_id = params[:restaurant_id]
+      redirect_path = params[:redirect_path]
+      
+      ot = @restaurant.opening_time
+      ot.toggle!(:close_early)
+      ot.update(open_early: false)
+
+      path = manager_live_orders_path(@restaurant) if redirect_path == 'orders'
+      path = manager_live_food_path(@restaurant) if redirect_path == 'food'
+      path = manager_live_drinks_path(@restaurant) if redirect_path == 'drinks'
+    
+   
+      respond_to do |format|
+        format.html { redirect_to path, notice: 'Stopped accepting orders for today' }
       end
    
     end

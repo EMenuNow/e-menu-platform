@@ -4,7 +4,7 @@
       $(".delay-button").on("click", function() {
         var delay = this.id.match(/\d+/);
         $("#current-delay").text("Current Delay: " + delay + " minutes");
-        delay == 0 ? $("#kitchen-delay").text("Kitchen Delay") : $("#kitchen-delay").text(delay + " min. Delay");
+        delay == 0 ? $("#kitchen-delay").text(" Kitchen Delay") : $("#kitchen-delay").text(" " +delay + " min. Delay");
         
       });
     });
@@ -18,41 +18,50 @@
     %>
 
     <div class='row'>
-      <div class='col-md-8 pb-1'>
+      <div class='col-md-4 pb-1'>
         <%= link_to manager_live_orders_path(@restaurant), class: "d-inline-block border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'orders'}" do %>
-          <i class="fa fa-1x fa-bars text-white <%='text-muted' if params[:action] != 'orders'%>"></i> Manager
+          <i class="fa fa-1x fa-bars text-white <%='text-muted' if params[:action] != 'orders'%>"></i><span class="d-none d-lg-inline"> Manager</span>
         <% end %>
         <%= link_to manager_live_orders_kitchen_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'kitchen'}" do %>
-          <i class="fa fa-1x fa-th text-white <%='text-muted' if params[:action] != 'kitchen'%>"></i> Kitchen
+          <i class="fa fa-1x fa-th text-white <%='text-muted' if params[:action] != 'kitchen'%>"></i><span class="d-none d-lg-inline"> Kitchen</span>
         <% end %>
         <% if ItemScreen.where(restaurant_id: @restaurant).joins(:item_screen_type).where("item_screen_types.key = 'FOOD'").presence %>
           <%= link_to manager_live_food_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'food'}" do %>
-            <i class="fa fa-1x fa-utensils text-white <%='text-muted' if params[:action] != 'food'%>"></i> Food
+            <i class="fa fa-1x fa-utensils text-white <%='text-muted' if params[:action] != 'food'%>"></i><span class="d-none d-lg-inline"> Food</span>
           <% end %>
         <% end %>
         <% if ItemScreen.where(restaurant_id: @restaurant).joins(:item_screen_type).where("item_screen_types.key = 'DRINK'").presence %>
           <%= link_to manager_live_drinks_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'drinks'}" do %>
-            <i class="fa fa-1x fa-coffee text-white <%='text-muted' if params[:action] != 'drinks'%>"></i> Drink
+            <i class="fa fa-1x fa-coffee text-white <%='text-muted' if params[:action] != 'drinks'%>"></i><span class="d-none d-lg-inline"> Drink</span>
           <% end %>
-        <% end %>        
-        <%
-=begin%>
-  <%= link_to manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: "border rounded p-2 ml-2 text-white #{'text-muted' if params[:action] != 'kitchen_orders'}" do %>
-        <i class="fa fa-1x fa-th"></i> Kitchen
-      <% end %> 
-  <%
-=end%>
+        <% end %>
+      </div>
+      <div class="col-md-4 text-center pb-1">
+        <%= link_to manager_restaurant_open_early_path(@restaurant, redirect_path: redirect_path), method: :post, remote: true, class: "d-none rounded p-2 text-uppercase mr-1 text-white bg-success", data: { confirm: 'Start accepting orders for today?' } do %>
+          <i class="fa fas fa-power-off text-white"></i><span class="d-none d-lg-inline">  Start Orders</span>
+        <% end %>
+        <%= link_to manager_restaurant_close_early_path(@restaurant, redirect_path: redirect_path), method: :post, remote: true, class: "d-none bg-danger rounded p-2 text-uppercase ml-1 text-white", data: { confirm: 'Stop accepting orders for today?' } do %>
+          <i class="fa fas fa-ban text-white"></i><span class="d-none d-lg-inline"> Stop Orders</span>
+        <% end %>
       </div>
       <div class='col-md-4 text-right pb-1'>
+        <%= link_to "#", class: "d-inline-block border rounded p-2 text-uppercase mr-1 text-white #{'text-muted border-secondary' if !params[:date].present? and !params[:start].present?}", data: { toggle: "modal", target: "#dateModal" } do %>
+          <i class="far fa-calendar-alt"></i><span class="d-none d-lg-inline"><%= params[:date].present? ? " #{params[:date].humanize}" : params[:start].present? ? " Date Range" : " Date" %></span>
+        <% end %>
+        <%= link_to "#", class: "d-none border rounded p-2 text-uppercase mr-1 text-white #{'text-muted border-secondary' if !params[:filter].present?}", data: { toggle: "modal", target: "#filterModal" } do %>
+          <i class="fas fa-filter"></i><span class="d-none d-lg-inline"> Filter</span>
+        <% end %>
         <%= link_to "#", class: "d-inline-block bg-warning rounded p-2 text-uppercase mr-1 text-white", data: { toggle: "modal", target: "#kitchen_delayModal" } do %>
-          <i class="fa fas fa-stopwatch pr-2 text-white"></i> <span id="kitchen-delay"><%= @restaurant.opening_time_kitchen_delay_minutes == 0 ? "Kitchen Delay" : "#{@restaurant.opening_time_kitchen_delay_minutes} min. Delay" %></span>
+          <i class="fa fas fa-stopwatch text-white"></i><span id="kitchen-delay" class="d-none d-lg-inline"><%= @restaurant.opening_time_kitchen_delay_minutes == 0 ? " Kitchen Delay" : " #{@restaurant.opening_time_kitchen_delay_minutes} min. Delay" %></span>
         <% end %>
         <%= link_to "#", class: "d-inline-block bg-secondary rounded p-2 text-uppercase text-white", data: { toggle: "modal", target: "#settingsModal" } do %>
-          <i class="fa fa-1x fa-cog pr-2"></i> Settings
+          <i class="fa fa-1x fa-cog"></i><span class="d-none d-lg-inline"> Settings</span>
         <% end %>
       </div>
     </div>
   </div>
-  <%= render partial: "manager/live/modal_container", locals: { title: "Settings", type: "settings" } %>
   <%= render partial: "manager/live/modal_container", locals: { title: "Kitchen Delay", type: "kitchen_delay" } %>
+  <%= render partial: "manager/live/modal_container", locals: { title: "Date Filter", type: "date" } %>
+  <%= render partial: "manager/live/modal_container", locals: { title: "Filter", type: "filter" } %>
+  <%= render partial: "manager/live/modal_container", locals: { title: "Settings", type: "settings" } %>
 </div>

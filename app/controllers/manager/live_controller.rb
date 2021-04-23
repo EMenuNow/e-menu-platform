@@ -8,6 +8,8 @@ module Manager
     before_action :set_features, only: [:food, :drinks, :orders, :kitchen]
     before_action :set_printers, only: [:orders, :kitchen]
     
+    before_action :live_params, only: [:food, :drinks, :orders, :kitchen]
+    
     layout :layout_chooser
 
     def layout_chooser
@@ -99,7 +101,7 @@ module Manager
     end
 
     def live_params
-      params.permit(:sort_by, :sort_order, :table_service, :collection, :delivery, :group_orders, :payment, :processing_status)
+      params.permit(:restaurant_id, :sort_by, :sort_order, :table_service, :collection, :delivery, :group_orders, :payment, :processing_status, :date, :start, :end, :day)
     end
 
   end

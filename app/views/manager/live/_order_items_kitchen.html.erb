@@ -17,7 +17,27 @@
 <div id="receipt-group" class="row bg-dark pb-2">
   <div class="col-12">
     <div class="row my-1 m-0">
-      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
+
+      <% if params[:date].present? and params[:start].present? and params[:end].present? %>
+        <% start_date = (params[:start]).in_time_zone(@restaurant.time_zone) %>
+        <% end_date = (params[:end]).in_time_zone(@restaurant.time_zone) %>
+        <% @data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", start_date, end_date).includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
+      <% elsif params[:date].present? and params[:day].present? %>
+        <% case params[:day] %>
+        <% when "yesterday" %>
+          <% day = Date.yesterday.in_time_zone(@restaurant.time_zone).all_day %>
+          <% @data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
+        <% when "today" %>
+          <% day = Date.today.in_time_zone(@restaurant.time_zone).all_day %>
+          <% @data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
+        <% when "tomorrow" %>
+          <% day = Date.tomorrow.in_time_zone(@restaurant.time_zone).all_day %>
+          <% @data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
+        <% end %>
+      <% end %>
+
+
+      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} unless @data %>
       <% @data.each do |t, receipts| %>
         <% items = nil %>
         <% receipts.each do |receipt| %>
