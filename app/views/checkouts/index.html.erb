@@ -163,8 +163,10 @@ function selectService(service_type) {
     $('#date-field').show();
     $('#time-field').show();
     $('#table-number-field').hide();
-    $('#group_order').prop('checked', false);
-    $('#group-order-boolean').hide();
+    <% if group_orders?(@restaurant) %>
+      $('#group_order').prop('checked', false);
+      $('#group-order-boolean').hide();
+    <% end %>
     $('#name-field').show();
     $('#telephone-field').show();
     $('#email-field').show();
@@ -182,8 +184,10 @@ function selectService(service_type) {
     $('#date-field').show();
     $('#time-field').show();
     $('#table-number-field').hide();
-    $('#group_order').prop('checked', false);
-    $('#group-order-boolean').hide();
+    <% if group_orders?(@restaurant) %>
+      $('#group_order').prop('checked', false);
+      $('#group-order-boolean').hide();
+    <% end %>
     $('#name-field').show();
     $('#telephone-field').show();
     $('#email-field').show();
@@ -201,9 +205,10 @@ function selectService(service_type) {
     $('#date-field').hide();
     $('#time-field').hide();
     $('#table-number-field').show();
-    $('#group_order').prop('checked', false);
-    // $('#group-order-boolean').hide();
-    $('#group-order-boolean').show(); 
+    <% if group_orders?(@restaurant) %>
+      $('#group_order').prop('checked', false);
+      $('#group-order-boolean').show();
+    <% end %>
     $('#name-field').hide();
     $('#telephone-field').hide();
     $('#email-field').show();
@@ -263,7 +268,9 @@ $(function(){
   $('#date-field').hide();
   $('#time-field').hide();
   $('#table-number-field').hide();
-  $('#group-order-boolean').hide();
+  <% if group_orders?(@restaurant) %>
+    $('#group-order-boolean').hide();
+  <% end %>
   $('#name-field').hide();
   $('#telephone-field').hide();
   $('#email-field').hide();
@@ -362,13 +369,15 @@ $(function(){
                       <b><%= label_tag :table_number %> <strong id='table_number_required' class= 'text-danger'>*</strong></b>
                       <%= text_field_tag :table_number,  nil, placeholder: "Table number", class: "border p-2 bg-light form-control validation_check" %>
                     </div>
-                    <div class=' col-12 text-left form-group' id='group-order-boolean'>
-                      <label>
-                        <%= check_box_tag :group_order %>
-                        <span>Ordering as a group?</span><br />
-                        <small>If every member of your group (at the same table) checks this box and places an order within a 5 minute window, your orders will be prepared together.</small>
-                      </label>
-                    </div>
+                    <% if group_orders?(@restaurant) %>
+                      <div class=' col-12 text-left form-group' id='group-order-boolean'>
+                        <label>
+                          <%= check_box_tag :group_order %>
+                          <span>Ordering as a group?</span><br />
+                          <small>If every member of your group (at the same table) checks this box and places an order within a 5 minute window, your orders will be prepared together.</small>
+                        </label>
+                      </div>
+                    <% end %>
                     <div id='name-field' class='col-sm-12 col-md-6 text-left form-group'>
                       <b><%= label_tag :name %> <strong id='name_required' class='text-danger'>*</strong></b>
                       <%= text_field_tag :name,  nil, class: "border p-2 bg-light form-control validation_check" %>
