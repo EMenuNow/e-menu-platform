@@ -55,6 +55,7 @@
 </div>
 
 <% checkout_toggle = @features.where(key: 'checkout').first %>
+<% group_order_toggle = @features.where(key: 'group_orders').first %>
 
 <div class="row">
   <div class="col-sm">
@@ -68,6 +69,17 @@
                           }, disabled: !@restaurant.subscription_enabled %>
         <label for="feature_<%= checkout_toggle.id %>">
           <span><%= checkout_toggle.name %> <small class="text-muted">(Accept orders & payments)</small></span>
+          <span></span>
+        </label>
+      </li>
+      <li class="my-3">
+        <%= check_box_tag dom_id(group_order_toggle), group_order_toggle.id, @restaurant.features.include?(group_order_toggle), data: {
+                          remote: true,
+                          url: manager_restaurant_toggle_feature_path(@restaurant.id, group_order_toggle.id),
+                          method: :post
+                          }, disabled: !@restaurant.subscription_enabled %>
+        <label for="feature_<%= group_order_toggle.id %>">
+          <span><%= group_order_toggle.name %> <small class="text-muted">(Allow group ordering)</small></span>
           <span></span>
         </label>
       </li>

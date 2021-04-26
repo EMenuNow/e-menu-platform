@@ -119,3 +119,7 @@ module TablesHelper
     ret
   end
 end
+
+  def group_orders?(restaurant) # Pre-pay table service enabled
+    feature_match('group_orders', restaurant.features)
+  end
