@@ -70,6 +70,7 @@ class Manager::PrintersController < Manager::BaseController
     @receipt = Receipt.find(params[:receipt_id]) 
     @receipt.print_receipt(@printer)
   end
+  
   def print_item
     @printer = Printer.find(params[:printer_id])    
     @screen_item = ScreenItem.find_by(uuid: params[:uuid]) 
