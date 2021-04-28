@@ -63,7 +63,11 @@
         <% time_placed = receipt.created_at.in_time_zone(@restaurant.time_zone) %>
         <% dd = receipt.due_date.in_time_zone(@restaurant.time_zone) %>
 
-        <% order_is_new = item_screen_type_key.present? ? receipt.items_processing_status(item_screen_type_key) != 'ready' : !receipt.is_ready? %>
+        <%  if item_screen_type_key.present? %>
+          <% order_is_new = receipt.items_processing_status(item_screen_type_key) != 'ready' && receipt.items_processing_status(item_screen_type_key) != 'complete' %>
+        <% else %>
+          <% order_is_new = !receipt.is_ready? %>
+        <% end %>
         <% next if !order_is_new %>
         <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
         <div class="col-lg-6 p-0" id="receipt-<%= receipt.id %>-card">
@@ -179,7 +183,7 @@
                           </div>
                           <% if item['note'].present? %>
                             <div class="row pb-2">
-                              <div class="col px-2 text-right">
+                              <div class="col text-left">
                                 <small><i>Note: </i> <%=item['note']%></small>
                               </div>
                             </div>
