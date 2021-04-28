@@ -84,22 +84,64 @@
             <div class="col tab-content">
               <div class="tab-pane fade show active" id="ordertab<%= receipt.order_id %>" role="tabpanel" aria-labelledby="order-tab">
                 <% receipts.each do |receipt| %>
+                <% sis = receipt.screen_items %>
                   <% receipt.items['items'].each do |item| %>
-                    <div class="row py-3 text-left">
-                      <div class="col-8">
-                        <%= item['item'].html_safe %>
-                      </div>
-                      <div class="col-4">
-                        <small>
-                          <%= item['optionals'].join('<br> ').html_safe%>
-                          <br />
+                    <% screen_item = sis.select{|x|x.uuid == item['uuid']}.first %>
+
+                    <% si_accepted = screen_item&.processing_status == "accepted" %>
+                    <% si_preparing = screen_item&.processing_status == "preparing" %>
+                    <% si_ready = screen_item&.processing_status == "ready" %>
+
+                    <% si_status_pill = 'badge-secondary' %>
+                    <% si_status_pill = 'badge-info' if si_preparing %>
+                    <% si_status_pill = 'badge-warning' if si_ready %>
+
+                    <% menu_id = item['menu_id'] %>
+
+                    <div class="row border-bottom">
+                        <div class="col">
+                          <div class="row py-1">
+                            <div class="col-4 px-2 text-left">
+                              <small class="d-inline-block text-truncate text-muted" style="max-width: 300px;"><%= Menu.find_by(id: menu_id)&.ancestry&.split('/')&.map{|a| Menu.find_by(id: a)&.name&.titleize}&.join(' • ') %></small>
+                            </div>
+                            <div class="col-8 px-2 text-right">
+                              <% if screen_item.present? %>
+                                  <div class="d-inline m-0 text-decoration-none badge badge-pill <%= si_status_pill %>"><%= screen_item&.processing_status&.titleize %></div>
+                              <% end %>
+                              <% if receipt.name.present? %>
+                                <div class="d-inline m-0 badge badge-user"><%= receipt.name.split.first.titleize %> <i class="fas fa-user"></i></div>
+                              <% end %>
+                              <small class="d-inline text-muted"><%= item['item_screen_type_key'].presence&.titleize %></small>
+                            </div>
+                          </div>
+                          <div class="row pb-2">
+                            <% if screen_item.present? %>
+                              <div class="col-8 px-2 text-left">
+                                <%= link_to receipt_screen_item_process_path(receipt.id, screen_item.id, only_path: true), method: :post, remote: true, data: { confirm: "Order ##{receipt.order_id} - #{screen_item.processing_status == 'accepted' ? 'Preparing item?' : screen_item.processing_status == 'preparing' ? 'Mark item ready?' : 'Reset item status' }" } do %>
+                                  <%= item['item'].html_safe %>
+                                <% end %>
+                              </div>
+                            <% else %>
+                              <div class="col-8 px-2 text-left">
+                                <%= item['item'].html_safe %>
+                              </div>
+                            <% end %>
+                            <div class="col-4 px-2 text-left">
+                              <small>
+                                <%= item['optionals'].join('<br> ').html_safe %>
+                              </small>
+                            </div>
+                          </div>
                           <% if item['note'].present? %>
-                            <strong>Note: </strong> <%=item['note']%>
+                            <div class="row pb-2">
+                              <div class="col px-2 text-right">
+                                <small><i>Note: </i> <%=item['note']%></small>
+                              </div>
+                            </div>
                           <% end %>
-                        </small>
+                        </div>
                       </div>
-                    </div>
-                    <hr class="m-0 mb-2" />
+
                   <% end %>
                 <% end %>
               </div>
