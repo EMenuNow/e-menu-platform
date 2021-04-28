@@ -91,10 +91,12 @@
                     <% si_accepted = screen_item&.processing_status == "accepted" %>
                     <% si_preparing = screen_item&.processing_status == "preparing" %>
                     <% si_ready = screen_item&.processing_status == "ready" %>
+                    <% si_complete = screen_item&.processing_status == "complete" %>
 
                     <% si_status_pill = 'badge-secondary' %>
                     <% si_status_pill = 'badge-info' if si_preparing %>
                     <% si_status_pill = 'badge-warning' if si_ready %>
+                    <% si_status_pill = 'badge-success' if si_complete %>
 
                     <% menu_id = item['menu_id'] %>
 
