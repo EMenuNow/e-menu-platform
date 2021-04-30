@@ -3,4 +3,7 @@ development:
 production:
   :concurrency: 2
 :queues:
+  - critical
+  - print
   - default
+  - low

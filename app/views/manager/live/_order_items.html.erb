@@ -98,13 +98,13 @@
 
 
       <% first_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} unless first_search_data %>
-      <% second_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).includes(order: :refunds).order(id: :DESC)).reverse unless second_search_data %>
+      <% second_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).includes(order: :refunds).order(id: :DESC).limit(50)).reverse unless second_search_data %>
       
       <% @data = [] %>
       <% @data += first_search_data %>
       <% @data += second_search_data %>
 
-      <% @data.take(50).each do |t, receipts| %>
+      <% @data.each do |t, receipts| %>
         <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
         <% receipt = receipts.first %>
         <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>
