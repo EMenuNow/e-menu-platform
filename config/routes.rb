@@ -89,9 +89,7 @@ Rails.application.routes.draw do
     get 'sectioned_menus/:menu_id' => 'tables#show', as: 'sectioned_menus_choice'
 
   end
-  require 'sidekiq/web'
-  mount Sidekiq::Web => '/sidekiq'
-
+  
   namespace :api do
     namespace :v1 do
       get 'menu/:id' => 'menu#index'
@@ -126,7 +124,7 @@ Rails.application.routes.draw do
         get :menu
       end
     end
-
+    
     get 'live_tables/:restaurant_id' => 'live#tables', as: :live_tables
     get 'live_items/:restaurant_id' => 'live#items', as: :live_items
     get 'live_orders/:restaurant_id/kitchen' => 'live#kitchen', as: :live_orders_kitchen
@@ -140,8 +138,8 @@ Rails.application.routes.draw do
     get 'send_receipt/:receipt_id' => 'live#send_receipt', as: :send_receipts
     get 'service/:restaurant_id/item/:table_item_id' => 'live#service', as: :live_service
     get 'ready/:restaurant_id/item/:table_item_id' => 'live#ready', as: :live_ready
-
-
+    
+    
     resources :features
     resources :templates  
     resources :settings
@@ -149,23 +147,23 @@ Rails.application.routes.draw do
       post 'add_feature/:feature_id', action: :add_feature, as: :add_feature
       post 'remove_feature/:feature_id', action: :remove_feature, as: :remove_feature
     end
-
+    
     resources :cuisines
     resources :restaurants do
-
+      
       post 'set_delay'
       post 'reporting/daily'
       get 'reporting/daily'
       get 'reporting/zreport_show/:daily_reporting_id', to: 'reporting#zreport_show', as: :zreport
-
+      
       resources :opening_times
       resources :busy_times, except: [:update]
       resources :delivery_postcodes
-
+      
       resources :themes
-
+      
       resources :item_screens
-
+      
       resources :pi_interfaces do 
         get :request_lsusb
         resources :printers 
@@ -176,8 +174,8 @@ Rails.application.routes.draw do
       get 'active', action: :active
       post 'toggle_active', action: :toggle_active
       post 'add_template', action: :add_template
-
-
+      
+      
       resources :menus do
         post :clone
         post 'toggle_active', action: :toggle_active
@@ -200,8 +198,9 @@ Rails.application.routes.draw do
       registrations: 'manager/restaurant_users/registrations',
       passwords: 'manager/restaurant_users/passwords'
     }
+    
   end
-
+  
   namespace :onboarding do
     resources :restaurants do
       get 'services'
@@ -214,21 +213,27 @@ Rails.application.routes.draw do
     get 'start', to: 'home#start'
     get 'continue', to: 'home#continue'
     patch 'agree', to: 'home#tos_agree'
-
+    
     devise_for :restaurant_users, path: '/', controllers: {
       sessions: 'onboarding/restaurant_users/sessions',
       registrations: 'onboarding/restaurant_users/registrations',
       passwords: 'onboarding/restaurant_users/passwords'
     }
   end
+  
+  require 'sidekiq/web'
 
-#printing
+  authenticate :manager_restaurant_user, lambda { |u| u.admin? } do
+    mount Sidekiq::Web => '/sidekiq/web'
+  end
 
-get 'receipt/:receipt_id/print/:printer_id', to: 'manager/printers#print', as: :print_receipt
-get 'receipt/:receipt_id/screen_item_uuid/:uuid/print/:printer_id', to: 'manager/printers#print_item', as: :print_item_receipt
-get 'receipt/:receipt_id/key/:item_screen_type_key/print/:printer_id', to: 'manager/printers#print_items', as: :print_items_receipt
-
-
+  #printing
+  
+  get 'receipt/:receipt_id/print/:printer_id', to: 'manager/printers#print', as: :print_receipt
+  get 'receipt/:receipt_id/screen_item_uuid/:uuid/print/:printer_id', to: 'manager/printers#print_item', as: :print_item_receipt
+  get 'receipt/:receipt_id/key/:item_screen_type_key/print/:printer_id', to: 'manager/printers#print_items', as: :print_items_receipt
+  
+  
   # get 'order/remove_from_basket/:path/:uuid', to: 'order#remove_from_basket', as: :remove_from_basket
   # get 'order/receipt/:path/:uuid', to: 'order#receipt', as: :order_receipt
   # get 'order/checkout/:path', to: 'order#checkout', as: :checkout
@@ -240,9 +245,9 @@ get 'receipt/:receipt_id/key/:item_screen_type_key/print/:printer_id', to: 'mana
   get 'baskets/:path/menu/:menu_id/section/:section_id', to: 'baskets#index', as: :order_menu_section
   # get 'order/:path/menu/:menu_id', to: 'restaurants#index', as: :order_menu
   get 'order/:path', to: 'order#index'
-
+  
   resources :baskets, :only => [:update], param: :path
-
+  
   get 'home_mobile/index'
   get 'home/index'
   post 'home/register_table'
@@ -250,10 +255,11 @@ get 'receipt/:receipt_id/key/:item_screen_type_key/print/:printer_id', to: 'mana
   post 'home/start_table/:table_id' => 'home#start_table', via: %i[get post], as: :start_table
   get 'home/table'
   post 'home/set_locale/:language_id' => 'home#set_locale', as: :home_set_locale
-
+  
   get '/:name', to: 'restaurant/menu#index'
-
+  
   root 'home#index'
+
 end
 
 
