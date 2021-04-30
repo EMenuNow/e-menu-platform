@@ -1,0 +1,27 @@
+<div class='container-fluid pb-2'>
+  <!--  style="background: url('/images/restaurant/thesauce/main-bg2.jpg') no-repeat fixed center;" -->
+  <div class='container'>
+    <div class="row py-4">
+      <div class='col-12 border text-left'>
+        <div class="row bg-dark">
+          <div class='col text-center text-light'>
+            <h1>RECEIPT</h1>
+            <%= render 'restaurants/components/receipt'%>
+          </div>
+        </div>
+        <div class="row bg-dark p-4">
+          <div class='col text-center text-light'>
+            <strong>Restaurant Address</strong><br>
+            <%=@restaurant.address%>
+          </div>
+        </div>
+        <div class="row bg-dark p-4">
+          <div class='col text-center text-light'>
+            <%=link_to 'Emenunow.com', '/', class: 'btn btn-warning'%>
+            <%=link_to "#{@restaurant.name} Menu", restaurant_path(@path), class: 'btn btn-warning'%>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,127 @@
+<%
+  @basket = @basket_service.basket
+%>
+<div class="row bg-light-70 pt-3" id="basket">
+  <div class="col">
+    <h5><b>Basket</b></h5>
+  </div>
+  <%
+=begin%>
+ <div class="col text-right">
+    <h3>Items: <%=@basket_item_count%></h3>
+  </div> 
+<%
+=end%>
+</div>
+<div class="row bg-light-70 pt-3">
+  <div class="col">
+    <% if @basket['items'].present? %>
+    <%
+=begin%>
+ <div class="d-none d-sm-block">
+      <div class='row'>
+        <div class="col-sm-4 offset-sm-1">Item</div>
+        <div class="col-sm-4">Extras</div>
+        <div class="col-sm-3">Total</div>
+      </div>
+      <hr />
+    </div> 
+<%
+=end%>
+    <% @basket['items'].each do |item| %>
+    <div class='row'>
+      <% note = item['note'] %>
+      <div class="col-sm-1">
+        <%= link_to basket_path(@path, uuid: item['uuid'], remove_from_basket: true), method: :PATCH do %>
+        <i class="fas fa-minus-circle text-danger"></i> <span class="d-sm-none">Remove</span>
+        <% end %>
+      </div>
+      <div class="col-sm-4">
+        <%= item['item'].html_safe %>
+        <% if note.present? %>
+        <br>
+        <strong>Note:</strong>
+        <%= note.html_safe%>
+        <% end %>
+      </div>
+      <div class="col-sm-4">
+        <%= item['optionals'].join('<br> ').html_safe %>
+      </div>
+      <div class="col-sm-2">
+        <%= number_to_currency(item['total'], unit: @restaurant.currency_symbol) %>
+      </div>
+    </div>
+    <% end %>
+    <hr />
+    <div class="row pt-1">
+      <div class="col-sm-8 offset-sm-1">
+        Total <%= "(#{@basket_service.discount_code.description})" if @basket_service.discount_code.present? %>
+      </div>
+      <div class="col-sm-2">
+        <%= number_to_currency(@basket_service.get_basket_item_total, unit: @restaurant.currency_symbol) %>
+      </div>
+    </div>
+    <% if params[:controller] != "checkouts" %>
+      <div class="row py-2 pb-5 bg-light-70 pt-5">
+        <div class="col">
+          <%
+            disable_basket_link = true
+            if @basket_service.get_basket_item_count.present? and @basket_service.get_basket_item_total > 0 and enable_checkout?(@restaurant) and @restaurant.availability.any?
+              disable_basket_link = false 
+            end
+            %>
+          <% if false %>
+            <script src="https://js.stripe.com/v3/"></script>
+            <button id="checkout-button" class="btn btn-dark btn-block">Checkout</button>
+            <script type="text/javascript">
+              var stripe = Stripe('<%= @restaurant.stripe_pk_api_key %>');
+              var checkoutButton = document.getElementById('checkout-button');
+
+              checkoutButton.addEventListener('click', function() {
+                fetch('<%= checkouts_path(@restaurant.path) %>', {
+                  method: 'GET'
+                })
+                .then(function(response) {
+                  return response.json();
+                })
+                .then(function(session) {
+                  return stripe.redirectToCheckout({ sessionId: session.id });
+                })
+                .then(function(result) {
+                  if (result.error) {
+                    alert(result.error.message);
+                  }
+                })
+                .catch(function(error) {
+                  console.error('Error:', error);
+                });
+              });
+            </script>
+          <% else %>
+            <%= button_to "CHECKOUT", checkouts_path(@path), disabled: disable_basket_link, method: :get,  class: 'btn btn-dark btn-block'%>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <% end %>
+    <hr />
+    <div class="row py-2 pb-5 bg-light-70">
+      <div class="col-10 offset-1">
+        <% if @basket_service.get_basket_db.discount_code.blank? %>
+        <%= form_for "", url: basket_path(@restaurant.path), :method => :patch do |f| %>
+        <%= f.hidden_field :path, :value => @path %>
+        <%= f.hidden_field :action, :value => "add" %>
+        <%= f.text_field :discount_code, :placeholder => "Promo code", class: "rounded form-control d-inline-block", style: "width:70%" %>
+        <%= button_to "Apply", nil, { class: 'bg-dark text-white rounded form-control d-inline-block', style: "width:28%" } %>
+        <% end %>
+        <% else %>
+        <%= button_to basket_path(@restaurant.path), :method => :patch, :class => "bg-dark text-light rounded p-1", params: { discount_code: "", path: @path } do %>
+        <%#= hidden_field_tag :path, @path %>
+        <%#= hidden_field_tag :action, "remove" %>
+        Discount applied: <%= @basket_service.get_basket_db.discount_code %> <i class="fa fa-1x fa-times-circle"></i>
+        <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

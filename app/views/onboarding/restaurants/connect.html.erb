@@ -1,0 +1,32 @@
+<% content_for :title do %>
+Connect to payment provider
+<% end %>
+
+<div class="row my-5">
+  <div class="col-10 mx-auto text-center">
+    <h3>We partner with Stripe to allow you to accept payments:</h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-10 mx-auto text-center">
+    <p>Accept secure payments directly from your menu</p>
+  </div>
+  <div class="col-10 mx-auto my-3 text-center">
+    <div class="mb-1">All major credit cards accepted</div>
+    <%= image_tag("icons/payment-visa.svg", class: "mx-1 payment-icon") %>
+    <%= image_tag("icons/payment-mastercard.svg", class: "mx-1 payment-icon") %>
+    <%= image_tag("icons/payment-american-express.svg", class: "mx-1 payment-icon") %>
+  </div>
+  <div class="col-10 mx-auto my-3 text-center">
+    <div class="mb-1">Apple Pay and Google Pay</div>
+    <%= image_tag("icons/payment-apple-pay.svg", class: "mx-1 payment-icon") %>
+    <%= image_tag("icons/payment-google-pay.svg", class: "mx-1 payment-icon") %>
+  </div>
+</div>
+
+<div class="row my-5">
+  <div class="col-md-8 mx-auto text-center">
+    <%= link_to("Connect Stripe", @connect, class: "btn btn-warning") %>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
-Layout/AlignHash:
+Layout/HashAlignment:
   Exclude:
     - 'db/seeds.rb'
 Layout/ClosingParenthesisIndentation:

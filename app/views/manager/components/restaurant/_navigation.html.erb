@@ -1,6 +1,6 @@
     <div class="nav-scroller bg-white shadow-sm">
       <nav class="nav nav-underline">
-        <%= link_to "Dashboard", manager_home_dashboard_path, class: "nav-link" %>
+        <%= link_to "Dashboard", manager_home_index_path, class: "nav-link" %>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Configuration
@@ -9,6 +9,7 @@
              <% if current_manager_restaurant_user.restaurant %>
               <%= link_to("Details", manager_restaurant_path(current_manager_restaurant_user.restaurant), class: "nav-link")  %>
               <%= link_to("Opening Times", manager_restaurant_opening_times_path(current_manager_restaurant_user.restaurant), class: "nav-link")  %>
+              <%= link_to("Restaurant Theme", manager_restaurant_themes_path(current_manager_restaurant_user.restaurant), class: "nav-link")  %>
               <% else %>
                <%= link_to("Add Restaurant", new_manager_restaurant_path, class: "nav-link")  %>
               <% end %>
@@ -19,11 +20,12 @@
                 <%= link_to("Tables", manager_restaurant_restaurant_tables_path(@restaurant), class: "nav-link") %>
                 <%= link_to("Table QR Codes", qr_manager_restaurant_restaurant_tables_path(@restaurant), class: "nav-link") %>
                 <%= link_to("Delivery Postcodes", manager_restaurant_delivery_postcodes_path(@restaurant), class: "nav-link") %>
+                <%= link_to("Discount Codes", manager_discount_codes_path(@restaurant), class: "nav-link") %>
               <% end %>
 
               <div class="dropdown-divider"></div>
                 <% if @restaurant.present? && @restaurant.id %> 
-                  <%= link_to("View Menus", manager_home_menu_path(), class: "nav-link") %>
+                  <%= link_to("View Menus", menu_manager_home_index_path, class: "nav-link") %>
                 <% end %>
               <div class="dropdown-divider"></div>
               <% if @restaurant.present? and @restaurant.id.present?%>

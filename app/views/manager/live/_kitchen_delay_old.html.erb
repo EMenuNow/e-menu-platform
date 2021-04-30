@@ -1,0 +1,36 @@
+<% content_for :js do %>
+  <script>
+    $(function() {
+      $(".delay-button").on("click", function() {
+        var delay = this.id.match(/\d+/);
+        $("#current-delay").text("Current Delay: " + delay + " minutes");
+      });
+    });
+  </script>
+<% end %> 
+<% Stripe.api_key = @restaurant.stripe_sk_api_key %>
+<% available = Stripe::Balance.retrieve(stripe_account: @restaurant.stripe_connected_account_id)["available"].first %>
+
+<div class="row mb-0 text-white">
+  <div class="col-lg-12 pt-3 pb-3">
+    <p class="m-0">Your restaurant's available balance: <%= number_to_currency(available["amount"] / 100.0, unit: @restaurant.currency_symbol) %></p>
+    <p>Top up your balance in stripe account setup by your EMenu service representative</p>
+  </div>
+</div>
+
+<div class='row mt-2'>
+  <div id="current-delay" class='col-sm-3 text-center text-white'>
+    Current Delay: <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes 
+  </div>
+  <%
+    redirect_path = params[:action]
+  %>
+
+  <div class='col text-center'>
+    <%= link_to 'Clear Delay', manager_restaurant_set_delay_path(@restaurant, value: 0, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-success btn-sm delay-button', id: 'delay-0-button'%> | 
+    <%= link_to 'Delay 15 Mins', manager_restaurant_set_delay_path(@restaurant, value: 15, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-15-button'%> | 
+    <%= link_to 'Delay 30 Mins', manager_restaurant_set_delay_path(@restaurant, value: 30, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-30-button'%> | 
+    <%= link_to 'Delay 45 Mins', manager_restaurant_set_delay_path(@restaurant, value: 45, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-45-button'%> | 
+    <%= link_to 'Delay 60 Mins', manager_restaurant_set_delay_path(@restaurant, value: 60, redirect_path: redirect_path), method: :post, remote: true, class: 'btn btn-warning btn-sm delay-button', id: 'delay-60-button'%> | 
+  </div>
+</div>

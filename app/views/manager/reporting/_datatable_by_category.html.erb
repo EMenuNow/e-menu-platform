@@ -57,7 +57,7 @@ $(document).ready(function() {
         <tr>
           <td><%= menu_parent_name  %><%#= get_menu_item_name(menu_id)%></td>
           <td class='text-right'><%= totals.count%></td>
-          <td class='text-right'><%= number_to_currency(total_sales.to_f / 100.to_f, unit: '£' )%></td>
+          <td class='text-right'><%= number_to_currency(total_sales.to_f / 100.to_f, unit: @restaurant.currency_symbol )%></td>
           <td class='text-right'><%= number_to_percentage(percent_count, precision: 2) %></td>
           <td class='text-right'><%= number_to_percentage(percent_total, precision: 2) %></td>
         </tr>
@@ -68,7 +68,7 @@ $(document).ready(function() {
         <tr class='font-weight-bold bg-dark text-light'>
           <td>Total</td>
           <td class='text-right'><%= @daily_reporting.items_count%></td>
-          <td class='text-right'><%= number_to_currency(@daily_reporting.total.to_f / 100.to_f, unit: '£' )%></td>
+          <td class='text-right'><%= number_to_currency(@daily_reporting.total.to_f / 100.to_f, unit: @restaurant.currency_symbol )%></td>
           <td class='text-right'><%= number_to_percentage(100, precision: 0) %></td>
           <td class='text-right'><%= number_to_percentage(100, precision: 0) %></td>
         </tr>

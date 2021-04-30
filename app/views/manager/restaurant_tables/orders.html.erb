@@ -22,8 +22,8 @@
             <td><%= table.created_at %></td>
             <td><%= table.aasm_state %></td>
             <td><%= table.password %></td>
-            <td><%= number_to_currency table.table_items.reject{|a| a.paid}.map{|e| e.price_a}.inject(:+) || 0, unit: "£"%></td>
-            <td><%= number_to_currency table.table_items.map{|e| e.price_a}.inject(:+) || 0, unit: "£"%></td>
+            <td><%= number_to_currency table.table_items.reject{|a| a.paid}.map{|e| e.price_a}.inject(:+) || 0, unit: restaurant_table.restaurant.currency_symbol%></td>
+            <td><%= number_to_currency table.table_items.map{|e| e.price_a}.inject(:+) || 0, unit: restaurant_table.restaurant.currency_symbol%></td>
           </tr>
           <% end %>
         <% end %>

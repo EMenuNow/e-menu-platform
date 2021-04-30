@@ -1,0 +1,51 @@
+<% content_for :title do %>
+Welcome to EMenu Now
+<% end %>
+
+<div class="row my-5">
+	<div class="col-md-6 mx-auto text-center">
+		<h3>Thanks for partnering with EMenu Now!</h3>
+	</div>
+</div>
+
+<% if @progress[:connect]&.include?("complete") %>
+
+	<div class="row my-5">
+		<div class="col-10 mx-auto text-center">
+			<p>You've set up your business and connected Stripe as a payment provider.</p>
+			<p>You'll be able to start creating your menu and accepting orders soon.</p>
+			<p>One of our team will be in contact soon to take you through the remaining steps.</p>
+		</div>
+	</div>
+
+	<div class="row my-5">
+		<div class="col-8 col-md-3 mx-auto text-center">
+			<%= link_to("EMenu Dashboard", onboarding_restaurant_dashboard_login_path(@restaurant, restaurant_user_id: current_onboarding_restaurant_user.id), class: 'next-link', method: 'post') %>
+		</div>
+	</div>
+
+<% else %>
+
+	<div class="row my-5">
+		<div class="col-10 mx-auto text-center">
+			<p>The stripe connection was not complete.</p>
+			<p>That's not a problem.</p>
+			<p>You can complete this later, or <%= link_to("click here", @connect) %> to try again.</p>
+		</div>
+	</div>
+
+	<div class="row my-5">
+		<div class="col-10 mx-auto text-center">
+			<p>You've still set up your business with EMenu.</p>
+			<p>You'll be able to start creating your menu and accepting orders soon.</p>
+			<p>One of our team will be in contact soon to take you through the remaining steps.</p>
+		</div>
+	</div>
+
+	<div class="row my-5">
+		<div class="col-8 col-md-3 mx-auto text-center">
+			<%= link_to("EMenu Dashboard", onboarding_restaurant_dashboard_login_path(@restaurant, restaurant_user_id: current_onboarding_restaurant_user.id), class: 'next-link', method: 'post') %>
+		</div>
+	</div>
+
+<% end %>

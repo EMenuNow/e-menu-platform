@@ -1,0 +1,5 @@
+<svg id="cross_circle" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <path id="circle" data-name="circle" d="M15,0A15,15,0,1,0,30,15,15,15,0,0,0,15,0Zm0,28.125A13.14,13.14,0,1,1,28.125,15,13.139,13.139,0,0,1,15,28.125Z" fill="black"/>
+  <line id="Line_1" data-name="Line 1" x2="8" y2="8" transform="translate(11 11)" fill="none" stroke="black" stroke-linecap="round" stroke-width="1.5"/>
+  <line id="Line_2" data-name="Line 2" x1="8" y2="8" transform="translate(11 11)" fill="none" stroke="black" stroke-linecap="round" stroke-width="1.5"/>
+</svg>

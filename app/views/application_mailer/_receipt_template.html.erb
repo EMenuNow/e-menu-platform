@@ -1,123 +1,132 @@
+<table>
+
+  <tbody>
+    <tr>
+      <td colspan=2><%=@restaurant.name%></td>
+    </tr>
+    <tr>
+      <td style='text-align: right;'>Payment Date:</td>
+      <td><%=@receipt.created_at.in_time_zone(@restaurant.time_zone).strftime("%d %B %Y - %H:%M")%></td>
+    </tr>
+    <tr>
+      <td style='text-align: right;'>Order Number:</td>
+      <td>#<%=@receipt.order_id%></td>
+    </tr>
+    <% if @receipt.delivery_or_collection != 'tableservice'  %>
+    <tr>
+      <td style='text-align: right;'>Name:</td>
+      <td><%=@receipt.name%></td>
+    </tr>
+    <% end %>
+    <% if @receipt.delivery_or_collection == 'tableservice'  %>
+    <tr>
+      <td style='text-align: right;'>Table Number:</td>
+      <td><%=@receipt.table_number%></td>
+    </tr>
+    <% end %>
+    <tr>
+      <td style='text-align: right;'>Type:</td>
+      <td><%=@receipt.delivery_or_collection%></td>
+    </tr>
+    <% if @receipt.delivery_or_collection != 'tableservice'  %>
+      <% d = @receipt.due_date.in_time_zone(@restaurant.time_zone) %>
+      <tr>
+        <td style='text-align: right;'>Date:</td>
+        <td><%= d.strftime("%A, #{d.day.ordinalize} %B %Y") %></td>
+      </tr>
+      <tr>
+        <td style='text-align: right;'>Time:</td>
+        <td><%=@receipt.collection_time%></td>
+      </tr>
+    <% end %>
+    <% if @receipt.email.present? %> <tr>
+      <td style='text-align: right;'>Email:</td>
+      <td><%=@receipt.email%></td>
+    </tr><% end %>
+    <% if @receipt.telephone.present? %> <tr>
+      <td style='text-align: right;'>Telephone:</td>
+      <td><%=@receipt.telephone%></td>
+    </tr><% end %>
+
+    <% if @receipt.delivery_or_collection == 'delivery'  %> <tr>
+      <td style='text-align: right;'>Address:</td>
+      <td><%=@receipt.address%></td>
+    </tr><% end %>
+  </tbody>
+</table>
 
 
-        <table>
 
-          <tbody>
-            <tr>
-              <td colspan=2><%=@restaurant.name%></td>
-            </tr>
-            <tr>
-              <td style='text-align: right;'>Payment Date:</td>
-              <td><%=@receipt.created_at.strftime("%d %B %Y - %H:%M")%></td>
-            </tr>
-            <tr>
-              <td style='text-align: right;'>Receipt Number:</td>
-              <td><%=@receipt.uuid%></td>
-            </tr>
-            <% if @receipt.delivery_or_collection != 'tableservice'  %>
-            <tr>
-              <td style='text-align: right;'>Name:</td>
-              <td><%=@receipt.name%></td>
-            </tr>
-            <% end %>
-            <% if @receipt.delivery_or_collection == 'tableservice'  %>
-            <tr>
-              <td style='text-align: right;'>Table Number:</td>
-              <td><%=@receipt.table_number%></td>
-            </tr>
-            <% end %>
-            <tr>
-              <td style='text-align: right;'>Type:</td>
-              <td><%=@receipt.delivery_or_collection%></td>
-            </tr>
-            <% if @receipt.delivery_or_collection != 'tableservice'  %>
-            <tr>
-              <td style='text-align: right;'>Time:</td>
-              <td><%=@receipt.collection_time%></td>
-            </tr>
-            <% end %>
-  <% if @receipt.email.present? %>          <tr>
-              <td style='text-align: right;'>Email:</td>
-              <td><%=@receipt.email%></td>
-            </tr><% end %>
-  <% if @receipt.telephone.present? %>          <tr>
-              <td style='text-align: right;'>Telephone:</td>
-              <td><%=@receipt.telephone%></td>
-            </tr><% end %>
-
-   <% if @receipt.delivery_or_collection == 'delivery'  %>        <tr>
-              <td style='text-align: right;'>Address:</td>
-              <td><%=@receipt.address%></td>
-            </tr><% end %>
-          </tbody>
-        </table>
-        
-        
-
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-        
-        
-        
-  
-
-           <table class='table'>
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Extras</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-              <% items =  @receipt.items['items']%>
-          
-                <% items.each do |item|%>
-                <tr>
-                  <td><%= item['item'].html_safe %></td>
-                  <td><%= item['optionals'].join('<br> ').html_safe %></td>
-                  <td class='text-right'><%= number_to_currency(item['total'], unit: '£') %></td>
-                </tr>
-                <% end %>
-
-              <% if @receipt.delivery_fee.present? %>
-                <tr>
-                  <td>Delivery Fee</td>
-                  <td></td>
-                  <td class='text-right'><%= number_to_currency(@receipt.delivery_fee.to_f, unit: '£') %></td>
-                </tr>
-              
-              <% end %>
+<table>
+  <thead>
+    <tr>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
 
 
-                <tr>
-                  <td>Total</td>
-                  <td></td>
-                  <td class='text-right'><%= number_to_currency(@receipt.basket_total/100.to_f, unit: '£') %></td>
-                </tr>
-              </tbody>
-            </table> 
-    <table>
-
-          <tbody>
-            <tr>
-              <td colspan=2><strong>Restaurant Address</strong></td>
-            </tr>
-            <tr>
-              <td colspan=2><%=@restaurant.address%></td>
-            </tr>
-    </tbody>
-    </table>
 
 
- 
+
+<table class='table'>
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Extras</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% items =  @receipt.items['items']%>
+
+    <% items.each do |item|%>
+    <tr>
+      <td><%= item['item'].html_safe %></td>
+      <td><%= item['optionals'].join('<br> ').html_safe %></td>
+      <td class='text-right'><%= number_to_currency(item['total'], unit: @receipt.restaurant.currency_symbol) %></td>
+    </tr>
+    <% end %>
+    <% if @receipt.discount_code.present? %>
+    <tr>
+      <td><%= @receipt.discount_code.description %></td>
+      <td></td>
+      <td class='text-right'>
+        -<%= number_to_currency(@receipt.discount_code.calculate_discount_from_basket_total(@receipt.basket_total), unit: @restaurant.currency_symbol) %>
+      </td>
+    </tr>
+    <% end %>
+
+    <% if @receipt.delivery_fee.present? %>
+    <tr>
+      <td>Delivery Fee</td>
+      <td></td>
+      <td class='text-right'><%= number_to_currency(@receipt.delivery_fee.to_f, unit: @receipt.restaurant.currency_symbol) %></td>
+    </tr>
+
+    <% end %>
+
+
+    <tr>
+      <td>Total</td>
+      <td></td>
+      <td class='text-right'><%= number_to_currency(@receipt.basket_total/100.to_f, unit: @receipt.restaurant.currency_symbol) %></td>
+    </tr>
+  </tbody>
+</table>
+<table>
+
+  <tbody>
+    <tr>
+      <td colspan=2><strong>Restaurant Address</strong></td>
+    </tr>
+    <tr>
+      <td colspan=2><%=@restaurant.address%></td>
+    </tr>
+  </tbody>
+</table>

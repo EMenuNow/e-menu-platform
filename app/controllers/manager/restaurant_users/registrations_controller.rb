@@ -3,6 +3,7 @@
 module Manager
   module RestaurantUsers
     class RegistrationsController < Devise::RegistrationsController
+      layout 'manager'
       # before_action :configure_sign_up_params, only: [:create]
       # before_action :configure_account_update_params, only: [:update]
 
@@ -41,7 +42,7 @@ module Manager
       # end
 
       def after_sign_up_path_for(_resource)
-        manager_home_dashboard_path
+        manager_home_index_path
       end
 
       # protected

@@ -7,6 +7,7 @@ class RestaurantUser < ApplicationRecord
          :recoverable, :rememberable, :trackable, :validatable
 
   has_one :restaurant
+  has_one :onboard
 
   def display_name
     email
@@ -17,10 +18,6 @@ class RestaurantUser < ApplicationRecord
  # binding.pry
     roles.include? role.to_s
   end
-
-
-
-
 
   
 end

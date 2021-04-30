@@ -1,0 +1,227 @@
+/* Kitchen closed/busy warning */
+.text-warning.text-center.border.border-warning {
+  background: var(--col-secondary);
+}
+
+.background-color a {
+  color: var(--dark);
+}
+
+
+/* Basket Button */
+
+.menu-header h3 a {
+  font-size: 1.25rem
+}
+
+h3 a,
+h3 a i:before {
+  color: var(--col-primary) !important;
+  background-color: var(--col-secondary) !important;
+  border-radius: 0.2em;
+  padding: 0.15em;
+}
+
+h3 a i:before {
+  font-size: 80%
+}
+
+
+
+/* Section Navigation */
+
+.pn-ProductNav_Wrapper {
+  background-color: white !important;
+}
+
+.pn-ProductNav_Link[aria-selected=true] {
+  color: var(--col-primary) !important;
+  background: var(--col-secondary) !important;
+  border-radius: 5px;
+}
+
+.pn-ProductNav_Link {
+  font-family: var(--font-primary) !important;
+  color: var(--col-secondary) !important;
+  text-transform: uppercase;
+  min-height: inherit;
+  padding: 0px 6px;
+  margin: 6px;
+}
+
+
+
+/* Menu Header */
+
+.menu-header {
+  background-color: var(--col-secondary) !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-attachment: scroll !important;
+}
+
+/* hide menu buttons (only use if only one menu)
+.menu-header .btn-block {
+  display: none;
+}
+*/
+
+.menu-header .btn-outline-dark.btn-block {
+  color: var(--col-primary) !important;
+  border-color: var(--col-primary) !important;
+}
+
+.menu-header .btn-dark.btn-block {
+  color: var(--light) !important;
+  border-color: var(--dark) !important;
+}
+
+/* centralise restaurant logo in header
+.menu-header img {
+  position: relative;
+  left: 50vw;
+  transform: translate(-50%, 0%);
+}
+*/
+
+
+/* Menu Body */
+/* set menu background color */
+.menu-body {
+  background-color: var(--light) !important;
+}
+
+.section-title{
+  text-align: center !important;
+  font-family: var(--font-primary);
+  color: var(--dark);
+}
+
+.section-name{
+  font-family: var(--font-primary);
+  font-size: 125%;
+  color: var(--col-secondary);
+}
+
+.item-name {
+  font-family: var(--font-primary);
+}
+
+i {
+  font-family: var(--font-primary);
+  font-style: var(--font-style-primary);
+  color: var(--dark);
+}
+
+.item-default {
+  background-color: white !important;
+  color: var(--col-secondary);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.featured-item {
+  border-left: 6px solid var(--col-primary);
+}
+
+
+
+/* Menu & Modal Buttons */
+
+.background-color .btn {
+  font-family: var(--font-primary);
+}
+
+.background-color .btn-outline-dark,
+.modal-content .btn-primary {
+  background: var(--col-secondary) !important;
+  color: var(--light);
+  /* border-color: var(--dark); */
+}
+
+.background-color .btn-dark,
+.modal-content .btn-secondary {
+  background: var(--col-secondary) !important;
+  color: var(--dark);
+  /* border-color: var(--dark); */
+}
+
+.background-color .col.bg-dark {
+  background-color: var(--col-primary) !important;
+}
+
+
+
+/* Modal Style */
+
+.modal-content {
+  background-color: var(--col-secondary) !important;
+  font-family: var(--font-primary) !important;
+  color: var(--light) !important;
+}
+
+.modal-body {
+  background-color: white !important;
+  color: var(--dark);
+}
+
+.modal-please-choose strong{
+  color: var(--col-secondary);
+}
+
+.custom-list-set {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  /* border-bottom: 1px dashed var(--dark); */
+}
+
+.custom-list-set:last-of-type {
+  /* border-bottom: none !important; */
+}
+
+.modal-footer .btn.btn-primary {
+  color: var(--col-primary) !important;
+  border-color: var(--col-primary) !important;
+}
+
+.modal-footer .btn.btn-secondary {
+  color: var(--light) !important;
+  border-color: var(--dark) !important;
+}
+
+
+/* Basket Style */
+
+.basket-body {
+  background-color: var(--light) !important;
+  font-family: var(--font-primary);
+  color: var(--col-secondary);
+}
+
+i:is(.fa-minus-circle) + span {
+  color: var(--col-secondary);
+}
+
+.basket-body .row .col h3 {
+  text-align: center;
+}
+
+#basket h3 {
+  color: var(--col-secondary);
+}
+
+.basket-body .row .col.text-right {
+  display: none;
+}
+
+
+
+/* Image style */
+
+.item-default img,
+.modal-body img {
+  border-radius: 0.5rem;
+  /* box-shadow: 0 3px 3px rgba(150, 150, 150, 0.6); */
+}

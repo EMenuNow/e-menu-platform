@@ -3,6 +3,7 @@
   <div class='row pt-3'>
     <div class='col'>
         <h1>Z Report</h1>
+        <% if @daily_reporting.date == DateTime.current.to_date %><h6>Updates every hour on the hour</h6><% end %>
     </div>
   </div>
 <div class='row mb-4'>

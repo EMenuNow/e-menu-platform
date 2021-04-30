@@ -5,7 +5,7 @@
 					<h3><%= t('payment.current_bill') %></h3>
 					<span class="current-bill  current-bill-lg">
 						
-						<%=number_to_currency @price, unit: "£"%>
+						<%=number_to_currency @price, unit: @table.restaurant.currency_symbol%>
 					</span>
 				</div>
 			</div>
@@ -23,7 +23,7 @@
 							  	<div class="row">
 							  		<div class="col-sm-6"><%= item.name%></div>
 							  		<div class="col-sm-4 text-right"><%= item.for%></div>
-							  		<div class="col-sm-2 text-right"><%=number_to_currency item.total_price, unit: "£"%></div>
+							  		<div class="col-sm-2 text-right"><%=number_to_currency item.total_price, unit: @table.restaurant.currency_symbol%></div>
 							  	</div>
 
 
@@ -33,7 +33,7 @@
 								  			<% list_item = CustomListItem.find(list_item_id) %>
 										  	<div class="row">
 										  		<div class="col-sm-1">&nbsp;</div>
-										  		<div class="col-sm-9">- <%= "#{custom_list.name}: #{list_item.name}" %>&nbsp;&nbsp;<%= "(#{number_to_currency(list_item.price, unit: "£")})"  if list_item.price > 0 %></div>
+										  		<div class="col-sm-9">- <%= "#{custom_list.name}: #{list_item.name}" %>&nbsp;&nbsp;<%= "(#{number_to_currency(list_item.price, unit: @table.restaurant.currency_symbol)})"  if list_item.price > 0 %></div>
 										  		<div class="col-sm-2 text-right"></div>
 										  	</div>
 								  		<% end %>

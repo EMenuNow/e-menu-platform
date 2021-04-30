@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe DeliveryPostcodesController, type: :routing do
+RSpec.describe Manager::DeliveryPostcodesController, type: :routing do
   describe "routing" do
     it "routes to #index" do
       expect(get: "/delivery_postcodes").to route_to("delivery_postcodes#index")

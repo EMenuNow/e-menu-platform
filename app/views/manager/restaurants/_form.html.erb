@@ -1,158 +1,296 @@
-
 <%= form_with(model: [:manager, restaurant], local: true) do |form| %>
-  <% if restaurant.errors.any? %>
-    <div id="error_explanation" class="alert alert-danger">
-      <h2><%= pluralize(restaurant.errors.count, "error") %> prohibited this restaurant from being saved:</h2>
+<% if restaurant.errors.any? %>
+<div id="error_explanation" class="alert alert-danger">
+  <h2><%= pluralize(restaurant.errors.count, "error") %> prohibited this restaurant from being saved:</h2>
 
-      <ul>
-      <% restaurant.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <%= form.hidden_field :restaurant_user_id %>
-        
-
-
+  <ul>
+    <% restaurant.errors.full_messages.each do |message| %>
+    <li><%= message %></li>
+    <% end %>
+  </ul>
+</div>
+<% end %>
+<%= form.hidden_field :restaurant_user_id %>
+<% 
+table_service = restaurant.features.where(id: 9).present?
+delivery = restaurant.features.where(id: 10).present?
+table_takeaway = restaurant.features.where(id: 11).present?
+collection = restaurant.features.where(id: 12).present?
+%>
 <!-- Tabs -->
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-  <li class="nav-item" role="presentation">
-    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
+<ul class="nav nav-tabs d-inline-block text-center" id="myTab" role="tablist">
+  <li class="nav-item d-inline-block text-center" role="presentation">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Your restaurant</a>
   </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link" id="finance-tab" data-toggle="tab" href="#finance" role="tab" aria-controls="finance" aria-selected="false">Finance</a>
+  <li class="nav-item d-inline-block text-center" role="presentation">
+    <a class="nav-link" id="styling-tab" data-toggle="tab" href="#styling" role="tab" aria-controls="styling" aria-selected="false">Banding/Styling</a>
+  </li> 
+  <li class="nav-item d-inline-block text-center" role="presentation">
+    <a class="nav-link" id="finance-tab" data-toggle="tab" href="#finance" role="tab" aria-controls="finance" aria-selected="false">Financial Adminstration</a>
   </li>
-  <li class="nav-item" role="presentation">
+  <%
+=begin%>
+ <li class="nav-item" role="presentation">
     <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
   </li>
   <li class="nav-item" role="presentation">
     <a class="nav-link" id="tracking-tab" data-toggle="tab" href="#tracking" role="tab" aria-controls="tracking" aria-selected="false">Tracking</a>
   </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link" id="styling-tab" data-toggle="tab" href="#styling" role="tab" aria-controls="styling" aria-selected="false">Styling</a>
-  </li>
+<%
+=end%>
 </ul>
 <!-- /Tabs -->
-
-<div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-  <!-- Home -->
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :name %>
-        <%= form.text_field :name, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-  </div>
- <div class="row">
+<div class="tab-content py-5 card" id="myTabContent">
+  <div class="tab-pane fade show active col-md-6 col-10 offset-md-3 offset-1" id="home" role="tabpanel" aria-labelledby="home-tab">
+    <!-- Home -->
+    <div class="row">
       <div class="col">
-        <div class="form-group ">
-          <%= form.label :image %>
+        <div class="form-group card p-3 text-center d-block">
+          <% if restaurant.image.attached? %>
+          <%= image_tag restaurant.image.variant(resize_and_pad: [100, 100]), class: "text-center w-auto"  %>
+          <br />
+          <% end %>
+          <h5 class="pb-5">Restaurant logo (Square shaped logo)</h5>
+          <br />
           <%= form.file_field :image %>
         </div>
       </div>
+    </div>
+    <div class="row pt-5">
       <div class="col">
         <div class="form-group ">
-           <% if restaurant.image.attached? %>
-              <%= image_tag restaurant.image.variant(resize: "200x200"), class: "img-fluid"  %>
-            <% end %>
+          <%= form.label "Restaurant name" %>
+          <%= form.text_field :name, class: 'form-control  form-control-sm text-center' %>
         </div>
       </div>
     </div>
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :address %>
-        <%= form.text_field :address, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :postcode %>
-        <%= form.text_field :postcode, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
+    <div class="row">
+      <div class="col">
         <div class="form-group ">
-    <%= form.label :telephone %>
-    <%= form.text_field :telephone, class: 'form-control  form-control-sm' %>
-  </div>
+          <%= form.label :address %>
+          <%= form.text_field :address, class: 'form-control  form-control-sm text-center' %>
+        </div>
+      </div>
     </div>
-    <div class="col">
-      <div class="form-group ">
-    <%= form.label :email %>
-    <%= form.text_field :email, class: 'form-control  form-control-sm' %>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :postcode %>
+          <%= form.text_field :postcode, class: 'form-control  form-control-sm text-center' %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :telephone %>
+          <%= form.text_field :telephone, class: 'form-control  form-control-sm text-center' %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :email %>
+          <%= form.text_field :email, class: 'form-control  form-control-sm text-center' %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :cuisine_id %>
+          <%= form.select :cuisine_id,  options_for_select(@cuisines.map{|a| [a.name, a.id]}, restaurant.cuisine_id ), {prompt: "Choose cuisine"}, {class: 'form-control  form-control-sm text-center'} %>
+        </div>
+      </div>
+    </div>
+    <!-- Home -->
   </div>
+  <div class="tab-pane fade col-12 col-md-6 offset-md-3" id="finance" role="tabpanel" aria-labelledby="finance-tab">
+    <!-- Finance -->
+    <% 
+      admin = params[:admin] == "true"
+    %>
+    <div class="row">
+      <div class="col">
+        <p class="py-3">
+          Please contact your EMenu account manager to configure this section
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= link_to("Connect stripe", @connect, class: "d-inline-block btn btn-warning#{' disabled' if @account[:details_submitted] && @account[:charges_enabled]}") %>
+          <% if @account[:details_submitted] && @account[:charges_enabled] %>
+            <strong class="d-inline-block text-gray-dark">Stripe connection <span class="badge badge-pill badge-success">Complete</span></strong>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label "Stripe Connected Account ID" %>
+          <%= form.text_field :stripe_connected_account_id, class: 'form-control  form-control-sm text-center', rows: 10, :disabled=>!admin  %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <label>Commission percentage e.g. 1.5</label>
+          <%= form.text_field :commision_percentage, class: 'form-control  form-control-sm text-center', rows: 10, :disabled=>!admin  %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label "URL Path" %>
+          <%= form.text_field :path, class: 'form-control  form-control-sm text-center', :disabled=>!admin %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <%= form.label :currency_id %>
+          <%= form.select :currency_id, options_for_select(Currency.all.map{|s| [s.name, s.id]}, restaurant.currency_id), {prompt: "Choose Currency"}, {class: 'form-control  form-control-sm text-center', :disabled=>!admin} %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <label>Stripe chargeback protection enabled (0.04% extra charge)
+            <br />
+            <%= form.check_box :stripe_chargeback_enabled, class: 'text-center', :disabled=>!admin %>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <label>Enable SEO indexing (show restaurant on EMenu listings)
+            <br />
+            <%= form.check_box :show_on_homepage, class: 'text-center', :disabled=>!admin %>
+          </label>
+        </div>
+      </div>
+    </div>
+    <!-- Finance -->
+  </div>
+  <div class="tab-pane fade col-12 col-md-6 offset-md-3" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+    <!-- Settings -->
+
+  <% if params[:admin] == "true" %>
+
+  <div class="row">
+    <div class="col-sm">
+      <h5>Services - Admin</h5>
+      <ul class="switches">
+      
+      <% @features.each do |feature|%>
+
+        <li class="my-3">
+          <%= check_box_tag dom_id(feature), feature.id, @restaurant.features.include?(feature), data: {
+                            remote: true,
+                            url: manager_restaurant_toggle_feature_path(@restaurant.id, feature.id),
+                            method: :post
+                            } %>
+          <label for="feature_<%= feature.id %>">
+            <span><%=feature.name%></span>
+            <span></span>
+          </label>
+        </li>
+
+      <% end %>
+
+      </ul>
+
     </div>
   </div>
-
-
-
 
   <div class="row">
     <div class="col">
       <div class="form-group ">
-        <%= form.label :cuisine_id %>
-        <%= form.select :cuisine_id,  options_for_select(@cuisines.map{|a| [a.name, a.id]}, restaurant.cuisine_id ), {prompt: "Choose cuisine"}, {class: 'form-control  form-control-sm'} %>
+        <label for="restaurant_ssubscription_enabled">Subscription Enabled</label>
+
+        <%= form.check_box :subscription_enabled, class: 'form-control  form-control-sm' %>
       </div>
     </div>
   </div>
+
+  <% else %>
+
   <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :path %>
-        <%= form.text_field :path, class: 'form-control  form-control-sm' %>
-      </div>
+    <div class="col-sm">
+      <h5>Services</h5>
+      <ul class="switches">
+      
+      <% @services.each do |feature|%>
+
+        <li class="my-3">
+          <%= check_box_tag dom_id(feature), feature.id, @restaurant.features.include?(feature), data: {
+                            remote: true,
+                            url: manager_restaurant_toggle_feature_path(@restaurant.id, feature.id),
+                            method: :post
+                            } %>
+          <label for="feature_<%= feature.id %>">
+            <span><%=feature.name%></span>
+            <span></span>
+          </label>
+        </li>
+
+      <% end %>
+
+      </ul>
+
+    </div>
+  </div>
+
+  <% checkout_toggle = @features.where(key: 'checkout').first %>
+  <% group_orders_toggle = @features.where(key: 'group_orders').first %>
+
+  <div class="row">
+    <div class="col-sm">
+      <hr>
+      <ul class="switches">
+        <li class="my-3">
+          <%= check_box_tag dom_id(checkout_toggle), checkout_toggle.id, @restaurant.features.include?(checkout_toggle), data: {
+                            remote: true,
+                            url: manager_restaurant_toggle_feature_path(@restaurant.id, checkout_toggle.id),
+                            method: :post
+                            }, disabled: !@restaurant.subscription_enabled %>
+          <label for="feature_<%= checkout_toggle.id %>">
+            <span><%=checkout_toggle.name%> <small class="text-muted">(Accept orders & payments)</small></span>
+            <span></span>
+          </label>
+        </li>
+        <li class="my-3">
+          <%= check_box_tag dom_id(group_orders_toggle), group_orders_toggle.id, @restaurant.features.include?(group_orders_toggle), data: {
+                            remote: true,
+                            url: manager_restaurant_toggle_feature_path(@restaurant.id, group_orders_toggle.id),
+                            method: :post
+                            }, disabled: !@restaurant.subscription_enabled %>
+          <label for="feature_<%= group_orders_toggle.id %>">
+            <span><%=group_orders_toggle.name%> <small class="text-muted">(Allow group ordering)</small></span>
+            <span></span>
+          </label>
+        </li>
+      </ul>
+
     </div>
   </div>
   
-
-  <!-- Home -->
-  </div>
-  <div class="tab-pane fade" id="finance" role="tabpanel" aria-labelledby="finance-tab">
-  <!-- Finance -->
+  <% end %>
 
   <div class="row">
-    <div class="col">
-      <h3>Stripe</h3>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col">
-        <div class="form-group ">
-          <%= form.label :stripe_api_key %>
-          <%= form.text_field :stripe_api_key, class: 'form-control  form-control-sm', rows: 10  %>
-        </div>
-      </div>
-
-  </div>
-
-  <div class="row">
-    <div class="col">
-        <div class="form-group ">
-          <%= form.label :stripe_publish_api_key %>
-          <%= form.text_field :stripe_publish_api_key, class: 'form-control  form-control-sm', rows: 10  %>
-        </div>
-      </div>
-
-  </div>
-
-  <!-- Finance -->
-  </div>
-  <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-  <!-- Settings -->
-
-
- <div class="row">
     <div class="col">
       <div class="form-group ">
-      <label for="restaurant_show_on_homepage">Show on eat.emenunow.com homepage</label>
+        <label for="restaurant_show_on_homepage">Show on eat.emenunow.com homepage</label>
 
         <%= form.check_box :show_on_homepage, class: 'form-control  form-control-sm' %>
       </div>
@@ -160,192 +298,112 @@
   </div>
 
 
-  <!-- Settings -->
+    <!-- Settings -->
   </div>
-
-<div class="tab-pane fade" id="tracking" role="tabpanel" aria-labelledby="tracking-tab">
-  <!-- tracking -->
-
-
-  <div class="row mt-2">
-    <div class="col">
+  <div class="tab-pane fade col-12 col-md-6 offset-md-3" id="tracking" role="tabpanel" aria-labelledby="tracking-tab">
+    <!-- tracking -->
+    <div class="row mt-2">
+      <div class="col">
         <div class="form-group ">
           <%= form.label :facebook_pixel %>
           <%= form.text_field :facebook_pixel, class: 'form-control  form-control-sm' %>
         </div>
       </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :facebook %>
-        <%= form.text_field :facebook, class: 'form-control  form-control-sm' %>
-      </div>
     </div>
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :twitter %>
-        <%= form.text_field :twitter, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-  </div>
-  <!-- tracking -->
-  </div>
-
-
-  <div class="tab-pane fade" id="styling" role="tabpanel" aria-labelledby="styling-tab">
-  <!-- Styling -->
-
-
-  <div class="row mt-5 border-bottom border-gray">
+    <div class="row">
       <div class="col">
         <div class="form-group ">
-          <%= form.label :background_image %>
-          <%= form.file_field :background_image %>
+          <%= form.label :facebook %>
+          <%= form.text_field :facebook, class: 'form-control  form-control-sm' %>
         </div>
       </div>
       <div class="col">
         <div class="form-group ">
-           <% if restaurant.background_image.attached? %>
-              <%= image_tag restaurant.background_image.variant(resize: "200x200"), class: "img-fluid"  %>
-            <% end %>
+          <%= form.label :twitter %>
+          <%= form.text_field :twitter, class: 'form-control  form-control-sm' %>
         </div>
       </div>
     </div>
-
-
-<% 
-subtle_background_list = [
-{file: 'None', name: 'None'},
-{file: 'wall4_@2X', name: 'Wall'},
-{file: 'asfalt_@2X', name: 'Asfalt'},
-{file: 'binding_light_@2X', name: 'Binding'},
-{file: 'circles-light', name: 'Circles'},
-{file: 'concrete-texture', name: 'Concrete'},
-{file: 'dark_wall_@2X', name: 'Dark Wall'},
-{file: 'debut_light_@2X', name: 'Debut Light'},
-{file: 'furley_bg_@2X', name: 'Furley'},
-{file: 'light-veneer', name: 'Light Veneer'},
-{file: 'lightpaperfibers_@2X', name: 'Paper Fibres'},
-{file: 'prism', name: 'Prism'},
-{file: 'scribble_light_@2X', name: 'Scribble'},
-]
-
-%>
-
-
-
-  <div class="row mt-3 border-bottom border-gray">
-    <div class="col">
-      <div class="row">
+    <!-- tracking -->
+  </div>
+  <div class="tab-pane fade col-12 col-md-6 offset-md-3" id="styling" role="tabpanel" aria-labelledby="styling-tab">
+    <!-- Styling -->
+    <div class="row my-3 border-bottom border-gray card p-5">
+      <% 
+        subtle_background_list = [
+          {file: 'None', name: 'None'},
+          {file: 'wall4_@2X', name: 'Wall'},
+          {file: 'asfalt_@2X', name: 'Asfalt'},
+          {file: 'binding_light_@2X', name: 'Binding'},
+          {file: 'circles-light', name: 'Circles'},
+          {file: 'concrete-texture', name: 'Concrete'},
+          {file: 'dark_wall_@2X', name: 'Dark Wall'},
+          {file: 'debut_light_@2X', name: 'Debut Light'},
+          {file: 'furley_bg_@2X', name: 'Furley'},
+          {file: 'light-veneer', name: 'Light Veneer'},
+          {file: 'lightpaperfibers_@2X', name: 'Paper Fibres'},
+          {file: 'prism', name: 'Prism'},
+          {file: 'scribble_light_@2X', name: 'Scribble'},
+        ]
+      %>
+      <div class="col">
+        <div class="row">
           <div class="col">
             <div class="form-group ">
-              <%= form.label :subtle_pattern_background %> <small class='text-gray text-warning'><i> WARNING: Choosing a subtle pattern  background will override the uploaded image</i></small>
-              <%= form.select :subtle_background,  options_for_select(subtle_background_list.map{|s| [s[:name], s[:file]]}, restaurant.subtle_background ), {prompt: "Choose Subtle Background"}, {class: 'form-control  form-control-sm'} %>
+              <h5 class="pb-5">Solid background colour</h5>
+              <p class='text-gray text-warning'><i> Choosing a solid background will override a custom background image</i></p>
+              <%= form.select :subtle_background,  options_for_select(subtle_background_list.map{|s| [s[:name], s[:file]]}, restaurant.subtle_background ), {prompt: "Choose solid background"}, {class: 'form-control  form-control-sm'} %>
+              <% content_for :js do %>
+              <script type="text/javascript">
+                $(".subtle-color").click(function () {
+                  $("#restaurant_subtle_background").val($(this).data("id"));
+                });
+              </script>
+              <% end %>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col">
             <div class="form-group ">
-            <div class="card-group">
-              <%subtle_background_list.reject{|a| a[:name]=="None"}.each do |subtle| %>
-
-<div class="card" style="width: 12rem;">
-  <%= image_tag "/background/#{subtle[:file]}.png", class: "img-fluid" %>
-  <div class="card-body">
-    <p class="card-text"><small><%=subtle[:name]%></small></p>
-  </div>
-</div>
-
-
-                   
-                <% end %>
+              <div class="row">
+                <% subtle_background_list.each do |subtle| %>
+                <div class="subtle-color card col-md-3 col-4 p-0" style="cursor: pointer;" data-id="<%= subtle[:file] %>" id="subtle-color-<%=subtle[:name]%>">
+                  <%= image_tag "/background/#{subtle[:file]}.png", style: "min-height: 100%;", class: "img-fluid" if !subtle[:file].include?("None") %>
+                  <!--<div class="card-body">
+                    <p class="card-text"><small></small></p>
+                  </div>-->
                 </div>
+                <% end %>
+              </div>
             </div>
           </div>
         </div>
       </div>
-  </div>
-
-
-
-  <div class="row mt-3">
-    <div class="col">
+    </div>
+    <div class="row mt-5 border-bottom border-gray card p-5">
+      <div class="col">
         <div class="form-group ">
-          <%= form.label :css_font_url %>
-          <%= form.text_field :css_font_url, class: 'form-control  form-control-sm' %>
+          <h5 class="pb-5">Custom Background Image</h5>
+          <%= form.file_field :background_image %>
         </div>
       </div>
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :css_font_class %>
-        <%= form.text_field :css_font_class, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col">
-      <h3>Custom CSS</h3>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col">
+      <div class="col">
         <div class="form-group ">
-          <%= form.label :custom_css %>
-          <%= form.text_area :custom_css, class: 'form-control  form-control-sm', rows: 10 %>
+          <% if restaurant.background_image.attached? %>
+          <%= image_tag restaurant.background_image.variant(resize: "200x200"), class: "img-fluid"  %>
+          <% end %>
         </div>
       </div>
-
-  </div>
-
-
-  <div class="row">
-    <div class="col">
-      <h3>Custom Styles</h3>
     </div>
-  </div>
-
-  <div class="row">
-    <div class="col">
-        <div class="form-group ">
-          <%= form.label :custom_styles %>
-          <%= form.text_area :custom_styles, class: 'form-control  form-control-sm', rows: 10  %>
-        </div>
-      </div>
-
-  </div>
-
-
-  <!-- /Styling -->
+    <!-- /Styling -->
   </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <div class="row">
-    <div class="col">
-
-
-  <div class="actions">
-    <%= form.submit nil, class: "btn btn-primary" %>
+<div class="row py-5">
+  <div class="col">
+    <div class="actions">
+      <%= form.submit "Submit restaurant details", class: "btn btn-primary" %>
+    </div>
   </div>
-</div></div>
+</div>
 <% end %>

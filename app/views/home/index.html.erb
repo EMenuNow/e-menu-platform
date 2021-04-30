@@ -1,32 +1,42 @@
-<main role="main">
-  <div class="jumbotron jumbotron-fluid hero-main-user-background mb-0">
-    <div class="container">
-      <h2 class="display-2 text-center text-light"><%= t('furniture.start_eating')%></h2>
-      <p class=" text-center ">
-      </p>
-    </div>
-  </div>
-  <div class="container-fluid">
-    <div class="row mb-0">
-      <div class="col-lg-6 bg-dark text-light text-center pt-3 pb-3">
-        <h2><%= t('furniture.enter_table_code')%></h2>
-        <%= form_tag home_register_table_path do %>
-          <%= text_field_tag :code %><%t('furniture.enter_table_code_submit')%>
-          <%= submit_tag t('furniture.enter_table_code_submit'), class: 'btn btn-warning btn-sm mb-1'%>
-        <% end %>
-      </div>
-      <div class="col-lg-6 bg-info text-light mt-0 mb-0 pt-3 pb-3">
-        <h2><%= t('furniture.where_to_eat')%></h2>
-        <p><%= t('furniture.available_restaurants')%></p>
-        <ul>
-        <% @restaurants.each do |restaurant| %>
-        <% if restaurant.show_on_homepage and restaurant.path.present? %>
-          <li><%= link_to restaurant.name, restaurant_path_path(restaurant.path), class: 'text-warning' %></li>
-          <% end %>
-        <% end %>
-        </ul>
-      </div>
-    </div>
-  </div>
-</main>
+<% content_for :hero do %>
+<div class="jumbotron jumbotron-fluid hero-main-user-background mb-0">
+	<div class="container text-light">
+		<div class="row mb-0">
+			<div class="col-lg-12 pt-3 pb-3">
+				<h1 class="display-2"><%= t('furniture.start_eating') %></h1>
+			</div>
+		</div>
+		<div class="row mb-0">
+			<div class="col-lg-12 pt-3 pb-3">
+				<h3><%= t('furniture.enter_table_code')%></h3>
+			</div>
+		</div>
+		<div class="mb-0">
+			<div class="pt-3 pb-3 mx-auto">
+				<%= form_tag home_register_table_path do %>
+				<%= text_field_tag :code, nil, :class=>"p-3" %>
+				<%= submit_tag t('furniture.enter_table_code_submit'), class: 'btn btn-warning btn-sm mb-1 p-3'%>
+				<% end %>
+			</div>
+		</div>
+	</div>
+</div>
+<% end %>
 
+<main role="main" class="container">
+	<div class="row">
+		<div class="col-lg-12 my-0 py-5 pb-3">
+			<h2><%= t('furniture.where_to_eat')%></h2>
+			<!-- <p><%= t('furniture.available_restaurants')%></p> -->
+			<div class="row">
+				<div class="col-lg-12 my-0 py-5 pb-3">
+					<ul>
+						<% @restaurants.select{|x|x.show_on_homepage && x.path.present?}.each do |restaurant| %>
+							<li class="h5"><%= link_to restaurant.name, welcome_restaurant_path(restaurant.path), class: 'text-primary' %></li>
+						<% end %>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>

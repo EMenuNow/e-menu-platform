@@ -1,0 +1,23 @@
+<main role="main">
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h2 class="text-center text-dark">Administration</h2>
+      <h4 class="text-center text-dark">Manage all restaurants from one screen</h4>
+    </div>
+  </div>
+</main>
+
+<div class="container pt-1 pb-5">
+  <hr class="my-1" />
+  <% @restaurants.each do |restaurant| %>
+    <div class="row py-2">
+      <div class="col-md-3">
+        <h5 class="m-0"><%= restaurant.name %></h5>
+      </div>
+      <div class="col-md-9 text-right">
+        <h5 class="m-0"><%= link_to "Login as", login_as_manager_administration_path(restaurant.restaurant_user.id) %></h5>
+      </div>
+    </div>
+    <hr class="my-1" />
+  <% end %>
+</div>

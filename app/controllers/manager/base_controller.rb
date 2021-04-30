@@ -2,9 +2,7 @@
 
 module Manager
   class BaseController < ApplicationController
-  	  alias_method :current_user, :current_manager_restaurant_user # Could be :current_member or :logged_in_user
-     
-      
+	  alias_method :current_user, :current_manager_restaurant_user # Could be :current_member or :logged_in_user
 
     layout 'manager'
 
@@ -14,10 +12,14 @@ module Manager
 
 
     def set_restaurant
-       @restaurant = Restaurant.find(params[:restaurant_id])
+      @restaurant = Restaurant.where(id: params[:restaurant_id]).first || current_manager_restaurant_user.restaurant
       unless current_manager_restaurant_user.id == @restaurant.restaurant_user_id
         redirect_to '/422.html'
       end
+    end
+
+    def authenticate_admin!
+      current_user.admin ? true : (redirect_to manager_home_index_path, :notice => "Admin level required")
     end
   end
 

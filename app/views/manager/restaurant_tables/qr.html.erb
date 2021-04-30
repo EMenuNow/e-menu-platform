@@ -1,14 +1,23 @@
-<div class="container border  mt-5 mb-2">
-  <div class="row m-2">
-    <% @restaurant_tables.each do |restaurant_table| %>
-      <div class="col-lg-6 qr">
-        <div class="py-2 m-2">
-          <%= raw create_qr(restaurant_table.code).as_html %>
-            <div class="col p-2">
-              <%= restaurant_table.code %>
-            </div>
+<div class="bg-dark">
+  <div class="container text-light mt-5 mb-2">
+    <div class="container mt-5 mb-2">
+      <div class="row pt-5">
+        <div class='col-sm-12 col-md-12 text-left text-light pb-4'>
+          <h1><%= @restaurant.name %> - your tables</h1>
         </div>
       </div>
-    <% end %>
+      <div class="row m-2">
+        <% @restaurant_tables.each do |restaurant_table| %>
+          <div class="col-lg-6 qr">
+            <div class="py-2 m-2">
+              <%= raw create_qr(restaurant_table.code).as_html %>
+                <div class="col p-2">
+                  <%= restaurant_table.code %>
+                </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,7 +1,22 @@
+<% content_for :title do %>
+Restaurant Configuration - <%= @restaurant&.name ? @restaurant.name : "Welcome" %>
+<% end %>
+
+<main role="main">
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container text-center">
+      <% if @restaurant.image.attached? %>
+      <%= image_tag @restaurant.image.variant(resize_and_pad: [200, 200]), class: "img-fluid"  %>
+      <% end %>
+      <h1 class=" text-dark">Restaurant configuration</h1>
+      <p class="pt-3">
+        Complete all the below information
+      </p>
+    </div>
+  </div>
+</main>
 <main role="main" class="container">
-  <div class="my-3 p-3 bg-white rounded shadow-sm">
-	  <h3 class="pb-2 mb-0">Edit Restaurant</h3>
+  <div class="my-3 p-3 bg-white rounded text-center">
 		<%= render 'form', restaurant: @restaurant %>
-		<%= link_to 'Back', manager_restaurants_path %>
 	</div>
 </main>

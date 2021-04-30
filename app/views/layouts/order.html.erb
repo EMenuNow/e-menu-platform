@@ -1,37 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
 
-    <title><%= content_for?(:title) ? yield(:title) : "Restaurant Menus re-defined" %></title>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <%= stylesheet_link_tag    "application" %>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-      <%= javascript_include_tag "application"%>
+  <title><%= content_for?(:title) ? yield(:title) : "Restaurant Menus re-defined" %></title>
 
-
-    <% if @restaurant.present? and  @restaurant.css_font_url.present? %> <link href="<%= @restaurant.css_font_url%>" rel="stylesheet"> <% end %>
-
-    <style>
-      <%=@restaurant.custom_css if @restaurant.present? and @restaurant.custom_css.present? %>
-    </style>
+  <%= stylesheet_link_tag    "application" %>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <%= javascript_include_tag "application"%>
 
 
-    <%= csrf_meta_tags %>
+  <% if @restaurant.present? and @restaurant.theme&.css_font_url.present? %>
+    <link href="<%= @restaurant.theme.css_font_url%>" rel="stylesheet" />
+  <% elsif @restaurant.present? and @restaurant.css_font_url.present? %>
+    <link href="<%= @restaurant.css_font_url%>" rel="stylesheet" />
+  <% end %>
 
-    <%= render 'order/components/facebook_pixel' if Rails.env == 'production' and @restaurant.facebook_pixel.present? %>
-  </head>
+  <style>
+    <%= render 'components/global/restaurant_style' %>
+  </style>
 
-  <body>
-    <%= render 'components/global/environment' %>
 
-    <%= render 'components/global/order_messages' %>
-    <div class="container-fluid px-0" >
-      <%= yield %>
-      <%#= render 'components/global/languages' %>
-      <%= render 'components/global/footer' %>
-    </div>
-    <%= yield :js %>
-  </body>
+  <%= csrf_meta_tags %>
+
+  <%= render 'order/components/facebook_pixel' if Rails.env == 'production' and @restaurant.facebook_pixel.present? %>
+</head>
+
+<body>
+  <%= render 'components/global/sidebar' %>
+  <%= render 'components/global/topbar' %>
+  <%= render 'components/global/environment' %>
+  <%#= render "patrons/sessions/new", :locals => { :redirect_after_signup_to => restaurant_path(Restaurant.first.path), :resource => Patron.new } if !patron_signed_in? %>
+  <%= render 'components/global/order_messages' %>
+  <%= yield %>
+  <%#= render 'components/global/languages' %>
+  <%= render 'components/global/footer' %>
+  <%= yield :js %>
+
+  <div class="overlay"></div>
+</body>
+
 </html>

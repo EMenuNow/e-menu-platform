@@ -1,0 +1,153 @@
+<% main_item = item[:id]%>
+<% start_price = item[:price_a].to_f %>
+
+<div class="modal fade" id="item-<%=item[:id]%>" tabindex="-1" role="dialog" aria-labelledby="<%=item[:name]%>" aria-hidden="true">
+  <div class="modal-dialog override" role="document">
+    
+    <% if Rails.env == 'development'%>
+      <h1>DEVELOPMENT</h1>
+    <% end %>
+
+    <div class='row'>
+      <div class='col-sm-12 col-md-8 col-lg-5 col-xl-4'>
+
+        <div class="modal-content bg-light">
+          <div class="modal-header">
+            
+            <div class="row">
+              <% image = get_menu_image(item[:id]) %>
+            </div> 
+
+            <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            
+          </div>
+
+          <div class="modal-body text-dark">
+            <div class="row">
+              <% if feature_match(:images, @restaurant.features) %> <% if image.present? %><div class='col-3'><%= image_tag image.variant(resize: "200x200"), class: 'img-fluid' %><%#=image_tag url_for(image), class: 'img-fluid'%></div><% end %><% end %>
+              <div class='col'>
+                <h5 class="modal-title" id="<%=item[:name]%>"><%=item[:name]%></h5>
+                <div >
+                  <small><%=item[:description]%></small>
+                </div>
+
+                <% if feature_match(:provenance, @restaurant.features) %>
+                  <% if item[:provenance].present? %>
+                    <div>
+                      <small><strong>Provenance: </strong><%= item[:provenance].html_safe %></small>
+                    </div>
+                  <% end %>
+                <% end %>
+
+                <% if feature_match(:nutrition, @restaurant.features) %>
+                  <div><small>
+                    <% if item[:nutrition].present? %>
+                      <strong>Nutrition: </strong><%= item[:nutrition].html_safe %>
+                    <% end %>
+                    <% if item[:calories].present? %>
+                      <strong>Calories: </strong><%= item[:calories] %>
+                    <% end %>
+                  </small></div>
+                <% end %>
+            
+              </div>
+            </div>  
+
+            <div class="row pt-2"></div>
+
+            <div class="row border-top mt-2 pt-1">
+              <% custom_lists = [] #item[:custom_lists] %>
+
+              <% item[:custom_lists].each do |l| %>
+                <% custom_lists << custom_list_object(l[0])%>
+              <% end %>
+              <%
+                sort_order = @restaurant.custom_list_ids
+                lookup = {}
+
+                sort_order.each_with_index do |item, index|
+                  lookup[item] = index
+                end
+
+                cl = custom_lists.sort_by do |item|
+                  lookup.fetch(item.id)
+                end
+              %>
+
+              <% 
+                lookup2 = {}
+                custom_list_sort_order = cl.map{|a| a.id}
+
+                custom_list_sort_order.each_with_index do |item, index|
+                  lookup2[item] = index
+                end
+              %>
+              
+              <%
+                il = item[:custom_lists].sort_by do |item|
+                  lookup2.fetch(item[0].to_i)
+                end
+              %>
+    
+              <% required_lists = [] %>
+
+              <% il.each_with_index do |list, index| %>
+                <% custom_list = custom_list_object(list[0])%>
+                <div class='col-12 custom-list-set<%= custom_list.required_items ? " required-set" : " optional-set" %><%= " limit-min" if custom_list.limit_min %><%= " limit-count" if custom_list.limit_count %><%= " limit-max" if custom_list.limit_max %>'<%= "data-scope=#{main_item} " %><%= "data-list=#{custom_list.id} " %><%= "data-min=#{custom_list.limit_min} " if custom_list.limit_min %><%= "data-count=#{custom_list.limit_count} " if custom_list.limit_count %><%= "data-max=#{custom_list.limit_max}" if custom_list.limit_max %>> 
+                  <div class="row ml-1 ">
+                    <div class='col rounded modal-please-choose'>
+                      <% message = cl_message_to_human(custom_list) %>
+                      <strong><%= custom_list.name %>  (<%=message%>)</strong>
+                    </div>
+                  </div>
+  
+                  <% list[1].each_with_index do |item_id, index| %>
+                    <% cli = custom_list_item(item_id)%>
+
+                    <% required_lists << custom_list.id if custom_list.required_items? %>
+
+                    <div class="row m-2 p-1 border<%= " alert alert-danger" if !cli.available %>">
+                      <div class='col'>
+                        <%= check_box_tag "item-#{cli.id}", "item-#{cli.id}-#{main_item}", nil, id:"custom-item-#{cli.id}", class: "selection-item selection-item-#{main_item}", 'data-price' => ("%.2f" % cli.price).to_f, 'data-start_price' => start_price, 'data-scope' => main_item,'data-constraint' => custom_list.constraint, 'data-id' => cli.id, disabled: !cli.available %> <small><strong><%=cli.name%><%= " (Unavailable)" if !cli.available %></strong> <% if cli.description.present?%>  <i>- <%=cli.description%></i><% end %></small>
+                      </div>
+                      <div class='col-3 text-right'>
+                        <small><%=number_to_currency(cli.price, unit: "+#{@restaurant.currency_symbol}") if cli.price.to_f > 0.0 %></small>
+                      </div>
+                    </div>
+
+                  <% end %>
+                </div>
+              <% end %>
+
+            
+              <input type='hidden' value='<%=required_lists.uniq.join(',')%>' id="required-lists-<%= main_item %>">
+              <%= text_field_tag "notes-#{main_item}", nil,  placeholder: "Tell the Kitchen: Allergies etc...", class: 'form-control note-field', 'data-scope' => main_item, 'data-start_price' => start_price %>
+              
+            </div>
+
+            <div id='required-message-<%= main_item%>'>
+              <% if required_lists.present? %>
+                <strong>Please choose a <span  class=' text-danger'><%= get_list_names(required_lists.uniq)%></span> before you can add the item to the basket</strong>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="placeholder-to-basket btn btn-primary <%= !required_lists.present? ? ' d-none' : '' %>" id="placeholder-to-basket-<%= main_item %>" data-scope="<%= main_item %>">Add to Order - <span class='button-price-<%=main_item%>'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></span></button>
+            
+            <%= link_to basket_path(@path, main_item: main_item, menu_id: params[:menu_id], section_id: params[:section_id], add_to_basket: true), class: "btn btn-primary#{required_lists.present? ? ' d-none' : ''}", id: "add-to-basket-#{main_item}", method: :PATCH do %>
+                Add to Order - <span class='button-price-<%=main_item%>'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></span>
+            <% end %>
+            
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

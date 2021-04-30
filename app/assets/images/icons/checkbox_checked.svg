@@ -1,0 +1,7 @@
+<svg id="Component_47_5" data-name="Component 47 – 5" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13">
+  <g id="Radio_outer" fill="none" stroke="#04acc4" stroke-width="2">
+    <rect width="13" height="13" rx="3" stroke="none"/>
+    <rect x="1" y="1" width="11" height="11" rx="2" fill="none"/>
+  </g>
+  <rect id="Radio_select" width="6" height="3" transform="translate(3.5 5)" fill="#04acc4"/>
+</svg>

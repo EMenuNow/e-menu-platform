@@ -1,0 +1,77 @@
+
+
+<div class="container-fluid main-bg p-0 m-0 bg-dark">
+  <div class="row">
+    <div class="col">
+      <div class="container">
+        <div class="row">
+          <div class="col text-center"> 
+            <%= image_tag @restaurant.logo.variant(resize_to_limit: [300, 300]) if @restaurant.logo.attached? %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-lg-4 text-light p-4 "> 
+            <h2 class="text-center">BURGERS</h2>
+            <small><em>with unlimited free toppings and choice of sauce</em></small>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: true %>
+            <%= render 'item', secondary_colour: false %>
+          </div>
+          <div class="col-sm-12 col-lg-4 text-light p-4"> 
+            <h2 class="text-center">BITES</h2>
+            <small><em>with unlimited free toppings and choice of sauce</em></small>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: true %>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: false %>
+          </div>
+          <div class="col-sm-12 col-lg-4 text-light p-4"> 
+            <h2 class="text-center">& BOXES</h2>
+            <small><em>with unlimited free toppings and choice of sauce</em></small>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: true %>
+            <%= render 'item', secondary_colour: false %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-lg-12 text-light "> 
+            <h2 class="text-center">SIDES</h2>
+            <small><em>with unlimited free toppings and choice of sauce</em></small>
+            <%= render 'sides', secondary_colour: false %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-lg-4 text-light p-4"> 
+            <h2 class="text-center">DESSERTS</h2>
+            <small><em>with unlimited free toppings and choice of sauce</em></small>
+            <%= render 'item', secondary_colour: false %>
+           <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: true %>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: false %>
+          </div>
+          <div class="col-sm-12 col-lg-4 text-light p-4"> 
+            <h2 class="text-center">HOT DRINKS</h2>
+            <small><em>with unlimited free toppings and choice of sauce</em></small>
+            <%= render 'drink', secondary_colour: false %>
+            <%= render 'drink', secondary_colour: false %>            
+            <%= render 'drink', secondary_colour: false %>            
+          </div>
+           <div class="col-sm-12 col-lg-4 text-light p-4">           
+            <h2 class="text-center">COLD DRINKS</h2>
+            <small><em>with unlimited free toppings and choice of sauce</em></small>
+            <%= render 'item', secondary_colour: true %>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: false %>
+            <%= render 'item', secondary_colour: false %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%= render 'modal'%>

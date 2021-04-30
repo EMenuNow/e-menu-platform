@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+Rails.application.routes.default_url_options = { :host => "eat.emenunow.com", :protocol => "https" } 
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 

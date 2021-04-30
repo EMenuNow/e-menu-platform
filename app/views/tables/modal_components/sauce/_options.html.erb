@@ -12,7 +12,7 @@
         <div class="row">
           <div class="col">
             <div class="menu-description ml-3">
-              <%=custom_list_options(sub.custom_lists, ['*']).html_safe%>
+              <%=custom_list_options(sub.custom_lists, ['*'], sub.restaurant.currency_symbol).html_safe%>
             </div>
           </div>
         </div>

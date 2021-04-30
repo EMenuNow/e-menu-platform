@@ -1,0 +1,50 @@
+<% content_for :hero do %>
+<div class="jumbotron jumbotron-fluid hero-main-user-background text-center">
+  <div class="container text-light">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1 class="display-2"><%= t('restaurants.welcome', name: @restaurant.name) %></h1>
+        <h5>Please choose your service type below</h5>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+      <% if @basket_service.service_types.blank? %>
+      This menu is for viewing only
+      <% else %>
+      <% @basket_service.service_types.each do |service_type| %>
+      <% enabled = @basket_service.services_enabled.select{|x|x.first==service_type}.flatten %>
+      <div class="row">
+        <div class="col-md-12 mb-2 text-center">
+          <%= link_to "#{service_type} #{'(Currently disabled)' if enabled.blank?}", "#", data: { value: restaurant_path(@restaurant.path, :service => enabled.second) },
+            :onclick=>"event.preventDefault();#{"$('#patron_redirect_after_signup_to').val($(this).data('value'));$('.selection-buttons').removeClass('bg-dark');$(this).addClass('bg-dark')" if enabled.present?}",
+            :class=>"selection-buttons bg-info text-white #{'bg-light text-dark' if enabled.blank?} p-4 d-inline-block rounded w-50 text-center" %>
+        </div>
+      </div>
+      <% end %>
+      <% end %>
+      <div class="row pb-5">
+        <div class="col-md-12 mt-5 mb-2 text-center">
+          <h5>Please enter your email address to begin ordering</h5>
+          <div class="row">
+            <div class="col-md-6 offset-md-3 mt-2 text-center">
+              <%= render partial: "patrons/sessions/new", locals: { redirect_after_signup_to: restaurant_path(@restaurant.path, :service => nil) } %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 offset-md-3 mt-2 text-left">
+              <%= link_to restaurant_path(@restaurant.path), :class=>"d-inline-block" do %>
+              <h6><u>Skip for now ></u></h6>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

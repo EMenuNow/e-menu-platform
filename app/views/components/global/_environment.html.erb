@@ -4,7 +4,7 @@
 bg = 'bg-warning'
 bg = 'bg-info' if Rails.env=='development'
 %>
-<div class='row m-0 p-3 <%=bg%>'>
+<div class='py-3 <%=bg%> d-fixed' style="position:fixed;bottom:0;right:0;">
 <div class='col'>
 <%= Rails.env %> environment
 </div></div>

@@ -5,7 +5,6 @@ class ApplicationController < ActionController::Base
   before_action :set_languages
   before_action :route_domain
 
-
   def route_domain
     @domain = request.subdomain
     @path = request.path

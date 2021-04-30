@@ -1,0 +1,45 @@
+<% 
+# colour = 'bg-light-70 text-dark' unless no_background  
+# colour = 'bg-orange-70 text-light' if ['King Prawn','Poffertjes','Salad Box','The Fizz', 'Hand Cut Fries with Rosmary and Truffle salt'].include?(item["name"])
+%>
+
+<% if item[:node_type] == 'section' %>
+<div class="col-sm-12 p-1 text-left <%= item[:css_class] if item[:css_class].present?%>">
+  <div class="order-item rounded" data-toggle="modal" data-target="#exampleModal">
+    <div class="row  cursor-pointer">
+      <div class="col text-danger">
+        <strong class='section-name'><%=item[:name]%></strong>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <% if item[:children].present? %>
+        <% item[:children].each do |child| %>
+        <%= render 'order/components/item', item: child, no_background: true %>
+        <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% else %>
+<div class="item-default <%= item[:ancestry].split('/').count == 3 ? 'col' : 'col-sm-12 col-md-6' %> p-1 <%= item[:css_class] if item[:css_class].present?%>">
+  <div class=" p-1 rounded cursor-pointer" data-toggle="modal" data-target="#item-<%=item[:id]%>">
+    <div class="row pb-1">
+      <div class='col item-title'><strong class='item-name '><%=item[:name]%></strong></div>
+      <div class='col-4 text-right'><strong class='item-name'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></strong></div>
+    </div>
+    <% if item[:image].present? or item[:description].present? %>
+    <div class="row pt-2">
+      <% if feature_match(:images, @restaurant.features) %>
+      <% image = get_menu_image(item[:id]) %>
+      <% if image.present? %><div class='col-3'><%= image_tag image.variant(resize: "200x200"), class: 'img-fluid' %><%#=image_tag url_for(image), class: 'img-fluid'%></div><% end %>
+      <% end %>
+      <% if item[:description].present? %><div class='col'><small><i><%=item[:description]%></i></small></div><% end %>
+    </div>
+    <% end %>
+  </div>
+</div>
+<%= render 'order/components/modal', item: item if is_takeaway_or_delivery?(@restaurant)%>
+<% end %>

@@ -11,6 +11,7 @@ module MenusHelper
   #   end
   #   return_string << '</ul>'
   # end
+
   def get_menu_image(item_id)
     begin
       m = Menu.find(item_id)
@@ -18,6 +19,7 @@ module MenusHelper
     rescue
     end
   end
+
   def get_menu_item_name(menu_id)
     name = ''
     begin
@@ -28,9 +30,6 @@ module MenusHelper
     name
   end
 
-
-
-
   def checked?(menu_custom_lists, custom_list_id, item_id)
     checked = ""
     if menu_custom_lists[custom_list_id.to_s].present?
@@ -40,32 +39,33 @@ module MenusHelper
   end
 
   def custom_list_items(items)
-    Rails.cache.fetch("custom_list_items_#{items.join('-')}", expires_in: 3.hours) do
+    Rails.cache.fetch("custom_list_items-#{items.join('-')}-", expires_in: 3.hours) do
       CustomListItem.where(id: items).map{|g| g.name}.join(", ")
-    end 
+    end
   end
 
   def custom_list(id)
     Rails.cache.fetch("custom_list_name_#{id}", expires_in: 3.hours) do
-      CustomList.find(id).name    
+      CustomList.find(id).name
     end
   end
 
   def custom_list_object(id)
     Rails.cache.fetch("custom_list_#{id}", expires_in: 3.hours) do
-      CustomList.find(id)    
-    end
-  end
-  def custom_list_item(id)
-    Rails.cache.fetch("custom_list_item_#{id}", expires_in: 3.hours) do
-      CustomListItem.find(id) 
-    end
-  end
-  def custom_list_constraint(key)
-    Rails.cache.fetch("custom_list_constraint_#{key}", expires_in: 3.hours) do
-      constraint_to_human CustomList.find(key).constraint 
+      CustomList.find(id)
     end
   end
 
+  def custom_list_item(id)
+    Rails.cache.fetch("custom_list_item_#{id}", expires_in: 3.hours) do
+      CustomListItem.find(id)
+    end
+  end
+  
+  def custom_list_constraint(key)
+    Rails.cache.fetch("custom_list_constraint_#{key}", expires_in: 3.hours) do
+      constraint_to_human CustomList.find(key).constraint
+    end
+  end
 
 end

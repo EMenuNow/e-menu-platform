@@ -5,12 +5,45 @@
 
   <div class="row">
     <div class="col">
-      <h3>Custom List: <%= @custom_list.name %></h3>
+      <h3>Option Set: <%= @custom_list.name %></h3>
     </div>
   </div>
-  <div class="row">
-    <div class="col">
-      Constraint: <%= constraint_to_human(@custom_list.constraint) %> 
+  <% if @custom_list.required_items %>
+    <div class="row">
+      <div class="col">
+        Required Items 
+      </div>
+    </div>
+  <% end %>
+  <% if @custom_list.limit_min %>
+    <div class="row">
+      <div class="col">
+        Minimum: <%= @custom_list.limit_min %> 
+      </div>
+    </div>
+  <% end %>
+  <% if @custom_list.limit_count %>
+    <div class="row">
+      <div class="col">
+        Quantity required: <%= @custom_list.limit_count %> 
+      </div>
+    </div>
+  <% end %>
+  <% if @custom_list.limit_max %>
+    <div class="row">
+      <div class="col">
+        Maximum: <%= @custom_list.limit_max %> 
+      </div>
+    </div>
+  <% end %>
+  <div class="row mt-3">
+    <div class="col-12">
+      Message to users:
+    </div>
+    <div class="col-12">
+      <blockquote class="blockquote">
+        <p class="mb-0">(<%= cl_message_to_human(@custom_list) %>)</p>
+      </blockquote>
     </div>
   </div>
 

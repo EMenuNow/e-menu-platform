@@ -36,7 +36,7 @@
             <%= t('payment.current_bill') %>:
           </span>
           <span class=" current-bill text-light mt-1 mr-3">
-            <%=number_to_currency @price, unit: "£"%>
+            <%=number_to_currency @price, unit: @table.restaurant.currency_symbol%>
           </span>
           <li class="nav-item">       
             <% price_css =  "invisible" if @price == 0 %>

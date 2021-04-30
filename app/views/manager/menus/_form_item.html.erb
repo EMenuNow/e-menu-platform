@@ -1,6 +1,26 @@
-    <h3 class=" pb-2 mb-0">Item</h3>
+<% content_for :js do %>
+  <script>
+    $(document).ready(function() {
+      $('.select-all').click(function () {
+          var set = $(this).parent();
+          var group = set.find('input:checkbox');
+          var checked = set.find('input:checkbox:checked');
 
-<%= menu.node_type%>
+          if (checked.length == group.length) {
+            $(this).removeClass('selected');
+            group.prop('checked', $(this).hasClass('selected'));
+          } else {
+            $(this).addClass('selected');
+            group.prop('checked', $(this).hasClass('selected'));
+          };
+      });
+    });
+  </script>
+<% end %>
+
+<h3 class=" pb-2 mb-0"><%= action_name == "edit" ? "Edit " : "New " %>Menu Item</h3>
+
+<%= menu.name %>
 
 <%= form_with(model: [:manager, @restaurant, menu], local: true) do |form| %>
   <% if menu.errors.any? %>
@@ -20,7 +40,7 @@
     <%= hidden_field_tag :parent, params[:parent] %>
 
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
+<ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
   <li class="nav-item">
     <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true"><%= t('menu.details')%></a>
   </li>
@@ -31,7 +51,7 @@
   </li>
   <% end %>
   <li class="nav-item">
-    <a class="nav-link" id="options-tab" data-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false"><%= t('menu.options')%></a>
+    <a class="nav-link" id="options-tab" data-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false"><%= t('menu.options_sets')%></a>
   </li>
 <!--   <li class="nav-item">
     <a class="nav-link" id="extras-tab" data-toggle="tab" href="#extras" role="tab" aria-controls="extras" aria-selected="false"><%= t('menu.extras')%></a>
@@ -90,8 +110,10 @@
   <div class="row">
     <div class="col">
       <div class="form-group ">
+        <% screen_type_options = [['None', nil]] %>
+        <% screen_type_options += ItemScreenType.where.not(key: 'FULL').map{|a| [a.name, a.id]} %>
         <%= form.label :item_screen_type_id %>
-        <%= form.select :item_screen_type_id, options_for_select(ItemScreenType.where.not(key: 'FULL').map{|a| [a.name, a.id]}, menu.item_screen_type_id), {prompt: 'Select screen type'}, {class: 'form-control  form-control-sm'} %>
+        <%= form.select :item_screen_type_id, options_for_select(screen_type_options, menu.item_screen_type_id), {prompt: 'Select screen type'}, {class: 'form-control  form-control-sm'} %>
       </div>
     </div>
   </div>
@@ -99,7 +121,7 @@
     <div class="col">
       <div class="form-group ">
         <%= form.label :secondary_item_screen_type_id %>
-        <%= form.select :secondary_item_screen_type_id, options_for_select(ItemScreenType.where.not(key: 'FULL').map{|a| [a.name, a.id]}, menu.secondary_item_screen_type_id), {prompt: 'Select screen type'}, {class: 'form-control  form-control-sm'} %>
+        <%= form.select :secondary_item_screen_type_id, options_for_select(screen_type_options, menu.secondary_item_screen_type_id), {prompt: 'Select screen type'}, {class: 'form-control  form-control-sm'} %>
       </div>
     </div>
   </div>
@@ -147,8 +169,9 @@
   <div class="tab-pane fade pt-3  pb-3" id="options" role="tabpanel" aria-labelledby="options-tab">
     <!-- options -->
     <div class="row">
-      <div class="col">
+      <div class="col mb-2">
         <h4>These are the available options for a customer to choose whilst ordering their meal.</h4>
+        <%= link_to 'Edit all Option Sets', manager_restaurant_custom_lists_path(@restaurant), class: "h5" %>
       </div>
     </div>
     <div class="row">
@@ -163,22 +186,22 @@
         <%# end %>
       </div> -->
       <% @restaurant.custom_lists.each do |custom_list| %>
-      <div class="col">
+      <div id="collection-check-set-<%= custom_list.id %>" class="collection-check-set col-12 col-lg-6 mb-4">
         <h6><strong><%= custom_list.name %></strong> (<%=constraint_to_human custom_list.constraint%>)</h6>
+        <%= link_to 'Edit Option Set details', edit_manager_restaurant_custom_list_path(@restaurant, custom_list) %> | 
+        <%= link_to 'Edit Option Set items', manager_restaurant_custom_list_path(@restaurant, custom_list) %>
         
         <% custom_list.custom_list_items.each do |item| %>
 
-          <div class="collection-check-box">
+          <div class="collection-check-box my-2">
             <input type="checkbox" value="<%=item.id%>" name="menu[custom_lists][<%=custom_list.id%>][]" id="menu_custom_lists_<%=custom_list.id%>-<%=item.id%>" <%=checked?(menu.custom_lists, custom_list.id, item.id)%>>
-            <i class=""><%= item.name%> <small>(<%= number_to_currency item.price, unit: "£"%>)</small></i>
+            <i class=""><%= item.name%> <small>(<%= number_to_currency item.price, unit: @restaurant.currency_symbol%>)</small></i>
+            <i><%= link_to '[edit]', edit_manager_restaurant_custom_list_custom_list_item_path(@restaurant, custom_list, item), class: "text-muted" %></i>
           </div>
-
 
         <% end %>
 
- 
-
-
+        <button type="button" id="select-all-<%= custom_list.id %>" class="select-all btn btn-primary btn-sm">Toggle all in set</button>
       </div>
       <% end %>
     </div>

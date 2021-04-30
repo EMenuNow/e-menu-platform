@@ -14,6 +14,9 @@ module Emenu
     config.active_job.queue_adapter = :sidekiq
     config.i18n.fallbacks = true
     config.autoload_paths += Dir[Rails.root.join('app', 'models', '{**}')]
+    config.autoload_paths += [
+      "#{Rails.root}/app/services/event_filter_service_types"
+    ]
 
 
     config.action_mailer.delivery_method = :mailjet_api

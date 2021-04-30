@@ -104,7 +104,7 @@
   // apple pay
   var paymentRequest = stripe.paymentRequest({
     country: 'GB',
-    currency: 'gbp',
+    currency: '<%=@restaurant.currency_code%>',
     total: {
       label: 'e-me.nu payment',
       amount: parseInt($("#price").val()),
@@ -201,7 +201,7 @@
   function update_display(){
       $("#items").val(ITEMS)
       $("#price").val(PRICE)
-      $(".display-price").html("£" + (PRICE/100).toFixed(2))
+      $(".display-price").html("<%=@table.restaurant.currency_symbol%>" + (PRICE/100).toFixed(2))
   }
 
   $(".item-check").click(function() {
@@ -256,7 +256,7 @@
 
 	<% price = @table.table_items.reject{|a| a.paid?}.reject{|a| a.ready?}.map{|e| e.total_price}.inject(:+) || 0 %>
 					
-          <%=number_to_currency price, unit: "£"%>								
+          <%=number_to_currency price, unit: @table.restaurant.currency_symbol%>								
 
 							</span>
 					</div>
@@ -296,7 +296,7 @@
                         <%= item.for%>
                       </div>
 								  		<div class="col-4 text-right">
-                        <%=number_to_currency item.total_price, unit: "£"%>
+                        <%=number_to_currency item.total_price, unit: @table.restaurant.currency_symbol%>
                       </div>
 								  	</div>
 
@@ -307,7 +307,7 @@
                           <% list_item = CustomListItem.find(list_item_id) %>
                           <div class="row">
                             <div class="col-sm-1">&nbsp;</div>
-                            <div class="col-sm-9">- <%= "#{custom_list.name}: #{list_item.name}" %>&nbsp;&nbsp;<%= "(#{number_to_currency(list_item.price, unit: "£")})"  if list_item.price > 0 %></div>
+                            <div class="col-sm-9">- <%= "#{custom_list.name}: #{list_item.name}" %>&nbsp;&nbsp;<%= "(#{number_to_currency(list_item.price, unit: @table.restaurant.currency_symbol)})"  if list_item.price > 0 %></div>
                             <div class="col-sm-2 text-right"></div>
                           </div>
                         <% end %>
@@ -340,7 +340,7 @@
         </div>
       <% end %>
 
-  <h2><%= label_tag :Total%> <span class="display-price">£0.00</span></h2>
+  <h2><%= label_tag :Total%> <span class="display-price"><%=@table.restaurant.currency_symbol%>0.00</span></h2>
 <script src="https://js.stripe.com/v3/"></script>
 <p class="mt-3">
   <i>Please choose the items that you will be paying for. "select all" if you are paying the whole bill.</i>

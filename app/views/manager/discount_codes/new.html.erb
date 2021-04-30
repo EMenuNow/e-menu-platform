@@ -1,0 +1,17 @@
+<main role="main">
+  <div class="jumbotron jumbotron-fluid hero-main-background">
+    <div class="container  text-center">
+      <h2 class="display-2 text-white">New discount code</h2>
+      <div class="row">
+        <div class="col-12">
+          <%= link_to 'Back', manager_discount_codes_path, :class=>"text-white btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="my-3 p-3 bg-white rounded">
+      <%= render 'form' %>
+    </div>
+  </div>
+</main>

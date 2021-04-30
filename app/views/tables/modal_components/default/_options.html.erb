@@ -1,5 +1,5 @@
 
-<% options = custom_list_options(sub.custom_lists, ['*']).html_safe%>
+<% options = custom_list_options(sub.custom_lists, ['*'], sub.restaurant.currency_symbol).html_safe%>
 <% if options.present? %>
 <div class="card">
   <div class="card-header" id="heading-options-<%=sub.id%>">

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="345.7" viewBox="0 0 1280 345.7">
+  <defs>
+    <filter id="Path_35" x="0" y="17" width="1280" height="334.702" filterUnits="userSpaceOnUse">
+      <feOffset dy="-3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Path_36" x="0" y="72" width="1280" height="279.702" filterUnits="userSpaceOnUse">
+      <feOffset dy="-3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-2"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Background_Shapes" data-name="Background Shapes" transform="translate(9)">
+    <path id="Path_34" data-name="Path 34" d="M1326.6,799.83l1280,.17V454.3s-238.085,20.273-615.248,114.314-664.752,0-664.752,0Z" transform="translate(-1326.597 -454.298)" fill="#04acc4" opacity="0.05"/>
+    <g transform="matrix(1, 0, 0, 1, -9, 0)" filter="url(#Path_35)">
+      <path id="Path_35-2" data-name="Path 35" d="M1326.6,771h1280V454.3s-334.224,46.285-618.444,156.954-661.556-32.8-661.556-32.8Z" transform="translate(-1317.6 -425.3)" fill="#04acc4" opacity="0.05"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, -9, 0)" filter="url(#Path_36)">
+      <path id="Path_36-2" data-name="Path 36" d="M1326.6,716h1280V454.3s-268.736,19-616.338,170.273-663.662-52.2-663.662-52.2Z" transform="translate(-1317.6 -370.3)" fill="#04acc4" opacity="0.05"/>
+    </g>
+  </g>
+</svg>

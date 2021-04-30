@@ -1,0 +1,61 @@
+<main role="main">
+
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="jumbotron jumbotron-fluid hero-main-background">
+    <div class="container text-center">
+      <h2 class="display-2 text-white">Your discount codes</h2>
+      <div class="row pb-5">
+        <div class="col-lg-12">
+          <h5><%= link_to "Create new discount code", new_manager_discount_code_path, :class=>"btn btn-primary" %></h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container text-center">
+    <!-- Example row of columns -->
+    <div class="row">
+      <div class="col-lg-1">
+        <b>Code</b>
+      </div>
+      <div class="col-lg-4">
+        <b>Type</b>
+      </div>
+      <div class="col-lg-2">
+        <b>Value/Amount</b>
+      </div>
+      <div class="col-lg-2">
+        <b>Expires on</b>
+      </div>
+      <div class="col-lg-2">
+        <b>Active?</b>
+      </div>
+    </div>
+    <hr />
+    <% @discount_codes.each do |dc| %>
+    <div class="row">
+      <div class="col-lg-1">
+        <%= dc.code %>
+      </div>
+      <div class="col-lg-4">
+        <%= dc.type %>
+      </div>
+      <div class="col-lg-2">
+        <%= dc.amount %>
+      </div>
+      <div class="col-lg-2">
+        <%= dc.expiry_date %>
+      </div>
+      <div class="col-lg-2">
+        <%= dc.is_active? ? "Yes" : "No" %>
+      </div>
+      <div class="col-lg-1">
+        <%= link_to "Deactivate", manager_discount_code_path(dc.restaurant, dc), :method=>:delete, :confirm => "Are you sure?" if dc.is_active? %>
+        <%= link_to "Edit", edit_manager_discount_code_path(dc.restaurant, dc) %>
+      </div>
+    </div>
+    <hr />
+    <% end %>
+  </div> <!-- /container -->
+
+</main>

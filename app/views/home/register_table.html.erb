@@ -1,3 +1,4 @@
+<% content_for(:hero) do %>
 <div class="container-fluid px-0">
 	<% if @restaurant_table %>
     <% if @restaurant_table.tables.where(aasm_state: :started).count == 0%>
@@ -15,20 +16,31 @@
         </div>
       </div>
     <% else %>
+      <div class="jumbotron jumbotron-fluid hero-main-background2 mb-0 text-light">
+        <div class="container text-center">
+          <h2 class="display-2 pb-4"><%= t('register_table.join.message')%></h2>
+          <p class="">
+            <h2><%= t('register_table.join.password_message')%></h2>
+            <%= form_tag start_table_path(@restaurant_table) do %>
+              <%= text_field_tag :password, nil, :class=>"p-3" %>
+              <%= submit_tag t('register_table.join.password_submit'), class: 'btn btn-primary btn-sm mb-1 p-3'%>
+            <% end %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+  <% else %>  
     <div class="jumbotron jumbotron-fluid hero-main-background2 mb-0 text-light">
       <div class="container  text-center">
-        <h2 class="display-2 "><%= t('register_table.join.message')%></h2>
-        <p class="">
-          <h2><%= t('register_table.join.password_message')%></h2>
-          <%= form_tag start_table_path(@restaurant_table) do %>
-            <%= text_field_tag :password %>
-            <%= submit_tag t('register_table.join.password_submit'), class: 'btn btn-primary btn-sm mb-1'%>
-          <% end %>
-        </p>
+        <h2 class="display-4 "><%= t('register_table.error.message')%></h2>
+        <%= link_to t('register_table.error.home_button'), home_index_path, class: 'btn btn-warning'%>
       </div>
     </div>
   <% end %>
-  <div class="row">
+</div>
+<% end %>
+<% if @restaurant_table %>
+  <div class="row py-5">
     <div class="col-sm pl-4 mt-4">
       <h3><strong><%= t('register_table.details.title')%>:</strong></h3>
       <table class="table">
@@ -49,12 +61,4 @@
       </table>
     </div>
   </div>
-  <% else %>  
-    <div class="jumbotron jumbotron-fluid hero-main-background2 mb-0 text-light">
-      <div class="container  text-center">
-        <h2 class="display-4 "><%= t('register_table.error.message')%></h2>
-        <%= link_to t('register_table.error.home_button'), home_index_path, class: 'btn btn-warning'%>
-      </div>
-    </div>
-  <% end %>
-</div>
+<% end %>

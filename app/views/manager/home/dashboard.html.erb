@@ -1,110 +1,129 @@
+<div class="container mb-5">
+  <div class="row">
 
-<div class="container mt-4 mb-5">
-	<div class="row">
+    <% if @restaurant %>
 
-		<% if @restaurant %>
-
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
-<%= link_to("Active Menus", manager_restaurant_active_path(@restaurant), class: "nav-link") %>
-	      </div>
-	    </div>
-	  </div>
-
-
-                
-              
-
-
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
-<%= link_to("Menus", manager_restaurant_menus_path(@restaurant), class: "nav-link") %>
-                
-	      </div>
-	    </div>
-	  </div>
-
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
-<%= link_to("Custom Lists", manager_restaurant_custom_lists_path(@restaurant), class: "nav-link") %>
-               
-	      </div>
-	    </div>
-	  </div>
-
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
-  <%= link_to("Tables", manager_restaurant_restaurant_tables_path(@restaurant), class: "nav-link") %>
-               
-	      </div>
-	    </div>
-	  </div>
-
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
- <%= link_to("Table QR Codes", qr_manager_restaurant_restaurant_tables_path(@restaurant), class: "nav-link") %>
-             	
-	      </div>
-	    </div>
-	  </div>
-
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
-	<%= link_to("Live Tables", manager_live_tables_path(@restaurant), class: "nav-link") %>
-               
-	      </div>
-	    </div>
-	  </div>
-
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
-  <%= link_to("Live Items", manager_live_items_path(@restaurant), class: "nav-link") %>
-      
-	      </div>
-	    </div>
-	  </div>
-
-
-
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
-  <%= link_to("Live Takeaway Orders", manager_live_orders_path(@restaurant), class: "nav-link") %>
-      
-	      </div>
-	    </div>
-	  </div>
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Active Menus", manager_restaurant_active_path(@restaurant), class: "nav-link") %>
+        </div>
+      </div>
+    </div>
 
 
 
 
 
 
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Menus", manager_restaurant_menus_path(@restaurant), class: "nav-link") %>
 
-	  <% else %>
+        </div>
+      </div>
+    </div>
 
-	  <div class="col-lg-6">
-	    <div class="card shadow p-3 mb-5 bg-white rounded">
-	      <div class="card-body text-center">
-	        <%= link_to 'Add Restaurant', new_manager_restaurant_path  %>
-	      </div>
-	    </div>
-	  </div>
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Custom Lists", manager_restaurant_custom_lists_path(@restaurant), class: "nav-link") %>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Tables", manager_restaurant_restaurant_tables_path(@restaurant), class: "nav-link") %>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Table QR Codes", qr_manager_restaurant_restaurant_tables_path(@restaurant), class: "nav-link") %>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Live Tables", manager_live_tables_path(@restaurant), class: "nav-link") %>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Live Items", manager_live_items_path(@restaurant), class: "nav-link") %>
+
+        </div>
+      </div>
+    </div>
 
 
 
-	  <% end %>
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Live Takeaway Orders", manager_live_orders_path(@restaurant), class: "nav-link") %>
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Discount codes", manager_discount_codes_path(@restaurant), class: "nav-link") %>
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to("Restaurant Theme", manager_restaurant_themes_path(@restaurant), class: "nav-link") %>
+
+        </div>
+      </div>
+    </div>
 
 
 
 
 
-	</div>
+
+
+    <% else %>
+
+    <div class="col-lg-6">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to 'Add Restaurant', new_manager_restaurant_path  %>
+        </div>
+      </div>
+    </div>
+
+
+
+    <% end %>
+
+
+
+
+
+  </div>
 </div>

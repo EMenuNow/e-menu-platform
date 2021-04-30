@@ -1,4 +1,7 @@
 en:
+  patron:
+    account:
+      your_account: Your account
   restaurant:
     heading: Choose a restaurant to book a table
     view_menu: VIEW MENU
@@ -81,4 +84,6 @@ en:
       three: Require three only
     error:
       title: Please choose the Options
+  restaurants:
+    welcome: Welcome to %{name}
 

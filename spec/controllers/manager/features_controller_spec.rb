@@ -28,9 +28,7 @@ RSpec.describe Manager::FeaturesController, type: :controller do
   # This should return the minimal set of attributes required to create a valid
   # Manager::Feature. As you add validations to Manager::Feature, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
-  }
+  let(:manager) { build :manager, :simple }
 
   let(:invalid_attributes) {
     skip("Add a hash of attributes invalid for your model")
@@ -42,16 +40,25 @@ RSpec.describe Manager::FeaturesController, type: :controller do
   let(:valid_session) { {} }
 
   describe "GET #index" do
-    it "returns a success response" do
-      Manager::Feature.create! valid_attributes
-      get :index, params: {}, session: valid_session
-      expect(response).to be_successful
+    it "Has no logged in user" do
+      get :index
+      expect(response).to redirect_to(new_manager_restaurant_user_session_path)
+    end
+  end
+
+  describe "GET #index" do
+    login_manager
+
+    it "Has a logged in user" do
+      get :index
+      expect(response).to redirect_to(manager_home_index_path)
     end
   end
 
   describe "GET #show" do
+    login_manager
+
     it "returns a success response" do
-      feature = Manager::Feature.create! valid_attributes
       get :show, params: {id: feature.to_param}, session: valid_session
       expect(response).to be_successful
     end

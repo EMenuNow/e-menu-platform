@@ -1,0 +1,93 @@
+<% content_for :js do %>
+  <script>
+
+    // Progress open/close
+    $(document).ready(function () {
+    $("#dismiss, .overlay").on("click", function () {
+      // hide sidebar
+      $("#progress").removeClass("active");
+      $("#onboarding-main").removeClass("invisible");
+      // hide overlay
+      $(".overlay").removeClass("active");
+    });
+
+    $("#progressCollapse").on("click", function () {
+      // open sidebar
+      $("#progress").toggleClass("active");
+      $("#onboarding-main").toggleClass("invisible");
+      // fade in the overlay
+      $(".overlay").toggleClass("active");
+      $(".collapse.in").toggleClass("in");
+      $("a[aria-expanded=true]").attr("aria-expanded", "false");
+    });
+    });
+
+    // Progress force
+    $(document).ready(forceProgress);
+    function forceProgress() {
+      const bodyWidth = $("body").width();
+    if (bodyWidth > 900 + 30 + 300) {
+      $("#progress").addClass("force-active");
+      $("#progressCollapse").addClass("invisible");
+      $("#onboarding-main").removeClass("invisible");
+      $(".overlay").removeClass("active");
+      if ($("#progress").hasClass("active")) {
+        $("#onboarding-main").removeClass("invisible");
+        $(".overlay").removeClass("active");
+        $("#progress").removeClass("active");
+      };
+    } else {
+      $("#progress").removeClass("force-active");
+      $("#progressCollapse").removeClass("invisible");
+    };
+    }
+    $(window).on("resize", forceProgress);
+
+  </script>
+<% end %>
+
+<nav id="progress" class="h-100">
+  <div class="d-flex flex-column h-100">
+
+    <div class="scroll">
+      <ol class="components">
+        
+        <li id="register-stage" class="<%= @progress[:register] if @progress %> <%= 'current' if devise_controller? %>">Register your account</li>
+        
+        <li id="terms-stage" class="<%= @progress[:terms] if @progress %>">Agree to our terms</li>
+        
+        <% if current_onboarding_restaurant_user && !@progress[:restaurant]&.include?("current") && !(action_name == 'complete') && !@progress[:connect]&.include?("complete") %>
+          <li id="restaurant-stage" class="link">
+            <%= link_to 'Set up your business', onboarding_continue_path, class: @progress[:restaurant] if @progress  %>
+          </li>
+        <% else %>
+          <li id="restaurant-stage" class="<%= @progress[:restaurant] if @progress %>">Set up your business</li>
+        <% end %>
+
+        <% if @restaurant&.persisted? && !@progress[:services]&.include?("current") && !(action_name == 'complete') && !@progress[:connect]&.include?("complete") %>
+          <li id="services-stage" class="link">
+            <%= link_to 'Choose your services', onboarding_restaurant_services_path(@restaurant), class: @progress[:services] if @progress  %>
+          </li>
+        <% else %>
+          <li id="services-stage" class="<%= @progress[:services] if @progress %>">Choose your services</li>
+        <% end %>
+
+        <% if @restaurant&.persisted? && !@progress[:connect]&.include?("current") && @progress[:services]&.include?("complete") && !(action_name == 'complete') && !@progress[:connect]&.include?("complete") %>
+          <li id="connect-stage" class="link">
+            <%= link_to 'Connect payment provider', onboarding_restaurant_connect_path(@restaurant), class: @progress[:connect] if @progress  %>
+          </li>
+        <% else %>
+          <li id="connect-stage" class="<%= @progress[:connect] if @progress %>">Connect payment provider</li>
+        <% end %>
+
+      </ol>
+    </div>
+
+    <div class="mt-auto">
+      <div class="no-circle">Not sure on something?</div>
+      <ul class="components">
+        <li><a class="callback" href="https://www.emenunow.com/book-a-call" %>Request a call back</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

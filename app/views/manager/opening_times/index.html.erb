@@ -1,68 +1,94 @@
-
-
 <div class="container-fluid">
   <div class="row p-3">
 		<div class="col pb-5">
 
+      <h1>Opening Times</h1>
 
-<h1>Opening Times</h1>
+      <% if @manager_opening_times.blank? %>
 
+        <%= link_to 'Create Restaurant Opening Times', new_manager_restaurant_opening_time_path(@restaurant), class: 'btn btn-primary ' %>
 
-  <% if @manager_opening_times.blank? %>
+      <% else %>
 
-    <%= link_to 'Create Restaurant Opening Times', new_manager_restaurant_opening_time_path(@restaurant), class: 'btn btn-primary ' %>
-
-  <% else %>
-
-    <div class="row">
-      <div class="col-sm-2 text-right pb-1">
-        <strong>Day</strong>
-      </div>
-      <div class="col-sm-2  pb-1">
-        <strong>Open</strong>
-      </div>
-      <div class="col-sm-2  pb-1">
-        <strong>Close</strong>
-      </div>
-    </div>
-
-      <% @manager_opening_time.times_array.each do |a| %>
         <div class="row">
-      		<div class="col-sm-2 text-right pb-1">
-            <%=a.camelcase%>
+          <div class="col-sm-2 text-right pb-1">
+            <strong>Day</strong>
           </div>
-      		<div class="col-sm-2  pb-1">
-            <%=@manager_opening_time.times[a]['open']%>
+          <div class="col-sm-2 pb-1">
+            <strong>Open</strong>
           </div>
-       		<div class="col-sm-2  pb-1">
-            <%=@manager_opening_time.times[a]['close']%>
+          <div class="col-sm-2 pb-1">
+            <strong>Close</strong>
           </div>
         </div>
-      <% end %>
 
-        <div class="row border-top border-grey">
-      		<div class="col-sm-4 text-right  pb-1">
+        <% @manager_opening_time.times_array.each do |a| %>
+          <div class="row">
+            <div class="col-sm-2 text-right pb-1">
+              <%=a.camelcase%>
+            </div>
+            <div class="col-sm-2 pb-1">
+              <%=@manager_opening_time.times[a]['open']%>
+            </div>
+            <div class="col-sm-2 pb-1">
+              <%=@manager_opening_time.times[a]['close']%>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="row mt-4">
+          <div class="col-sm-4 text-right pb-1">
             Time before earliest collection / delivery
           </div>
-       		<div class="col-sm-6  pb-1">
+          <div class="col-sm-6 pb-1">
             <%=@manager_opening_time.delay_time_minutes%> minutes
           </div>
         </div>
 
         <div class="row">
-      		<div class="col-sm-4 text-right  pb-1">
+          <div class="col-sm-4 text-right pb-1">
             Current kitchen delay
           </div>
-       		<div class="col-sm-6  pb-1">
+          <div class="col-sm-6 pb-1">
             <%=@manager_opening_time.kitchen_delay_minutes%> minutes
           </div>
         </div>
 
-    <%= link_to 'Edit', edit_manager_restaurant_opening_time_path(@restaurant, @manager_opening_time) %> 
+        <div class="row">
+          <div class="col-sm-4 text-right pb-1">
+            Advanced order cut-off days
+          </div>
+          <div class="col-sm-6 pb-1">
+            <%=@manager_opening_time.cut_off_days%> days
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-4 text-right pb-1">
+            Advanced order maximum days
+          </div>
+          <div class="col-sm-6 pb-1">
+            <%=@manager_opening_time.advanced_order_days%> days
+          </div>
+        </div>
+
+        <div class="row mb-4 border-bottom">
+          <div class="col-sm-4">
+            <%= link_to 'Edit', edit_manager_restaurant_opening_time_path(@restaurant, @manager_opening_time) %>
+          </div>
+        </div>
+
+        <%= render 'manager/busy_times/index', manager_busy_times: @manager_busy_times %>
+
+        <div class="row">
+          <div class="col-sm-4 pb-1">
+            <%= link_to 'Add', new_manager_restaurant_busy_time_path(@restaurant) %>
+          </div>
+        </div>
 
 
-  <% end %>
+      <% end %>
 
-</div>
-</div>
+    </div>
+  </div>
 </div>

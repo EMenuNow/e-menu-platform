@@ -8,6 +8,7 @@
     <tr>
       <th>Server token</th>
       <th>Online</th>
+      <th>Version</th>
       <th colspan="2"></th>
     </tr>
   </thead>
@@ -17,6 +18,7 @@
       <tr>
         <td><%= pi_interface.server_token %></td>
         <td><%= pi_interface.online %></td>
+        <td><%= pi_interface.version %></td>
         <td><%= link_to 'Show', manager_restaurant_pi_interface_path(@restaurant, pi_interface) %></td>
         <td><%= link_to 'Destroy', manager_restaurant_pi_interface_path(@restaurant, pi_interface), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>

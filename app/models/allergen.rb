@@ -1,0 +1,4 @@
+class Allergen < MenuItemCategorisation
+
+  
+end

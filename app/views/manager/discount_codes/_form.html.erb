@@ -1,0 +1,111 @@
+<div class="row text-center">
+  <div class="col-lg-8 offset-lg-2">
+    <%= form_for([@discount_code, @discount_code.becomes(DiscountCode)], :html => {:multipart => true}, 
+    url: @discount_code.new_record? ? manager_discount_codes_path(@restaurant) : manager_discount_code_path(@restaurant, @discount_code)) do |f| %>
+    <% if @discount_code.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@discount_code.errors.count, "error") %> prohibited this discount code from being saved:</h2>
+
+      <ul>
+        <% @discount_code.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+    <% end %>
+    <div class="row py-4">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-12 bg-light py-3">
+            <h5>Unique code</h5>
+          </div>
+        </div>
+        <div class="row pt-2">
+          <div class="col-lg-8 offset-lg-2">
+            <%= f.text_field :code, :class => "w-100", :disabled => params[:action] == "edit" %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row py-4">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-12 bg-light py-3">
+            <h5>Type</h5>
+          </div>
+        </div>
+        <div class="row pt-2">
+          <div class="col-lg-8 offset-lg-2">
+            <%= f.select :type, options_for_select(DiscountCode.types.map{|x|[x.underscore.humanize,x]}, :selected => @discount_code.try("", :type)), {}, { :class => "w-100" } %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row py-4">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-12 bg-light py-3">
+            <h5>Value/Amount</h5>
+          </div>
+        </div>
+        <div class="row pt-2">
+          <div class="col-lg-8 offset-lg-2">
+            <%= f.text_field :amount, :placeholder => "Number only", :class => "w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--<div class="row py-4">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-12 bg-light py-3">
+            <h5>Max uses (optional)<%= ": Used already " + @discount_code.used_times.to_s + " times" if @discount_code.used_times != 0 %></h5>
+          </div>
+        </div>
+        <div class="row pt-2">
+          <div class="col-lg-8">
+            <%= f.text_field :max_uses, :placeholder => "Leave blank for unlimited uses", :class => "w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>-->
+    <div class="row py-4">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-12 bg-light py-3">
+            <h5>Expires on (optional)</h5>
+            <%= link_to "Clear", "#", :onclick=>"event.preventDefault();$('#discount_code_expires_on').val('');" %>
+          </div>
+        </div>
+        <div class="row pt-2">
+          <div class="col-lg-8 offset-lg-2">
+            <%= f.date_field :expires_on, min: Date.today, :placeholder => "Leave blank for unlimited timespan", :class => "w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--<div class="row py-4">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-12 bg-light py-3">
+            <h5>Single use per user (Optional, only works for signed-in users)</h5>
+          </div>
+        </div>
+        <div class="row pt-2">
+          <div class="col-lg-8">
+            <%= f.check_box :single_use_per_user, value: @discount_code.single_use_per_user %>
+          </div>
+        </div>
+      </div>
+    </div>-->
+    <div class="row py-4">
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col-lg-12">
+            <%= f.submit %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% end %>
+  </div>

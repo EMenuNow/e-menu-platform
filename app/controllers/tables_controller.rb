@@ -16,7 +16,7 @@ class TablesController < ApplicationController
     table_id = cookies[:table_id]
     @price = @table.table_items.reject{|a| a.paid?}.map{|e| e.total_price}.inject(:+) || 0
     @restaurant = @table.restaurant
-    @template = @restaurant.template.first.key 
+    @template = @restaurant.template.first&.key || Template.first.key
     
     @menu_id = params[:menu_id].to_i if params[:menu_id].present?
 
@@ -101,7 +101,7 @@ class TablesController < ApplicationController
     begin
       status = Stripe::Charge.create(
         amount: price,
-        currency: 'gbp',
+        currency: @restaurant.currency_code,
         description: '#{@restaurant.name} charge',
         source: token
       )

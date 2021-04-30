@@ -1,0 +1,137 @@
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr class="full-header">
+    <td bgcolor="#FFFFFF">&nbsp;</td>
+    <td align="center" width="600" bgcolor="#FFFFFF">
+      <table>
+        <tbody>
+          <tr>
+            <td class="logo">
+              <a href="https://www.emenunow.com/">
+                <img src="<%= root_url %>logo/Logo_v1.0.0.png" alt="EMenu Now Logo"/>
+              </a>
+            </td>
+            <td width="600">&zwnj;</td>
+            <td class="socials">
+              <a href="https://www.instagram.com/emenunow/">
+                <img src="<%= root_url %>email/welcome/insta_header.png" alt="Instagram"/>
+              </a>
+              <a href="https://www.facebook.com/EMenuNow">
+                <img src="<%= root_url %>email/welcome/fb_header.png" alt="Facebook"/>
+              </a>
+              <a href="https://twitter.com/emenunow">
+                <img src="<%= root_url %>email/welcome/twitter_header.png" alt="Twitter"/>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </td>
+    <td bgcolor="#FFFFFF">&nbsp;</td>
+  </tr>
+  <tr>
+    <!-- // LEFT SPACER CELL *** MUST HAVE A BACKGROUND COLOUR -->
+    <td bgcolor="#FFFFFF" style="font-size: 0px"></td>
+    <!-- LEFT SPACER CELL // -->
+
+    <!-- // MAIN CONTENT CELL -->
+    <td align="center" width="600" bgcolor="#FFFFFF" class="mobilefullwidth">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tbody>
+        <!-- START OF CONTENT -->
+        <tr>
+          <td>
+            <table class="hero">
+            <tr>
+              <td width="10">&zwnj;</td>
+              <td>
+                <h1>Welcome to</h1>
+                <img src="<%= root_url %>logo/Logo__icon_v1.0.0.png" alt="EMenu Now"/>
+              </td>
+              <td width="250">&zwnj;</td>
+            </tr>
+            </table>
+          </td>
+        </tr>
+        <tr class="main">
+          <td height="80px">
+            <p>Thank you for partnering with EMenu Now.</p>
+            <% if @onboard.completed? %>
+              <p>You've set up your business and connected Stripe as a payment provider.</p>
+            <% else %>
+              <p>You've set up your business, but the stripe connection was not complete.</p>
+            <% end %>
+            <p>You'll be able to start creating your menu and accepting orders soon.</p>
+          </td>
+        </tr>
+        <tr class="secondary-bkg what-next">
+          <td>
+            <h2>So... What's Next?</h2>
+          </td>
+        </tr>
+        <tr class="secondary-bkg cta-section">
+          <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="20">
+              <% if !@onboard.completed? && @connect %>
+                <tr class="stripe">
+                  <td>
+                    <h3>Finish set up with Stripe</h3>
+                    <p>There are still a few details required to connect with our payment provider</p>
+                    <%= link_to(@connect, class: "stripe-connect") do %>
+                      <span>Connect with Stripe</span>
+                    <% end %>
+                    </a>
+                  </td>
+                </tr>
+              <% end %>
+              <tr>
+                <td>
+                  <h3>Head to your dashboard</h3>
+                  <p>The control centre for your business on the EMenu Now platform</p>
+                  <%= link_to(manager_home_index_url, method: 'post') do %>
+                    <img src="<%= root_url %>email/welcome/dashboard.png" alt="EMenu Now Dashboard"/>
+                  <% end %>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <h3>Schedule a set up call</h3>
+                  <p>A member of our team will be in touch to assist with the set up of your menu and prepare your business for accepting orders</p>
+                  <a href="https://calendly.com/emenu/15min">
+                    <img src="<%= root_url %>email/welcome/schedule.png" alt="Schedule a call"/>
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr class="secondary-bkg">
+          <td class="contact">
+            <a href="mailto:info@emenunow.com?subject=Mail from onboarding <%= @restaurant.name %>">info@emenunow.com</a>
+            <a href="https://www.instagram.com/emenunow/">
+            <img src="<%= root_url %>email/welcome/insta_footer.png" alt="Instagram"/>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <tr class="footer">
+              <td>
+                <p>EMenuNow is a trading name of EMenu Ltd. registered in England. Company no.12436135.</p>
+                <a href="https://www.emenunow.com/privacy-policy">Privacy Policy</a>
+                <a href="https://www.emenunow.com/terms-and-conditions">Terms and Conditions</a>
+              </td>
+            </tr>
+          </td>
+        </tr>
+
+        <!-- END OF CONTENT -->
+      </tbody>
+      </table>
+    </td>
+    <!-- // MAIN CONTENT CELL -->
+
+    <!-- // RIGHT SPACER CELL *** MUST HAVE A BACKGROUND COLOUR -->
+    <td bgcolor="#FFFFFF" style="font-size: 0px"></td>
+    <!-- RIGHT SPACER CELL // -->
+  </tr>
+</table>

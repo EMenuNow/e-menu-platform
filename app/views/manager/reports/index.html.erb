@@ -1,0 +1,186 @@
+<%
+  total_value = (@receipts.sum(&:basket_total)/100.0)
+  total_emenu_commission_value = (@receipts.sum(&:application_fee_amount)/100.0)
+  total_revenue = number_to_currency(total_value, unit: @restaurant.currency_symbol)
+  dates = @restaurant.receipts.select(:created_at).order(created_at: :asc).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
+%>
+
+<main role="main">
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h2 class="text-center text-dark">Reporting</h2>
+      <h4 class="text-center text-dark">Your EMenu customer statistics</h4>
+    </div>
+  </div>
+</main>
+
+<div class="container pt-1 pb-5 text-center">
+  <% if dates.present? %>
+    <div class="row pb-1">
+      <div class="col-lg-12">
+        <div class="pt-2 pb-5 bg-white rounded">
+          <%= form_for manager_reports_path, :method => "get", html: { id: "options-form" } do |f| %>
+            <h6 class="m-0">Showing orders after:
+            <%= select_tag :after_created_at, options_for_select(dates, :selected => params[:after_created_at]) , :onchange => "$('#options-form').submit()" %>
+            and before
+            <%= select_tag :before_created_at, options_for_select(dates, :selected => params[:before_created_at]) , :onchange => "$('#options-form').submit()" %>
+            </h6>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <% if @receipts.blank? %>
+    <div class="row pb-1">
+      <div class="col-lg-12">
+        <div class="card shadow p-3 mt-4 mb-5 bg-white rounded">
+          <h2>There are no orders to show analytics of reporting on here!</h2>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="row py-2 justify-content-center">
+      <div class="col-lg-3">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <h3 class="m-0">Orders</h3>
+          <h5 class="m-0"><%= @receipts.size %></h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <h3 class="m-0">Revenue</h3>
+          <h5 class="m-0"><%= total_revenue %></h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <h3 class="m-0">Average Value</h3>
+          <h5 class="m-0"><%= number_to_currency(total_value / @receipts.size, unit: @restaurant.currency_symbol) %></h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <h3 class="m-0">Unique customers</h3>
+          <h5 class="m-0"><%= @receipts.uniq{|x|x.order&.patrons}.size %></h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <h3 class="m-0">Tips</h3>
+          <h5 class="m-0">Feature coming soon</h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <h3 class="m-0">Z Reports</h3>
+          <h5 class="m-0"><%= link_to "Daily Reports", manager_restaurant_reporting_daily_path(@restaurant) %></h5>
+        </div>
+      </div>
+    </div>
+
+    <% content_for :js do %>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+      google.charts.load('current', {packages:['corechart']});
+      google.charts.setOnLoadCallback(drawBar);
+      google.charts.setOnLoadCallback(drawLine);
+
+      function drawBar() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        data.addColumn('number', 'Revenue');
+        data.addColumn('number', 'Orders');
+        // data.addColumn('number', 'Emenu Fee');
+        data.addRows([
+        <% @receipts.reverse.group_by{|x|x.created_at.strftime("%d-%m-%Y")}.each do |g, receipts| %>
+          <% sum = receipts.sum{|x|x.basket_total}/100 %>
+          ["<%=DateTime.parse(g).strftime("%d-%m-%Y")%>", {v:<%=sum%>, f: "<%=number_to_currency(sum, unit: @restaurant.currency_symbol)%>"}, <%= receipts.size %>],
+        <% end %>
+        ]);
+        var options = {
+          legend: {position: 'top', textStyle: {}},
+          vAxis: {
+            minValue:0,
+            viewWindow: {
+                min: 0
+            },
+          },
+          hAxis: {
+          },
+          height: 500
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('number_format_chart'));
+        chart.draw(data, options);
+      }
+
+      function drawLine() {
+        var data = google.visualization.arrayToDataTable([
+          ['Date', 'Revenue', 'Orders'],
+          <% @receipts.reverse.group_by{|x|x.created_at.strftime("%d-%m-%Y")}.each do |g, receipts| %>
+            <% sum = receipts.sum{|x|x.basket_total}/100 %>
+            ["<%=DateTime.parse(g).strftime("%d-%m-%Y")%>", {v:<%=sum%>, f: "<%=number_to_currency(sum, unit: @restaurant.currency_symbol)%>"}, <%= receipts.size %>],
+          <% end %>
+        ]);
+        var options = {
+          legend: {position: 'top', textStyle: {}},
+          vAxis: {
+            minValue:0,
+            viewWindow: {
+                min: 0
+            },
+          },
+          hAxis: {
+          },
+          height: 500
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('number_line_chart'));
+        chart.draw(data, options);
+      }
+    </script>
+    <% end %>
+    <div class="row pb-1">
+      <div class="col-lg-12">
+        <h2>Daily Revenue</h2>
+        <div class="card shadow p-3 mt-4 mb-5 bg-white rounded">
+          <% if @receipts.size > 10 %>
+            <div id="number_line_chart" width="100%" height="300px"></div>
+          <% else %>
+            <div id="number_format_chart" width="100%" height="300px"></div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="row pb-1">
+      <div class="col-lg-12">
+        <h2>Top Product Sales</h2>
+        <% popular = @receipts.group_by{|t|t.items["items"].map{|j|j["item"]}.flatten}.sort_by{|x, y|y.size}.reverse.take(8) %>
+        <div class="row pt-4 pb-1 justify-content-center">
+          <% popular.each do |group, x| %>
+            <div class="col-3">
+              <div class="card shadow p-3 mb-5 bg-white rounded"> 
+                <h3><b><%= x.size %> purchases</b></h3>
+                <%= group.first.html_safe %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="row pb-1">
+      <div class="col-lg-12">
+        <h2>Download data</h2>
+        <div class="row pt-4 pb-1">
+          <div class="col-12">
+            <%= link_to "Download summary (excel)", manager_reports_path(format: "xlsx", view: "summary"), :class=>"d-block" %>
+            <%= link_to "Download detailed daily billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%d %m"), :class=>"d-block" %>
+            <%= link_to "Download detailed weekly billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%W"), :class=>"d-block" %>
+            <%= link_to "Download detailed monthly billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%m"), :class=>"d-block" %>
+            <%= link_to "Download invoices (pdf)", manager_reports_path(format: "pdf") %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

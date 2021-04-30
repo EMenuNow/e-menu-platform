@@ -1,50 +1,104 @@
-
-    <main role="main">
-
-      <!-- Main jumbotron for a primary marketing message or call to action -->
-      <div class="jumbotron jumbotron-fluid hero-main-background">
-        <div class="container">
-          <h2 class="display-1 text-center text-dark">Restaurant Menus</h2>
-          <h1 class="display-3 text-center text-dark">Re-Imagined</h1>
-          <p class=" text-center ">
-
-          <% if current_manager_restaurant_user %>
-
-            <%= link_to "Manage Restaurant", manager_home_dashboard_path, class: 'btn btn-primary btn-lg', role: 'button'%>
-
-          <% else %>
-
-            <%= link_to "Log In", new_manager_restaurant_user_session_path, class: 'btn btn-primary btn-lg', role: 'button'%>
-           <%= link_to "Sign Up", new_manager_restaurant_user_registration_path, class: 'btn btn-secondary btn-lg', role: 'button'%>
-          
+<main role="main">
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container text-center">
+      <h2 class="text-dark">Welcome to <%= @restaurant.name %></h2>
+      <p>Manage your account here</p>
+    </div>
+  </div>
+</main>
+<div class="container mb-5">
+  <div class="row py-5">
+    <% if @restaurant %>
+    <div class="col-lg-6">
+      <div class="card p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to manager_restaurant_path(@restaurant), class: "nav-link" do %>
+            <%= image_tag "icons/ecom.svg", :style=>"height:50px;" %>
+            <span class="px-3">Restaurant Configuration</span>
           <% end %>
-
-          </p>
         </div>
       </div>
-
-      <div class="container">
-        <!-- Example row of columns -->
-        <div class="row">
-          <div class="col-md-4">
-            <h2>Put your menu online</h2>
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-          </div>
-          <div class="col-md-4">
-            <h2>Heading</h2>
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-          </div>
-          <div class="col-md-4">
-            <h2>Heading</h2>
-            <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to manager_restaurant_menus_path(@restaurant), class: "nav-link" do %>
+            <%= image_tag "icons/menu.svg", :style=>"height:50px;" %>
+            <span class="px-3">Menu Control</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to manager_live_tables_path(@restaurant), class: "nav-link" do %>
+            <%= image_tag "icons/round-table.svg", :style=>"height:50px;" %>
+            <span class="px-3">Table service</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to manager_live_orders_path(@restaurant), class: "nav-link" do %>
+            <%= image_tag "icons/monitor.svg", :style=>"height:50px;" %>
+            <span class="px-3">Live Orders</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to qr_manager_restaurant_restaurant_tables_path(@restaurant), class: "nav-link" do %>
+            <%= image_tag "icons/qr-code.svg", :style=>"height:50px;" %>
+            <span class="px-3">QR Codes</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to manager_discount_codes_path(@restaurant), class: "nav-link" do %>
+            <%= image_tag "icons/bill.svg", :style=>"height:50px;" %>
+            <span class="px-3">Discount Codes</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to manager_reports_path, class: "nav-link" do %>
+            <%= image_tag "icons/reports.svg", :style=>"height:50px;" %>
+            <span class="px-3">Analytics and reporting</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <% if current_manager_restaurant_user.admin %>
+      <div class="col-lg-6">
+        <div class="card p-3 mb-5 bg-white rounded">
+          <div class="card-body text-center">
+            <%= link_to manager_administrations_path, class: "nav-link" do %>
+              <%= image_tag "icons/bill.svg", :style=>"height:50px;" %>
+              <span class="px-3">Admin: Global Adminstration</span>
+            <% end %>
           </div>
         </div>
-
-       
-
-      </div> <!-- /container -->
-
-    </main>
+      </div>
+    <% end %>
+    <% else %>
+    <div class="col-lg-6">
+      <div class="card p-3 mb-5 bg-white rounded">
+        <div class="card-body text-center">
+          <%= link_to 'Add Restaurant', new_manager_restaurant_path  %>
+        </div>
+      </div>
+    </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+class Diet < MenuItemCategorisation
+
+  
+end

@@ -1,0 +1,131 @@
+<% content_for :js do %>
+
+  <%= javascript_include_tag "color_picker"%>
+
+<% end %>
+
+<%= form_with(model: ['manager', @restaurant, manager_theme], local: true) do |form| %>
+  <% if manager_theme.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(manager_theme.errors.count, "error") %> prohibited this manager_theme from being saved:</h2>
+
+      <ul>
+      <% manager_theme.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<%= form.hidden_field :restaurant_id, class: 'form-control' %>
+
+  <div class="form-row">
+    <div class="form-group">
+      <h5>Colours</h5>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-md-4 pb-1">
+      <div class="form-check">
+        <%= form.check_box :dark_theme, { class: 'form-check-input', disabled: true } %>
+        <%= form.label 'Dark Theme (coming soon)', { class: 'form-check-label' } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <%= form.label 'Primary Colour:' %>
+      <%= form.text_field :color_primary, { class: 'form-control' } %>
+    </div>
+    <div class="form-group col-md-4">
+      <div class="color-picker" id="color_block_primary" style="background-color:<%= @restaurant.theme.color_primary if @manager_theme&.color_primary.present? %>"></div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <%= form.label 'Secondary Colour:' %>
+      <%= form.text_field :color_secondary, { class: 'form-control' } %>
+    </div>
+    <div class="form-group col-md-4">
+      <div class="color-picker" id="color_block_secondary" style="background-color:<%= @restaurant.theme.color_secondary if @manager_theme&.color_secondary.present? %>"></div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <h5>Fonts</h5>
+    </div>
+  </div>
+
+  <div class="form-row pb-4">
+    <div class="form-group col-md-8">
+      <%= form.label 'Google Font Url:' %>
+      <%= form.text_area :css_font_url, { class: 'form-control' } %>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <%= form.label 'Primary Font Family:' %>
+      <%= form.text_field :font_primary, { class: 'form-control' } %>
+    </div>
+    <div class="form-group col-md-4">
+      <%= form.label 'Primary Font Weight:' %>
+      <%= form.select :font_weight_primary, options_for_select(@font_weights, manager_theme.font_weight_primary), {prompt: 'Choose Font Weight'}, {class: 'form-control'} %>
+    </div>
+  </div>
+
+  <div class="form-row pb-4">
+    <div class="form-group col-md-4">
+      <%= form.label 'Primary Text Transform:' %>
+      <%= form.select :text_transform_primary, options_for_select(@text_transforms, manager_theme.text_transform_primary), {prompt: 'Choose Text Transform'}, {class: 'form-control'} %>
+    </div>
+    <div class="form-group col-md-4">
+      <%= form.label 'Primary Font Style:' %>
+      <%= form.select :font_style_primary, options_for_select(@font_styles, manager_theme.font_style_primary), {prompt: 'Choose Font Style'}, {class: 'form-control'} %>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <%= form.label 'Secondary Font Family:' %>
+      <%= form.text_field :font_secondary, { class: 'form-control' } %>
+    </div>
+    <div class="form-group col-md-4">
+      <%= form.label 'Secondary Font Weight:' %>
+      <%= form.select :font_weight_secondary, options_for_select(@font_weights, manager_theme.font_weight_secondary), { prompt: 'Choose Font Weight' }, {class: 'form-control' } %>
+    </div>
+  </div>
+
+  <div class="form-row pb-4">
+    <div class="form-group col-md-4">
+      <%= form.label 'Secondary Text Transform:' %>
+      <%= form.select :text_transform_secondary, options_for_select(@text_transforms, manager_theme.text_transform_secondary), { prompt: 'Choose Text Transform' }, {class: 'form-control' } %>
+    </div>
+    <div class="form-group col-md-4">
+      <%= form.label 'Secondary Font Style:' %>
+      <%= form.select :font_style_secondary, options_for_select(@font_styles, manager_theme.font_style_secondary), { prompt: 'Choose Font Style' }, { class: 'form-control' } %>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <h5>Custom Styling</h5>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-8">
+      <%= form.label 'Custom CSS:' %>
+      <%= form.text_area :custom_css, { class: 'form-control', rows: "10" } %>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <%= form.submit nil, class: 'btn btn-primary' %>
+  </div>
+
+<% end %>

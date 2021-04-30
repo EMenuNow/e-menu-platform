@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe PiInterfacesController, type: :routing do
+RSpec.describe Manager::PiInterfacesController, type: :routing do
   describe "routing" do
     it "routes to #index" do
       expect(get: "/pi_interfaces").to route_to("pi_interfaces#index")

@@ -1,18 +1,24 @@
-<footer class="container-fluid text-center pt-3 pb-3">
-  <div class="row">
-    <div class="col-sm">
-      <%= link_to home_index_path, class: 'btn btn-outline-primary' do %>
-        <i class="fa fa-home"></i> Public Site
-      <% end %>
+<footer>
+  <div class="container py-5 text-center">
+    <% if @restaurant&.path %>
+    <div class="row">
+      <div class="col-sm">
+        <%= link_to restaurant_path(@restaurant.path), class: 'btn btn-outline-primary' do %>
+        <i class="fa fa-home"></i> Your Public Restaurant
+        <% end %>
+      </div>
+    </div>
+    <% end %>
+    <div class="row pt-3">
+      <div class="col-sm">
+        <p><small>&copy; e-me.nu 2020</small></p>
+        <!-- <p><small>
+            <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+          </small><small>Translated by Yandex.Translate</small> </p> -->
+        <% if !Rails.env.production? %>
+        <%= link_to 'Dev only: broadcast orders', manager_live_orders_broadcast_path(@restaurant), remote: true if Rails.env == 'development' and @restaurant.present? and  @restaurant.id.present? %>
+        <% end %>
+      </div>
     </div>
   </div>
-<hr>
-  <div class="row">
-    <div class="col-sm">
-		  <p><small>&copy; e-me.nu 2018-2019</small></p>
-		  <p><small><div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div></small><small>Translated by Yandex.Translate</small> </p>
-	     <%= link_to 'broadcast orders', manager_live_orders_broadcast_path(@restaurant), remote: true if Rails.env == 'development' and @restaurant.present? and  @restaurant.id.present? %>
-
-  	</div>
-	</div>
 </footer>

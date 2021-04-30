@@ -1,0 +1,110 @@
+<% content_for :js do %>
+  <script>
+  
+    $(document).ready(updatePath);
+    function updatePath() {
+      var path = $("#restaurant_path").val() || 'your-website-name-here';
+      $("#path-span").text(path);
+    };
+
+    $("#restaurant_path").on('keypress', function(e) {
+      var regex = new RegExp("^[a-zA-Z\-0-9 ]+$");
+      var key = String.fromCharCode(!e.charCode ? e.keyCode : e.charCode);
+      if (!regex.test(key)) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    $("#restaurant_path").on('input', function(e) {
+      e.target.value = e.target.value.replace(/\s+/g, '-').toLowerCase();
+    });
+
+    $("#restaurant_path").keyup(updatePath);
+
+  </script>
+<% end %>
+
+<%= form_with(model: [:onboarding, restaurant], local: true) do |form| %>
+  <% if restaurant.errors.any? %>
+    <div id="error_explanation" class="alert alert-danger">
+      <h4><%= pluralize(restaurant.errors.count, "error") %> prohibited this business from being saved:</h2>
+      <ul>
+        <% restaurant.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= form.hidden_field :restaurant_user_id %>
+  <div>
+    <div>
+      <div class="row">
+        <%= form.label :name, "What's the name of your business?", class: 'h4 w-100 text-center mb-3' %>
+        <div class="col-md-6 mx-auto">
+          <div class="form-group">
+            <%= form.text_field :name, class: 'form-control form-control-sm', placeholder: 'Business name...' %>
+          </div>
+        </div>
+      </div>
+      <div class="row my-5">
+        <h4 class="w-100 text-center mb-3">Where is your business located?</h4>
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= form.label :address %>
+            <%= form.text_field :address, class: 'form-control form-control-sm', placeholder: 'Address...' %>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= form.label :postcode %>
+            <%= form.text_field :postcode, class: 'form-control form-control-sm', placeholder: 'Postcode...' %>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= form.label :telephone %>
+            <%= form.text_field :telephone, class: 'form-control form-control-sm', placeholder: 'Telephone...' %>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= form.label :email %>
+            <%= form.text_field :email, class: 'form-control form-control-sm', placeholder: 'Email address...' %>
+          </div>
+        </div>
+      </div>
+      <div class="row my-5">
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= form.label :cuisine_id %>
+            <%= form.select :cuisine_id,  options_for_select(@cuisines.map{|a| [a.name, a.id]}, restaurant.cuisine_id ), {prompt: "Choose cuisine"}, {class: 'form-control form-control-sm'} %>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= form.label :currency_id %>
+            <%= form.select :currency_id, options_for_select(Currency.all.map{|s| [s.name, s.id]}, restaurant.currency_id), {prompt: "Choose Currency"}, {class: 'form-control form-control-sm'} %>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <%= form.label :path, 'Choose a website name for your menu.', class: 'h5 w-100 text-center mb-3' %>
+        <div class="col-md-6 mx-auto">
+          <div class="form-group">
+            <%= form.text_field :path, class: 'form-control form-control-sm', placeholder: 'your-website-name-here' %>
+          </div>
+        </div>
+      </div>
+      <div class="row my-3">
+        <h5 class="w-100 text-center mb-3">Access your menu from this address:</h5>
+        <p class="w-100 text-center mb-3 restaurant-path">eat.emenunow.com/<span id="path-span">your-website-name-here</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="row my-5">
+    <div class="col-md-8 mx-auto text-center">
+      <%= form.submit ('Submit'), class: "btn btn-warning" %> 
+    </div>
+  </div>
+<% end %>

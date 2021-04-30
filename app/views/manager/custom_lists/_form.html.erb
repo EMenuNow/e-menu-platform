@@ -1,3 +1,129 @@
+<% content_for :js do %>
+  <script>
+
+    $(document).ready(function () {
+
+      var $listName = $("#custom_list_name");
+      var $checkRequired = $("#custom_list_required_items");
+      var $radioMin = $("#radio_min_count_radio_min");
+      var $radioCount = $("#radio_min_count_radio_count");
+      var $checkMax = $("#check_max_value");
+      var $limitMin = $("#custom_list_limit_min");
+      var $limitCount = $("#custom_list_limit_count");
+      var $limitMax = $("#custom_list_limit_max");
+      var $submitButton = $("#custom_list_submit");
+
+      function checkRequired() {
+        if ($checkRequired.prop("checked")) {
+          $("#min_count_radios").show();
+        } else {
+          $limitCount.val("");
+          $limitMin.val("");
+          $radioCount.prop("checked", false);
+          $radioMin.prop("checked", false);
+          $("#min_count_radios").hide();
+          $("#limit_min_input").hide();
+          $("#limit_count_input").hide();
+        };
+      };
+
+      function limitMin() {
+        $limitCount.val("");
+        $radioMin.prop("checked", true);
+        $radioCount.prop("checked", false);
+        $("#limit_count_input").hide();
+        $("#limit_min_input").show();
+      };
+
+      function limitCount() {
+        $limitMin.val("");
+        $radioCount.prop("checked", true);
+        $radioMin.prop("checked", false);
+        $("#limit_min_input").hide();
+        $("#limit_count_input").show();
+        $checkMax.prop("checked", false);
+        $limitMax.val("");
+        $("#limit_max_input").hide();
+      };
+
+      function limitMax() {
+        if ($checkMax.prop("checked")) {
+          $checkMax.prop("checked", true);
+          $("#limit_max_input").show();
+        } else {
+          $limitMax.val("");
+          $checkMax.prop("checked", false);
+          $("#limit_max_input").hide();
+        };
+      };
+
+      function switchCountMin() {
+        if ($checkRequired.prop("checked") && ($radioCount.prop("checked"))) { limitMin(); };
+      };
+
+      function validate() {
+        console.log("validating");
+        if ($listName.val()) {
+          if (!$checkRequired.prop("checked") && !$limitMin.val() && !$limitCount.val() && !$limitMax.val() && !$limitMax.is(":visible")) {
+            $submitButton.prop("disabled", false);
+          } else if (!$checkRequired.prop("checked") && !$limitMin.val() && !$limitCount.val() && $limitMax.val()) {
+            $("#min-max-warning").hide();
+            $submitButton.prop("disabled", false);
+          } else if ($checkRequired.prop("checked") && $limitMin.val() && !$limitCount.val() && !$limitMax.val() && !$limitMax.is(":visible")) {
+            $submitButton.prop("disabled", false);
+          } else if ($checkRequired.prop("checked") && !$limitMin.val() && $limitCount.val() && !$limitMax.val() && !$limitMax.is(":visible")) {
+            $submitButton.prop("disabled", false);
+          } else if ($checkRequired.prop("checked") && $limitMin.val() && !$limitCount.val() && $limitMax.val()) {
+            if ($limitMax.val() <= $limitMin.val()) {
+              $submitButton.prop("disabled", true);
+              $("#min-max-warning").show();
+            } else {
+              $("#min-max-warning").hide();
+              $submitButton.prop("disabled", false);
+            }
+          } else {
+            $submitButton.prop("disabled", true);
+            $("#min-max-warning").hide();
+          };
+        } else {
+          $submitButton.prop("disabled", true);
+          $("#min-max-warning").hide();
+        };
+      };
+
+      function loadValidate() {
+        checkRequired();
+
+        if ($limitMin.val()) {
+          limitMin();
+        } else if ($limitCount.val()) {
+          limitCount();
+        };
+
+        if ($limitMax.val()) {
+          $checkMax.prop("checked", true);
+          limitMax();
+        } else {
+          $("#limit_max_input").hide();
+          limitMax();
+        };
+        
+        validate();
+      };
+      
+      loadValidate();
+
+      $checkRequired.on( "change", checkRequired );
+      $radioMin.on( "click", limitMin );
+      $radioCount.on( "click", limitCount );
+      $checkMax.on( "change", function() { limitMax(); switchCountMin(); } );
+      $(document).on("click change keyup", validate);
+
+    });
+
+  </script>
+<% end %>
+
 <%= form_with(model: [:manager, @restaurant, custom_list], local: true) do |form| %>
   <% if custom_list.errors.any? %>
      <div id="error_explanation" class="alert alert-danger">
@@ -11,46 +137,89 @@
     </div>
   <% end %>
 
-
   <div class="row">
     <div class="col">
-      <div class="form-group ">
-        <%= form.label :name %>
+      <div class="form-group">
+        <%= form.label :name, class: "h5" %>
         <%= form.text_field :name, class: 'form-control  form-control-sm' %>
       </div>
     </div>
   </div>
 
+  <div id="val-group">
 
-  <%
-
-    options = [
-      [constraint_to_human('1'), '1'],
-      [constraint_to_human('2'), '2'],
-      [constraint_to_human('3'), '3'],
-      [constraint_to_human('*'), '*'],
-    ]
-
-
-  %>
-
-
-
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :constraint %>
-        <%= form.select :constraint, options_for_select(options, custom_list.constraint), {prompt: "Choose constraint"}, {class: 'form-control'} %>
+    <div class="row">
+      <div class="col">
+        <h5>Is a selection required?</h5>
+        <div class="form-group">
+          <%= form.label :required_items, "Yes" %>
+          <%= form.check_box :required_items %>
+        </div>
       </div>
     </div>
+
+    <div class="row">
+      <div id="min_count_radios" class="col-12">
+
+        <h5>Is a minimum, or exact number of options required?</h5>
+        <div class="form-group">
+          <%= label_tag "radio_min_count_radio_min", "Minimum" %>
+          <%= radio_button_tag "radio_min_count", "radio_min" %>
+        </div>
+        <div class="form-group">
+          <%= label_tag "radio_min_count_radio_count", "Exact" %>
+          <%= radio_button_tag "radio_min_count", "radio_count" %>
+        </div>
+
+      </div>
+
+      <div class="col-12">
+
+        <div id="limit_min_input" class="form-group">
+          <%= form.label :limit_min, "Minimum number of options:" %>
+          <%= form.number_field :limit_min, { class: 'form-control', min: 0  } %>
+        </div>
+
+        <div id="limit_count_input" class="form-group">
+          <%= form.label :limit_count, "Exact number of options:" %>
+          <%= form.number_field :limit_count, { class: 'form-control', min: 0  } %>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <h5>Is a maximum number of options required?</h5>
+        <div class="form-group">
+          <%= label_tag "check_max_value", "Yes" %>
+          <%= check_box_tag "check_max_value" %>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="limit_max_input" class="row">
+      <div class="col">
+
+        <div class="form-group">
+          <%= form.label :limit_max, "Maximum number of options:" %>
+          <%= form.number_field :limit_max, { class: 'form-control', min: 0  } %>
+        </div>
+        <div id="min-max-warning" class="alert alert-warning" role="alert">
+          Maximum number of options must be greater than minimum.
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
-
-
-
-    <%= form.hidden_field :restaurant_id %>
+  <%= form.hidden_field :restaurant_id %>
 
   <div class="actions">
-    <%= form.submit nil, class: 'btn btn-warning mt-2' %>
+    <%= form.submit (action_name == "edit" ? "Update Option Set" : "Create Option Set"), id: 'custom_list_submit', class: 'btn btn-warning mt-2', disabled: true %>
   </div>
+
 <% end %>

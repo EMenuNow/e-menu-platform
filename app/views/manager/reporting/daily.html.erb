@@ -76,7 +76,7 @@ $(document).ready(function() {
             <% @daily_reportings.each do |daily_reporting| %>
             <tr>
               <td><%= daily_reporting.date %></td>
-              <td class='text-right'><%= number_to_currency(daily_reporting.total.to_f / 100.to_f, unit: '£' )%></td>
+              <td class='text-right'><%= number_to_currency(daily_reporting.total.to_f / 100.to_f, unit: @restaurant.currency_symbol )%></td>
               <td class='text-right'><%= daily_reporting.items_count%></td>
               <td class='text-right'><%= link_to 'View',  manager_restaurant_zreport_path(@restaurant,  daily_reporting) %></td>
             </tr>

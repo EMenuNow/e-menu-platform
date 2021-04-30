@@ -1,4 +1,29 @@
+<% content_for :js do %>
 
+  <script>
+  
+    $(function(){
+      $('.available_cli').on('change', function() {
+        cli_id = $(this).val();
+        cli_checked = $(this).is(':checked');
+        cli_available = $(`#available_${cli_id}`);
+        cli_item = $(`#item-${cli_id}`);
+
+        if (cli_checked) {
+          cli_available.text('Available');
+          cli_item.removeClass('alert');
+          cli_item.removeClass('alert-danger');
+        } else {
+          cli_available.text('Unavailable');
+          cli_item.addClass('alert');
+          cli_item.addClass('alert-danger');
+        }
+      })
+    })
+  
+  </script>
+
+<% end %>
 
 
 <div class="container my-3 p-3 bg-white rounded shadow-sm">
@@ -17,10 +42,27 @@
 
   <tbody>
     <% custom_list_items.each do |custom_list_item| %>
-      <tr>
+      <tr id='item-<%= custom_list_item.id %>' class="<%= "alert alert-danger" if !custom_list_item.available %>">
         <td><%= custom_list_item.name %></td>
         <td><%= custom_list_item.description %></td>
-        <td><%= number_to_currency(custom_list_item.price, unit: "£") %></td>
+        <td><%= number_to_currency(custom_list_item.price, unit: restaurant.currency_symbol) %></td>
+
+        <td class="switches w-25"> 
+
+          <%= check_box_tag dom_id(custom_list_item, :available), custom_list_item.id, custom_list_item.available, data: {
+                            remote: true,
+                            url: manager_restaurant_custom_list_custom_list_item_toggle_active_path(@restaurant, @custom_list, custom_list_item),
+                            method: :post
+                            }, class: "available_cli" %>
+          <label for="<%= dom_id(custom_list_item, :available) %>">
+            <span id="available_<%= custom_list_item.id %>" class="management-description pr-2">
+              <%= custom_list_item.available ? "Available" : "Unavailable" %>
+            </span>
+            <span></span>
+          </label>
+          
+        </td>
+
         <td><%= link_to 'Edit', edit_manager_restaurant_custom_list_custom_list_item_path(restaurant, custom_list, custom_list_item) %></td>
         <td><%= link_to 'Destroy', manager_restaurant_custom_list_custom_list_item_path(restaurant, custom_list, custom_list_item), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>

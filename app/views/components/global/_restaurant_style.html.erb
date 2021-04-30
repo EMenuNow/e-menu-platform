@@ -1,0 +1,35 @@
+    :root {
+
+    <% if @restaurant and @restaurant.theme&.colors_set? %>
+    --col-primary: <%=@restaurant.theme.color_primary%>;
+    --col-secondary: <%=@restaurant.theme.color_secondary%>;
+    <% end %>
+
+    <% if @restaurant and @restaurant.theme&.font_primary %>
+    --font-heading: <%=@restaurant.theme.font_primary%>;
+    --font-weight-heading: <%=@restaurant.theme.font_weight_primary%>;
+    --text-transform-heading: <%=@restaurant.theme.text_transform_primary%>;
+    --font-style-heading: <%=@restaurant.theme.font_style_primary%>;
+    <% end %>
+
+    <% if @restaurant and @restaurant.theme&.font_primary %>
+    --font-primary: <%=@restaurant.theme.font_primary%>;
+    --font-weight-primary: <%=@restaurant.theme.font_weight_primary%>;
+    --text-transform-primary: <%=@restaurant.theme.text_transform_primary%>;
+    --font-style-primary: <%=@restaurant.theme.font_style_primary%>;
+    <% end %>
+    
+    <% if @restaurant and @restaurant.theme&.font_secondary %>
+    --font-secondary: <%=@restaurant.theme.font_secondary%>;
+    --font-weight-secondary: <%=@restaurant.theme.font_weight_secondary%>;
+    --text-transform-secondary: <%=@restaurant.theme.text_transform_secondary%>;
+    --font-style-secondary: <%=@restaurant.theme.font_style_secondary%>;
+    <% end %>
+
+    }
+    
+    <% if @restaurant.present? and @restaurant.theme&.custom_css.present? %>
+      <%= @restaurant.theme.custom_css %>
+    <% elsif @restaurant.present? and @restaurant.custom_css.present? %>
+      <%= @restaurant.custom_css %>
+    <% end %>

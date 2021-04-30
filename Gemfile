@@ -44,9 +44,16 @@ gem 'ancestry'
 gem 'faker'
 gem 'jquery_mobile_rails'
 
+gem 'rubyzip', '= 1.0.0'
+gem 'axlsx', '= 2.0.1'
+gem 'axlsx_rails'
+gem 'wicked_pdf'
+
 gem 'aasm'
 gem 'rqrcode'
 gem 'stripe'
+gem 'stripe-ruby-mock', '~> 2.5.0', :require => 'stripe_mock'
+
 gem 'acts_as_list'
 gem 'cancancan'
 gem 'globalize', git: 'https://github.com/globalize/globalize'
@@ -56,12 +63,19 @@ gem 'trix-rails', require: 'trix'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'sidekiq'
 gem 'yandex-translator'
-gem 'mini_racer'
-gem 'rb-readline'
+#gem 'mini_racer'
+# gem 'rb-readline'
+gem 'image_processing', '~> 1.0'
+gem 'active_storage_validations'
 
 gem 'mailjet'
 gem "webpacker"
 gem 'jquery-datatables'
+
+# Application moitoring
+gem 'scout_apm'
+# Error logging
+gem 'rollbar'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -85,16 +99,20 @@ group :development do
   gem 'pry'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'railroady'
 end
 
 group :test do
   # Adds support for Capybara system testing and selenium driver
 
   gem 'capybara', '>= 2.15', '< 4.0'
+  gem 'factory_bot_rails'
+  gem 'rails-controller-testing'
   # gem 'selenium-webdriver'
   # Easy installation and use of chromedriver to run system tests with Chrome
   # gem 'chromedriver-helper'
-  # gem 'database_cleaner', '~> 1.5'
+  gem 'database_cleaner-active_record'
+
   # gem 'rails-controller-testing' # If you are using Rails 5.x
   # gem 'shoulda-matchers', '~> 3.0', require: false
 end

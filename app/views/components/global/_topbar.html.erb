@@ -1,0 +1,24 @@
+<div class="container-fluid p-0">
+  <nav id="topbar" class="p-1 d-flex justify-content-between fixed-top navbar-dark bg-dark">
+    <button class="navbar-toggler border-0" type="button" id="sidebarCollapse">
+      <svg xmlns="http://www.w3.org/2000/svg" width="31" height="21" viewBox="0 0 31 21" class="hamburger">
+        <g id="Hamburger" transform="translate(1.5 1.5)">
+          <line id="Line_1" data-name="Line 1" x2="28" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3"/>
+          <line id="Line_2" data-name="Line 2" x2="28" transform="translate(0 9)" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3"/>
+          <line id="Line_3" data-name="Line 3" x2="28" transform="translate(0 18)" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3"/>
+        </g>
+      </svg>
+
+    </button>
+    <% if @restaurant && @restaurant.image.attached? %>
+      <%#= link_to (image_tag @restaurant.image, height: 23, width: 'auto'), restaurant_path(@restaurant.path), class:"navbar-brand" %>
+    <% else %>
+      <%= link_to root_path, :class=>"navbar-brand" do %>
+        <%= image_tag("logo/Logo__icon_v1.0.0-dark-bkg.svg", height: '20', width: 'auto') %>
+      <% end %>
+    <% end %>
+    <button class="navbar-toggler invisible" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+</div>

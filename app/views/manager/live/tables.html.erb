@@ -1,54 +1,54 @@
-<div class="container-fluid  bg-light border  mt-5 mb-2">
-  <div class="row m-2">
-    <div class="col">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Table Number</th>
-            <th>Table Code</th>
-            <th>Started</th>
-            <th>State</th>
-            <th>Password</th>
-            <th>Current Total</th>
-            <th>Table Total</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-        <% @restaurant_tables.each do |restaurant_table| %>
-          <% restaurant_table.tables_live.each do |table|%>
-          <tr class="p-3 mb-2">
-            <td><%= restaurant_table.number%></td>
-            <td><%=restaurant_table.code%></td>
-            <td><%= table.created_at %></td>
-            <td><%= table.aasm_state %></td>
-            <td><%= table.password %></td>
-            <td><%= number_to_currency table.current_total, unit: "£"%></td>
-            <td><%= number_to_currency table.total, unit: "£"%></td>
-            <td><%=link_to "Close Table", table_manager_finish_path(table), class: "btn btn-warning  mt-2 mb-2" if table.all_ready %></td>
-          </tr>
-          <tr>
-          
-       
-            <td colspan=8>
-            <% table.table_items.order(:created_at).each do |item| %>
-              <div class='row'>
-                
-                <div class='col-2 text-right'><small><%=item.aasm_state%></small></div>
-                <div class='col'><small><%=item.name%></small></div>
-                
-              </div>
-              
-              
+<div class="bg-dark">
+  <div class="container text-light mt-5 mb-2">
+    <div class="row pt-5">
+      <div class='col-sm-12 col-md-12 text-left text-light pb-4'>
+        <h1><%= @restaurant.name %> - your tables</h1>
+      </div>
+    </div>
+    <div class="row m-2 pb-5">
+      <div class="col">
+        <table class="table text-light">
+          <thead>
+            <tr>
+              <th>Table Number</th>
+              <th>Table Code</th>
+              <th>Started</th>
+              <th>State</th>
+              <th>Password</th>
+              <th>Current Total</th>
+              <th>Table Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @restaurant_tables.each do |restaurant_table| %>
+            <% restaurant_table.tables.each do |table|%>
+            <tr class="p-3 mb-2">
+              <td><%= restaurant_table.number%></td>
+              <td><%=restaurant_table.code%></td>
+              <td>
+                <%= raw create_qr(restaurant_table.code).as_html %>
+                <%= restaurant_table.code %>
+              </td>
+              <td><%= number_to_currency table.current_total, unit: table.restaurant.currency_symbol%></td>
+              <td><%= number_to_currency table.total, unit: table.restaurant.currency_symbol%></td>
+              <td><%=link_to "Close Table", table_manager_finish_path(table), class: "btn btn-warning  mt-2 mb-2" if table.all_ready %></td>
+            </tr>
+            <tr>
+              <td colspan=8>
+                <% table.table_items.order(:created_at).each do |item| %>
+                <div class='row'>
+                  <div class='col-2 text-right'><small><%=item.aasm_state%></small></div>
+                  <div class='col'><small><%=item.name%></small></div>
+                </div>
+                <% end %>
+              </td>
+            </tr>
             <% end %>
-            </td>
-         
-          </tr>
-          <% end %>
-        <% end %>
-        </tbody>
-      </table>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
-

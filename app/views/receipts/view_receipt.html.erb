@@ -16,14 +16,14 @@
     <div class="row bg-dark mt-4">
       <div class='col text-center text-light'>
           <h1>RECEIPT</h1>  
-          <%= render 'order/components/receipt'%>      
+          <%= render 'restaurants/components/receipt'%>      
       </div>
     </div>
 
     <div class="row bg-dark mb-2 p-4">
       <div class='col text-center text-light'>
           <%=link_to 'Emenunow.com', '/', class: 'btn btn-warning'%>
-          <%=link_to "#{@restaurant.name} Menu", restaurant_path_path(@path), class: 'btn btn-warning'%>
+          <%=link_to "#{@restaurant.name} Menu", restaurant_path(@path), class: 'btn btn-warning'%>
       </div>
     </div>
 

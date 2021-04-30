@@ -14,6 +14,4 @@ class ApplicationMailer < ActionMailer::Base
     mail(to: @receipt.email, from: from , subject: @restaurant.name)
   end
 
-
-
 end

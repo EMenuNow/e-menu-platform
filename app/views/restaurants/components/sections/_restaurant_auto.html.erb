@@ -1,0 +1,117 @@
+<%
+style = "background: url('#{url_for(@restaurant.background_image)}') no-repeat fixed center;" if @restaurant.background_image.attached? and @restaurant.background.blank?
+style = "background: url('#{@restaurant.background}') ;" if @restaurant.background.present?
+%>
+
+<div class="container-fluid background-color menu-header" style="<%= style %>">
+  <div class="row">
+    <div class="col text-left mt-2 mb-2"> 
+      <% if @restaurant.image.attached? %>
+        <%= image_tag @restaurant.image.variant(resize_and_pad: [200, 200]), class: "img-fluid"  %>
+      <% end %>                
+    </div>
+    <div class="col text-right text-dark">
+      <div class='row'>
+        <div class='col pt-3'>
+          <h3>
+            <% if is_takeaway_or_delivery?(@restaurant)%>
+            <% 
+              disable_basket_link = true 
+              if @basket_service.get_basket_item_count.present? and @basket_service.get_basket_item_count > 0
+                disable_basket_link = false 
+              end
+            %>
+
+            <% unless disable_basket_link %>
+            <%= link_to "#basket" do %>
+            <i class="fas fa-shopping-basket"></i> <%= number_to_currency(@basket_service.get_basket_item_total, unit: @restaurant.currency_symbol) %>
+            <% end if @basket_service.basket %>
+            <% end %>
+            <% end %>
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% 
+    menu_id = params[:menu_id].to_i if params[:menu_id]
+    menu_id = menu.first[:id] if menu_id.blank? 
+  %>
+
+  <div class='row'>
+    <div class='col-sm-12 col-md-12 col-lg-12 col-xl-8 pb-1'>
+      <div class="row">
+        <% menu_nav = menu.map{|a| {name: a[:name], menu_id: a[:id]}}%>
+        <% menu_nav.each do |menu| %>
+        <div class="col p-0 m-1 ml-5 mr-5">
+          <% button_css = menu[:menu_id] == menu_id ? 'btn-outline-dark' : 'btn-dark'%>
+          <%= link_to menu[:name], restaurant_path(@restaurant.path, menu_id: menu[:menu_id]), class: "btn #{button_css} btn-block" %>
+        </div>
+        <% end %>
+      </div>
+    </div>
+    <div class='col-xl-4 pb-1'>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class='row'>
+    <div class='col-md-8 pb-4 menu-body'>
+      <% menu.select{|w| w[:id] == menu_id }.each do |m| %>
+      <% if m[:node_type] == 'menu' %>
+      <div class="row">
+        <div class="col">
+          <div class="container-fluid p-0">
+            <% nav_items = m[:children].map{|a| {name: a[:name], id: a[:id]}} %>
+            <% 
+              current_section = (params[:section_id] || nav_items.first[:id]).to_i
+            %>
+            <div class='row bg-dark'>
+              <div class='col bg-dark p-0'>
+                <div class="pn-ProductNav_Wrapper">
+                  <nav id="pnProductNav" class="pn-ProductNav dragscroll" data-overflowing="both">
+                    <div id="pnProductNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition" style="transform: none;">
+                      <% nav_items.each do |nav|%>
+                      <% selected = current_section == nav[:id] ? true : false %>
+                      <%= link_to nav[:name], restaurant_path(@restaurant.path, menu_id: m[:id], section_id: nav[:id]), class: 'pn-ProductNav_Link', 'aria-selected'=>"#{selected}" %>
+                      <% end %>
+
+                      <!--<span id="pnIndicator" class="pn-ProductNav_Indicator" style="transform: translateX(1680.5px) scaleX(1.1829687500000001); background-color: rgb(236, 187, 12);"></span>-->
+                    </div>
+                  </nav>
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class='col-sm-12 col-md-12 col-lg-12 col-xl-12'>
+                <div class="row pt-4">
+                  <% m[:children].select{|a| a[:id] == current_section}.each do |section| %>
+                  <% if section[:node_type] == 'section' %>
+                  <div class="col-sm-12 col-lg-12 text-light">
+                    <h2 class="text-left section-title"><%= section[:name] %></h2>
+                    <div class='row'>
+                      <% section[:children].each do |item| %>
+                      <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false if section[:node_type] == 'section'  %>
+                      <% end  %>
+                    </div>
+                  </div>
+                  <% end %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% end %>
+      <% end %>
+    </div>
+    <div class='col-md-4 basket-body'>
+      <div class='col-sm-auto'>
+        <%= render 'restaurants/components/basket' if is_takeaway_or_delivery?(@restaurant)%>
+      </div>
+    </div>
+  </div>
+</div>

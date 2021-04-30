@@ -38,7 +38,7 @@ namespace :reporting do
       date = args[:date]
 
     # Daily Reporting
-    date = Date.yesterday if date.blank?
+    date = Date.today if date.blank?
 
 
     puts "Processing Date: #{date}"

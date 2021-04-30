@@ -1,0 +1,17 @@
+
+<div class="container-fluid">
+  <div class="row">
+		<div class="col pb-5">
+
+
+      <%= render 'manager/busy_times/index', manager_busy_times: @manager_busy_times %>
+
+      <hr />
+
+      <%= render 'form', manager_opening_time: @manager_opening_time, manager_busy_time: @manager_busy_time %>
+
+      <%= link_to 'Back', manager_restaurant_opening_times_path(@restaurant) %>
+
+    </div>
+  </div>
+</div>

@@ -1,10 +1,20 @@
-<footer class="container-fluid text-center pt-3 pb-3">
-
-  <div class="row">
-    <div class="col-sm">
-    <p><%= link_to 'Privacy Policy', 'https://www.emenunow.com/privacy-policy', target: 'privacy'%> | <%= link_to 'Terms and Conditions', 'https://www.emenunow.com/terms-and-conditions', target: 'terms'%></p>
-		  <p><small><%=t('footer.e_menu_copyright')%></small></p>
-		  <p><small><%#=t('footer.disclaimer').html_safe%></small> </p>
- 		</div>
+<footer class="py-5">
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-4">
+				<p>
+				<%= link_to 'Privacy Policy', 'https://www.emenunow.com/privacy-policy',
+				target: 'privacy'%> | <%= link_to 'Terms and Conditions',
+				'https://www.emenunow.com/terms-and-conditions', target: 'terms'%>
+				</p>
+				<p><small><%= t('footer.e_menu_copyright') %></small></p>
+				<!-- <p><small><%= t('footer.disclaimer').html_safe %></small></p> -->
+				<% if current_manager_restaurant_user %>
+				<p><small><%= link_to "Visit restaurant dashboard", manager_home_index_path, class: 'btn btn-outline-primary' %></small></p>
+				<% else %>
+				<p><small><%= link_to "Restaurant Login", new_manager_restaurant_user_session_path, class: 'btn btn-outline-primary' %></small></p>
+				<% end %>
+			</div>
+		</div>
 	</div>
 </footer>

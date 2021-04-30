@@ -1,5 +1,3 @@
-
-
 class ReceiptsChannel < ApplicationCable::Channel
 
   def subscribed

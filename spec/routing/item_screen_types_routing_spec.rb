@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ItemScreenTypesController, type: :routing do
+RSpec.describe Manager::ItemScreenTypesController, type: :routing do
   describe "routing" do
     it "routes to #index" do
       expect(get: "/item_screen_types").to route_to("item_screen_types#index")

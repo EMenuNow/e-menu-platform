@@ -2,36 +2,48 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
 
-    <title><%= content_for?(:title) ? yield(:title) : "Restaurant Menus re-defined" %></title>
+    <title>
+      <%= content_for?(:title) ? yield(:title) : "EMenu Dashboard - #{@restaurant&.name ? @restaurant.name : "Welcome"}" %>
+    </title>
 
-    <%= stylesheet_link_tag    "application" %>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <%= stylesheet_link_tag "application" %>
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+      integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+      crossorigin="anonymous"
+    />
     <%= javascript_include_tag "application"%>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
+    <script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script>
 
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js'></script>
+    <style>
+      <%= render 'components/global/manager_style' %>
+    </style>
 
-    <script src='https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js'></script>
-    <script src='https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js'></script>
+    <%= stylesheet_link_tag "emenu_overwrite" if !@restaurant&.theme&.colors_set? %>
 
     <%= csrf_meta_tags %>
   </head>
 
   <body>
     <%= render 'components/global/environment' %>
-    <%= render 'manager/components/global/topnav' %>
-    <%= render 'manager/components/restaurant/navigation' if current_manager_restaurant_user %>
-
+    <%= render 'manager/components/global/topbar' %>
+    <%= render 'manager/components/global/sidebar' %>
     <%= render 'components/global/messages' %>
-    <div class="container-fluid px-0">
-      <%= yield %>
-      <%= render 'components/global/languages' %>
-      <%= render 'manager/components/global/footer' %>
-    </div>
-    <%= yield :js %>
-    <%= yield :channels %>
+    <%#= render 'manager/components/restaurant/navigation' if current_manager_restaurant_user %>
+    <%= yield %>
+    <%= render :partial => 'components/global/languages' %>
+    <%= render :partial => 'manager/components/global/footer' %>
+    <div class="overlay"></div>
+    <%= yield :js %> <%= yield :channels %>
   </body>
 </html>

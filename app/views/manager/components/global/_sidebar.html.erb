@@ -1,0 +1,117 @@
+<nav id="sidebar" class="manager-sidebar h-100">
+  <div class="d-flex flex-column h-100">
+    <div class="sidebar-header">
+      <button class="navbar-toggler border-0" type="button" id="dismiss">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22.243" height="22.243" viewBox="0 0 22.243 22.243">
+          <g id="Hamburger" transform="translate(2.121 2.121)">
+            <line id="Line_1" data-name="Line 1" y1="18" x2="18" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3" />
+            <line id="Line_3" data-name="Line 3" x2="18" y2="18" fill="none" stroke="var(--col-primary)" stroke-linecap="round" stroke-width="3" />
+          </g>
+        </svg>
+      </button>
+    </div>
+
+    <div class="scroll">
+      <ul class="list-unstyled components">
+        <% if current_manager_restaurant_user %>
+          <li>
+            <%= link_to "Dashboard", manager_home_index_path %>
+          </li>
+        <% end %>
+        <% if current_manager_restaurant_user&.restaurant %>
+          <li class="active">
+            <a href="#configSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Configuration</a>
+            <ul class="collapse list-unstyled" id="configSubmenu">
+              <li>
+                <%= link_to("Details", manager_restaurant_path(current_manager_restaurant_user.restaurant))  %>
+              </li>
+              <li>
+                <%= link_to("Opening Times", manager_restaurant_opening_times_path(current_manager_restaurant_user.restaurant))  %>
+              </li>
+              <li>
+                <%= link_to("Restaurant Theme", manager_restaurant_themes_path(current_manager_restaurant_user.restaurant))  %>
+              </li>
+              <% if @restaurant.present? && @restaurant.id %> 
+                <li>
+                  <%= link_to("Active Menus", manager_restaurant_active_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("Menus", manager_restaurant_menus_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("Option Sets", manager_restaurant_custom_lists_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("Tables", manager_restaurant_restaurant_tables_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("Table QR Codes", qr_manager_restaurant_restaurant_tables_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("Delivery Postcodes", manager_restaurant_delivery_postcodes_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("Discount Codes", manager_discount_codes_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("View Menus", menu_manager_home_index_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("Printer Interfaces", manager_restaurant_pi_interfaces_path(@restaurant)) %>
+                </li>
+                <li>
+                  <%= link_to("Live Screen Management", manager_restaurant_item_screens_path(@restaurant)) %>
+                </li>
+              <% end%>
+            </ul>
+          <% else %>
+          <li>
+            <%= link_to("Add Restaurant", new_manager_restaurant_path) %>
+          </li>
+          <% end %>
+        </li>
+        <% if @restaurant.present? && @restaurant.id %> 
+          <li class="active">
+            <a href="#manageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Management</a>
+            <ul class="collapse list-unstyled" id="manageSubmenu">
+              <li>
+                <%= link_to("Live Tables", manager_live_tables_path(@restaurant)) %>
+              </li>
+              <% ItemScreen.where(restaurant_id: @restaurant.id).each do |item_screen| %>
+                <%
+                  path = manager_live_orders_path(@restaurant) if item_screen.item_screen_type_key == "FULL"
+                  path = manager_live_food_path(@restaurant) if item_screen.item_screen_type_key == "FOOD"
+                  path = manager_live_drinks_path(@restaurant) if item_screen.item_screen_type_key == "DRINK"
+                %>
+                <li>
+                  <%= link_to("Live #{item_screen.item_screen_type_name}", path) %>
+                </li>
+              <% end %>
+              <li>
+                <%= link_to("Receipts", manager_receipts_path(@restaurant)) %>
+              </li>
+            </ul>
+          </li>
+          <li class="active">
+            <a href="#reportSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Reporting</a>
+            <ul class="collapse list-unstyled" id="reportSubmenu">
+              <li>
+                <%= link_to("Daily Reports", manager_restaurant_reporting_daily_path(@restaurant)) %> 
+              </li>
+            </ul>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div class="sidebar-footer mt-auto">
+      <div class="d-flex justify-content-between">
+        <div class="p-1 d-flex flex-column">
+          <div class="p-1">Powered by</div>
+          <div class="px-1 py-0"><%= image_tag("logo/Logo__icon_v1.0.0-dark-bkg.svg", height: '15', width: 'auto') %></div>
+        </div>
+        <%= link_to 'Privacy Policy', 'https://www.emenunow.com/privacy-policy', target: 'privacy', class: 'p-1 pr-2 mt-auto' %>
+      </div>
+    </div>
+  </div>
+</nav>

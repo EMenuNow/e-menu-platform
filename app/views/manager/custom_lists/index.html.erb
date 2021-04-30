@@ -1,12 +1,15 @@
 <div class="container my-3 p-3 bg-white rounded shadow-sm">
 
-<h1>Custom Lists</h1>
+<h1>Option Sets</h1>
 
 <table class="table">
   <thead>
     <tr>
       <th>Name</th>
-      <th>Constraint</th>
+      <th>Required?</th>
+      <th>Minimun</th>
+      <th>Exactly</th>
+      <th>Maximum</th>
       <th colspan="4"></th>
     </tr>
   </thead>
@@ -15,11 +18,14 @@
     <% @custom_lists.each do |custom_list| %>
       <tr>
         <td><%= custom_list.name %></td>
-        <td><%= constraint_to_human custom_list.constraint %></td>
+        <td><%= custom_list.required_items? %></td>
+        <td><%= custom_list.limit_min %></td>
+        <td><%= custom_list.limit_count %></td>
+        <td><%= custom_list.limit_max %></td>
         <td><%= link_to 'Manage Options', manager_restaurant_custom_list_path(@restaurant, custom_list) %></td>
-        <td><%= link_to 'Edit List name', edit_manager_restaurant_custom_list_path(@restaurant, custom_list) %></td>
+        <td><%= link_to 'Edit Option Set', edit_manager_restaurant_custom_list_path(@restaurant, custom_list) %></td>
         <td><%= link_to_if !custom_list.custom_list_items.present?, 'Delete List', manager_restaurant_custom_list_path(@restaurant, custom_list), method: :delete, data: { confirm: 'Are you sure?' } %></td>
-        <td><%=link_to 'up', manager_restaurant_custom_list_up_path(@restaurant, custom_list), method: :post unless custom_list.first? %> -- <%=link_to 'down', manager_restaurant_custom_list_down_path(@restaurant, custom_list), method: :post unless custom_list.last? %></td>
+        <td><%= link_to 'up', manager_restaurant_custom_list_up_path(@restaurant, custom_list), method: :post unless custom_list.first? %> -- <%= link_to 'down', manager_restaurant_custom_list_down_path(@restaurant, custom_list), method: :post unless custom_list.last? %></td>
       </tr>
     <% end %>
   </tbody>
@@ -27,5 +33,5 @@
 
 <br>
 
-<%= link_to 'New Custom List', new_manager_restaurant_custom_list_path(@restaurant) %>
+<%= link_to 'New Option Set', new_manager_restaurant_custom_list_path(@restaurant) %>
 </div>

@@ -1,0 +1,54 @@
+<% content_for :title do %>
+Choose your services
+<% end %>
+
+<% content_for :js do %>
+  <script>
+  
+    // Progress update if checkboxes change
+    $(document).ready(checkServices);
+    function checkServices() {
+    if ($("#services-choice input:checkbox:checked").length > 0)
+    {
+      // any are checked
+      $("#services-stage").addClass("complete");
+      $("#connect-button").removeClass("disabled");
+    }
+    else
+    {
+      // none is checked
+      $("#services-stage").removeClass("complete");
+      $("#connect-button").addClass("disabled");
+    }
+    }
+    $("#services-choice input:checkbox").change(checkServices);
+
+  </script>
+<% end %>
+
+<div class="row">
+  <div class="col-lg-6 text-center mx-auto">
+    <h3>What services do you want available?</h3>
+    <ul id="services-choice" class="mx-auto switches">
+    <% @services.each do |feature|%>
+      <li class="my-3">
+        <%= check_box_tag dom_id(feature), feature.id, @restaurant.features.include?(feature), data: {
+                          remote: true,
+                          url: onboarding_restaurant_toggle_feature_path(@restaurant.id, feature.id),
+                          method: :post
+                          } %>
+        <label for="feature_<%= feature.id %>">
+          <span><%=feature.name%></span>
+          <span></span>
+        </label>
+      </li>
+    <% end %>
+    </ul>
+  </div>
+</div>
+
+<div class="row my-5">
+  <div class="col-md-8 mx-auto text-center">
+    <%= link_to("Save", onboarding_restaurant_connect_path, class: "btn btn-warning", role: "button", id: "connect-button") %>
+  </div>
+</div>

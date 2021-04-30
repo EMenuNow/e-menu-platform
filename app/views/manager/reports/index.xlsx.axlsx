@@ -1,0 +1,67 @@
+total_value = (@receipts.sum(&:basket_total)/100.0)
+total_emenu_commission_value = (@receipts.sum(&:application_fee_amount)/100.0)
+total_revenue = number_to_currency(total_value, unit: @restaurant.currency_symbol)
+dates = @restaurant.receipts.select(:created_at).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
+
+wb = xlsx_package.workbook
+
+
+if params[:view] == "summary"
+  wb.add_worksheet(name: "Summary View") do |sheet|
+    # this is the head row of your spreadsheet
+    sheet.add_row ["Date","Sales", "Tips", "Delivery Fees", "Service Charge", "Total Revenue"]
+    
+    # each user is a row on your spreadsheet
+    @receipts.group_by{|x|x.created_at.strftime("%d-%m-%Y")}.each do |g, receipts|
+      sheet.add_row [g, receipts.size,"", number_to_currency(receipts.sum{|x|x.delivery_fee.to_i}, unit: @restaurant.currency_symbol), number_to_currency(receipts.sum{|x|x.application_fee_amount.to_i}, unit: @restaurant.currency_symbol), number_to_currency(receipts.sum{|x|x.basket_total.to_i}, unit: @restaurant.currency_symbol) ]
+    end
+  end
+elsif params[:view] == "detailed"
+  wb.add_worksheet(name: "Detailed View") do |sheet|
+    # this is the head row of your spreadsheet
+    sheet.add_row ["Period", "Service Type","Sales", "Tips", "Service Charge", "Delivery Fees", "Total Revenue", "Refunds", "Stripe fee (Rounded up)", "Emenu Service Charge (Rounded up)", "EMenu VAT charge (Rounded up)", "Chargeback enabled", "Chargeback fee (Rounded up)", "Total Costs"]
+    
+    # each user is a row on your spreadsheet
+    @receipts.group_by{|x|x.created_at.strftime("#{params[:segment]} - %Y")}.each do |g, receipts|
+      receipts.group_by{|x|x.delivery_or_collection}.each do |stype, receipts|
+        if params[:segment] == "%d %m"
+          receipts.each do |receipt|
+            sheet.add_row ["#{g}",
+              receipt.delivery_or_collection,
+              number_to_currency(receipt.basket_total / 100.0, unit: @restaurant.currency_symbol),
+              "",
+              number_to_currency(receipt.application_fee_amount / 100.0, unit: @restaurant.currency_symbol),
+              number_to_currency(receipt.delivery_fee.to_f, unit: @restaurant.currency_symbol),
+              number_to_currency(receipt.basket_total / 100.0, unit: @restaurant.currency_symbol),
+              "",
+              number_to_currency(receipt.stripe_processing_fee.to_f / 100.0, unit: @restaurant.currency_symbol),
+              number_to_currency(receipt.emenu_commission / 100.0, unit: @restaurant.currency_symbol),
+              number_to_currency(receipt.emenu_vat_charge / 100.0, unit: @restaurant.currency_symbol),
+              receipt.chargeback_enabled,
+              number_to_currency(receipt.chargeback_fee / 100.0, unit: @restaurant.currency_symbol),
+              number_to_currency(receipt.emenu_vat_charge / 100.0, unit: @restaurant.currency_symbol),
+              number_to_currency(receipt.application_fee_amount / 100.0, unit: @restaurant.currency_symbol),
+            ]
+          end
+        else
+          sheet.add_row ["#{g}",
+            stype,
+            number_to_currency(receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol),
+            "",
+            number_to_currency(receipts.sum{|x|x.application_fee_amount} / 100.0, unit: @restaurant.currency_symbol),
+            number_to_currency(receipts.sum{|x|x.delivery_fee.to_f}, unit: @restaurant.currency_symbol),
+            number_to_currency(receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol),
+            "",
+            number_to_currency(receipts.sum{|x|x.stripe_processing_fee.to_f} / 100.0, unit: @restaurant.currency_symbol),
+            number_to_currency(receipts.sum{|x|x.emenu_commission} / 100.0, unit: @restaurant.currency_symbol),
+            number_to_currency(receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol),
+            "",
+            number_to_currency(receipts.sum{|x|x.chargeback_fee} / 100.0, unit: @restaurant.currency_symbol),
+            number_to_currency(receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol),
+            number_to_currency(receipts.sum{|x|x.application_fee_amount} / 100.0, unit: @restaurant.currency_symbol),
+          ]
+        end
+      end
+    end
+  end
+end

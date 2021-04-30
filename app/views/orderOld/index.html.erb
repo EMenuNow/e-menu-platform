@@ -1,0 +1,159 @@
+<% content_for :js do%>
+
+<script>
+  $(function() {
+
+    BASE_URL = '<%=add_to_basket_path(@path)%>'
+    $('.selection-item').change(function() {
+      item = $(this)
+
+
+      start_price = item.data('start_price') * 1
+      scope = item.data('scope')
+      //    console.log("scope: " + scope)
+
+      lists = $('#required-lists-' + scope).val()
+      //     console.log('Lists:' + lists)
+      valid = []
+
+      $.each(lists.split(','), function(i, v) {
+        //  console.log('value_list:' + v )
+
+        instance_valid = false
+        $.each($('.selection-item-required-' + v), function(index, value) {
+          item = $(this)
+          is_checked = (item.is(':checked'));
+          if (is_checked) {
+            instance_valid = true
+          }
+          //     console.log(is_checked)
+          //     console.log(scope)
+        });
+        valid.push(instance_valid)
+
+      });
+      required_options = true
+      $.each(valid, function(i, v) {
+        if (v == false) {
+          required_options = false
+        }
+      });
+      if (required_options) {
+        $('#required-message-' + scope).hide();
+        $('#add-to-basket-' + scope).removeClass('disabled');
+
+      }
+
+
+      //      console.log("Valid")
+      //      console.log(valid)
+      //      console.log("/valid")
+      //      console.log('required_options')
+      //      console.log(required_options)
+      //      console.log('/required_options')
+
+      calculate_price(start_price, scope)
+    });
+
+    function calculate_price(start_price, scope) {
+
+      price = start_price
+      //     console.log('item: ' + scope + " price:"+ price)
+      optionals = []
+
+      $.each($('.selection-item-radio-' + scope + ':checked'), function(index, value) {
+        price += ($(this).data('price') * 1);
+        optionals.push($(this).data('id'))
+      });
+
+      $.each($('.selection-item-' + scope + ':checked'), function(index, value) {
+        price += ($(this).data('price') * 1);
+        optionals.push($(this).data('id'))
+      });
+
+      new_price = parseInt(price * 100) / 100
+      $(".button-price-" + scope).html("<%=@restaurant.currency_symbol%>" + new_price)
+      $("#optionals-" + scope).html(optionals.join(','))
+      note = $("#notes-" + scope).val()
+
+        <%
+          menu_id = params[:menu_id].to_i if params[:menu_id].present?
+          menu_id = @menu2.first[:id] if params[:menu_id].blank?
+          current_section = params[:section_id].to_i 
+          if params[:section_id].blank?
+            menu = @menu2.select { |w| w[:id] == menu_id}.first
+            nav_items = menu[:children].map {|a| {
+              name: a[:name],
+              id: a[:id]
+            } }
+            current_section = nav_items.first[:id] if nav_items.present?
+          end
+        %>
+
+
+        section_id = <%= current_section %> ;
+        menu_id = <%= menu_id %> ;
+
+      if (note.length < 1) {
+        url = BASE_URL + '/' + scope + '/' + optionals.join(',') + '?section_id=' + section_id + '&menu_id=' + menu_id
+        $('#add-to-basket-' + scope).attr("href", url)
+        //     console.log("href", url)
+      } else {
+        opt = optionals.join(',')
+        if (opt.length < 1) {
+          opt = 'nil'
+        }
+        url = BASE_URL + '/' + scope + '/' + opt
+        $('#add-to-basket-' + scope).attr("href", url + '/note/' + encodeURIComponent(note).replace(/\./g, '%7C%7C%7C') + '?section_id=' + section_id + '&menu_id=' + menu_id)
+        //       console.log("href", url + '/note/' + encodeURIComponent(note).replace(/\./g, '%7C%7C%7C'))
+      }
+
+
+    };
+
+
+  });
+</script>
+
+<% end %>
+
+<div class="container-fluid">
+  <% if !@restaurant.is_open %>
+    <% if is_takeaway?(@restaurant) or is_delivery?(@restaurant) %>
+      <div class="row">
+        <div class="col text-warning text-center border border-warning">
+          The Kitchen is currently closed, but you can still order takeaway for next available open time
+        </div>
+      </div>
+    <% else %>
+      <div class="row">
+        <div class="col text-warning text-center border border-danger">
+          The Kitchen is Now closed
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if @restaurant.is_open and @restaurant.is_closing < 30 and is_tableservice?(@restaurant) %>
+    <div class="row">
+      <div class="col text-warning text-center border border-warning">
+        The Kitchen is closing in <%= @restaurant.is_closing%> minutes<% if (is_takeaway?(@restaurant) or is_delivery?(@restaurant)) and @restaurant.is_closing < @restaurant.opening_time.delay_time_minutes %>, but you can still order takeaway for next available open time <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @restaurant.is_open and @restaurant.opening_time_kitchen_delay_minutes > 0 %>
+    <div class="row ">
+      <div class="col text-warning text-center border border-warning">
+        Please Note: The kitchen is busy and there could be up to <%= @restaurant.opening_time_kitchen_delay_minutes %> minutes delay
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= render 'all' if @restaurant.blank? %>
+<% if feature_match('menu_in_sections', @restaurant.features) %>
+<%= render 'order/components/sections/restaurant_auto', menu: @menu2 if @restaurant.present? %>
+<% else %>
+<%= render 'order/components/restaurant_auto', menu: @menu2 if @restaurant.present? %>
+<% end %>

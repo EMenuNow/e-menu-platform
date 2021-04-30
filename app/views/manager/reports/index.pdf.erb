@@ -1,0 +1,132 @@
+<%
+  total_value = (@receipts.sum(&:basket_total)/100.0)
+  total_emenu_commission_value = (@receipts.sum(&:application_fee_amount)/100.0)
+  total_revenue = number_to_currency(total_value, unit: @restaurant.currency_symbol)
+  dates = @restaurant.receipts.select(:created_at).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
+%>
+<!doctype html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <%= wicked_pdf_stylesheet_link_tag "pdf" %>
+    <%= wicked_pdf_javascript_include_tag "pdf" %>
+
+  </head>
+  <body onload='number_pages()'>
+    <main role="main">
+      <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <div class="row pb-1 text-center">
+            <div class="col-12">
+              <%= wicked_pdf_image_tag "logo/logo.png", :class=>"w-25 pb-5" %>
+              <h2 class="text-dark">Invoice for period</h2>
+              <h4 class="text-dark"><%= dates.last %> to <%= dates.first %></h4>
+              <h6 class="text-dark">Invoice Number: <%= (@restaurant.id.to_s + dates.last.to_s + dates.first.to_s).gsub("-","") %></h6>
+              <h6 class="text-dark">Date Generated: <%= DateTime.now.strftime("%d-%m-%Y") %></h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div class="container">
+      <div class="row pb-1 text-center">
+        <div class="col-12">
+          <h4><b>Invoice to</b></h4>
+          <hr class="m-0 pb-2" />
+          <h5><%= @restaurant.email %></h5>
+          <h5><%= @restaurant.name %></h5>
+          <h5><%= @restaurant.address %></h5>
+          <h5><%= @restaurant.postcode %></h5>
+          <h5><%= @restaurant.telephone %></h5>
+        </div>
+      </div>
+    </div>
+
+    <hr class="py-4" />
+    <div class="container pt-1 pb-5 text-left">
+      <% if @receipts.blank? %>
+        <div class="row pb-1">
+          <div class="col-12">
+            <div class="card shadow p-3 mt-4 mb-5 bg-white rounded">
+              <h2>There are no orders to show analytics of reporting on here!</h2>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="row pt-1 text-center">
+          <div class="col-2 offset-1">
+            <b>Month/Year</b>
+          </div>
+          <div class="col-3">
+            <b>Sales Value</b>
+          </div>
+          <div class="col-3">
+            <b>Emenu Fees (VAT)</b>
+          </div>
+          <div class="col-1">
+            <b>Total Payout</b>
+          </div>
+        </div>
+        <% @receipts.group_by{|x|x.created_at.strftime("%m - %Y")}.each do |g, receipts| %>
+          <% receipts.group_by{|x|x.delivery_or_collection}.each do |stype, receipts| %>  
+            <%
+              basket_total = 0
+              fee_sum = 0
+            %>
+            <hr class="m-0" />
+            <div class="row pt-2 text-center">
+              <div class="col-2 offset-1">
+                <h6><%= g %></h6>
+              </div>
+              <div class="col-3">
+                <h6><%= number_to_currency(basket_total = receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol) %></h6>
+              </div>
+              <div class="col-3">
+                <h6><%= number_to_currency(fee_sum = receipts.sum{|x|x.application_fee_amount} / 100.0, unit: @restaurant.currency_symbol) %> (<%= number_to_currency(receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol) %>)</h6>
+              </div>
+              <div class="col-1">
+                <h6><%= number_to_currency(basket_total - fee_sum, unit: @restaurant.currency_symbol) %></h6>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+        <div class="row text-right pt-5">
+          <div class="col-8">
+            <b>Fees paid to EMenu:</b>
+          </div>
+          <div class="col-2"> 
+            <%= number_to_currency(@receipts.sum{|x|x.application_fee_amount} / 100.0, unit: @restaurant.currency_symbol) %>
+          </div>
+        </div>
+        <div class="row text-right">
+          <div class="col-8">
+            <b>VAT paid on EMenu fees:</b>
+          </div>
+          <div class="col-2"> 
+            <%= number_to_currency(@receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol) %>
+          </div>
+        </div>
+        <div class="row text-right">
+          <div class="col-8">
+            <b>Payout due to restaurant by EMenu:</b>
+          </div>
+          <div class="col-2"> 
+            <%= number_to_currency((@receipts.sum{|x|x.basket_total} - @receipts.sum{|x|x.application_fee_amount}) / 100.0, unit: @restaurant.currency_symbol) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <main role="main">
+      <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <div class="row text-center">
+            <div class="col-12">
+              <%= wicked_pdf_image_tag "logo/logo.png", :class=>"pb-2", :style=>"width:100px;" %>
+              <h6 class="text-dark">Thank you for your custom</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
