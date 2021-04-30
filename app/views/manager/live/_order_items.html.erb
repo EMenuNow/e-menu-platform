@@ -75,13 +75,13 @@
     <%# .each do |receipts| %>
       <%# @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).order(id: :DESC).limit(70)).reverse %> <%# Default full order set %>
       <% first_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %> <%# Default not ready order set %>
-      <% second_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).includes(order: :refunds).order(id: :DESC)).reverse %> <%# Default ready order set %>
+      <% second_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).includes(order: :refunds).order(id: :DESC).limit(50)).reverse %> <%# Default ready order set %>
       
       <% @data = [] %>
-      <% @data += first_data if !params[:processing_status].present? %>
-      <% @data += second_data if params[:processing_status] = 'completed' %>
+      <% @data += first_data %>
+      <% @data += second_data %>
       
-      <% @data.take(50).each do |t, receipts| %>
+      <% @data.each do |t, receipts| %>
         <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
         <% receipt = receipts.first %>
         <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>

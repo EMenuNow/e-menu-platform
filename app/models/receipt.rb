@@ -5,6 +5,7 @@ class Receipt < ApplicationRecord
   after_create :broadcast
   after_create :creation_print
   after_create :item_breakdown
+  after_create :group_order_task
   has_many :screen_items
   belongs_to :discount_code, optional: true
   delegate :id, to: :restaurant, prefix: true
@@ -220,6 +221,10 @@ class Receipt < ApplicationRecord
   #  mylogger.debug("PRINTING SECONDARY: #{printer.inspect}")
     ActionCable.server.broadcast("printers_channel_#{restaurant_id}_#{printer.pi_interface_server_token}", data)
     update_print_status('Sent to printer')
+  end
+
+  def group_order_task
+    GroupOrderTaskWorker.perform_in(6.minutes, self.id) if self.group_order
   end
 
   def zreport
