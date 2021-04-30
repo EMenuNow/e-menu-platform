@@ -46,6 +46,8 @@
         $('.day-select').prop('checked', false);
       };
 
+      validate();
+
       $('#date-filter').on("change", validate);
       $('#day-select').on("change", clearDateRange);
       $('.input-daterange').on("click", clearDay);
@@ -62,40 +64,40 @@
   <%= form_tag({}, {:method => :get}) do %>
     <div class="row mb-3" id="date-select">
       <div class="col-6 text-right">
-        <%= radio_button_tag(:date, "created_at", false, autocomplete: 'off', class: 'date-select') %>
+        <%= radio_button_tag(:date, "created_at", params[:date] == 'created_at', autocomplete: 'off', class: 'date-select') %>
         <%= label_tag(:date_created_at, "Order Placed") %>
       </div>
       <div class="col-6 text-left">
-        <%= radio_button_tag(:date, "due_date", false, autocomplete: 'off', class: 'date-select') %>
-        <%= label_tag(:date_due_date, "Due Date") %>
+        <%= radio_button_tag(:date, "due_date", params[:date] == 'due_date', autocomplete: 'off', class: 'date-select') %>
+        <%= label_tag(:date_due_date, "Order Due") %>
       </div>
     </div>
     <br />
 
     <div class="row mb-3" id="day-select">
       <div class="col-4 text-right">
-        <%= radio_button_tag(:day, "yesterday", false, autocomplete: 'off', class: 'day-select') %>
+        <%= radio_button_tag(:day, "yesterday", params[:day] == 'yesterday', autocomplete: 'off', class: 'day-select') %>
         <%= label_tag(:day_yesterday, "Yesterday") %>
       </div>
       <div class="col-4">
-      <%= radio_button_tag(:day, "today", false, autocomplete: 'off', class: 'day-select') %>
+      <%= radio_button_tag(:day, "today", params[:day] == 'today', autocomplete: 'off', class: 'day-select') %>
       <%= label_tag(:day_today, "Today") %>
       </div>
       <div class="col-4 text-left">
-      <%= radio_button_tag(:day, "tomorrow", false, autocomplete: 'off', class: 'day-select') %>
+      <%= radio_button_tag(:day, "tomorrow", params[:day] == 'tomorrow', autocomplete: 'off', class: 'day-select') %>
       <%= label_tag(:day_tomorrow, "Tomorrow") %>
       </div>
     </div>
 
     <div class="mb-3 input-group input-daterange">
       
-      <%= text_field_tag :start, nil, placeholder: 'YYYY-MM-DD', hide_label: true, class: 'input-group-text form-control datepicker', id: 'start-date', autocomplete: 'off' %>
+      <%= text_field_tag :start, params[:start], placeholder: 'YYYY-MM-DD', hide_label: true, class: 'input-group-text form-control datepicker', id: 'start-date', autocomplete: 'off' %>
 
       <div class="input-group-prepend input-group-append">
         <span class="input-group-text"> to </span>
       </div>
 
-      <%= text_field_tag :end, nil, placeholder: 'YYYY-MM-DD', hide_label: true, class: 'input-group-text form-control datepicker', id: 'end-date', autocomplete: 'off' %>
+      <%= text_field_tag :end, params[:end], placeholder: 'YYYY-MM-DD', hide_label: true, class: 'input-group-text form-control datepicker', id: 'end-date', autocomplete: 'off' %>
       
     </div>
     <div class="mb-3 form-group">
