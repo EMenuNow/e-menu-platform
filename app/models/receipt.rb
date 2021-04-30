@@ -5,6 +5,7 @@ class Receipt < ApplicationRecord
   after_create :broadcast
   after_create :creation_print
   after_create :item_breakdown
+  after_create :group_order_task
   has_many :screen_items
   belongs_to :discount_code, optional: true
   delegate :id, to: :restaurant, prefix: true
@@ -23,7 +24,13 @@ class Receipt < ApplicationRecord
   end
 
   def is_recent_group_order?
-    self.group_order && self.created_at > 6.minutes.ago
+    self.group_order && self.created_at > 5.minutes.ago
+  end
+
+  def group_receipt_items
+    items = []
+    self.find_grouped_receipts.each{|x| items += x.items['items']}
+    return items
   end
 
   def order_id
@@ -41,14 +48,14 @@ class Receipt < ApplicationRecord
     item_screens = ItemScreen.where(restaurant_id: restaurant_id).joins(:item_screen_type).where("item_screen_types.key <> 'FULL'")
     if item_screens.present?
       items['items'].each do |item|
-        ScreenItem.create(restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['item_screen_type_key'], uuid: item['uuid']) if item['item_screen_type_key'].present?
-        ScreenItem.create(secondary: true, restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['secondary_item_screen_type_key'], uuid: item['uuid']) if item['secondary_item_screen_type_key'].present?
+        ScreenItem.create(restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['item_screen_type_key'], uuid: item['uuid'], processing_status: 'accepted') if item['item_screen_type_key'].present?
+        ScreenItem.create(secondary: true, restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['secondary_item_screen_type_key'], uuid: item['uuid'], processing_status: 'accepted') if item['secondary_item_screen_type_key'].present?
       end
       broadcast_items
-      creation_print_grouped('FOOD') if items['items'].select{|s| s['item_screen_type_key'] == 'FOOD'}.present?
-      creation_print_grouped('DRINK') if items['items'].select{|s| s['item_screen_type_key'] == 'DRINK'}.present?
-      secondary_creation_print_grouped('FOOD') if items['items'].select{|s| s['secondary_item_screen_type_key'] == 'FOOD'}.present?
-      secondary_creation_print_grouped('DRINK') if items['items'].select{|s| s['secondary_item_screen_type_key'] == 'DRINK'}.present?
+      creation_print_grouped('FOOD') if self.group_receipt_items.select{|s| s['item_screen_type_key'] == 'FOOD'}.present?
+      creation_print_grouped('DRINK') if self.group_receipt_items.select{|s| s['item_screen_type_key'] == 'DRINK'}.present?
+      secondary_creation_print_grouped('FOOD') if self.group_receipt_items.select{|s| s['secondary_item_screen_type_key'] == 'FOOD'}.present?
+      secondary_creation_print_grouped('DRINK') if self.group_receipt_items.select{|s| s['secondary_item_screen_type_key'] == 'DRINK'}.present?
     end
   end
 
@@ -222,6 +229,10 @@ class Receipt < ApplicationRecord
     update_print_status('Sent to printer')
   end
 
+  def group_order_task
+    GroupOrderTaskWorker.perform_in(5.minutes, self.id) if self.group_order
+  end
+
   def zreport
     
     #i = items['items'].present? ? items['items'].map{|s| {id: s['menu_id'], total: (s['total']*100.to_f).to_i, optional_ids: s['optionals']}} : []
@@ -260,6 +271,28 @@ class Receipt < ApplicationRecord
 
   def self.group_by_time(receipts, seconds = 300)
     receipts.group_by {|x| (time = Time.at((x.created_at.to_f / seconds).round * seconds).utc).to_s + (x.group_order ? nil : x.id ).to_s + x.table_number.to_s }.sort_by{|x,y|y.first.created_at}
+  end
+
+  def items_processing_status(screen_type_key = nil)
+    receipts = self.find_grouped_receipts
+
+    screen_items = []
+    receipts.each do |r|
+      if screen_type_key.present?
+        screen_items += r.screen_items.select{|d| d['item_screen_type_key'] == screen_type_key}
+      else
+        screen_items += r.screen_items
+      end
+    end
+
+    statuses = []
+    screen_items.each do |i|
+      statuses += [i.processing_status]
+    end
+    
+    return statuses[0] if statuses.uniq.length == 1
+    return 'preparing' if statuses.uniq.length > 1
+    return 'error'
   end
 
 end
