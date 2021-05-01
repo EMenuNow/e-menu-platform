@@ -26,6 +26,7 @@ class ReceiptsController < ApplicationController
   def view_receipt
     @receipt = Receipt.find_by(uuid: params[:uuid])
     @restaurant = @receipt.restaurant
+    @path = @restaurant.path
     respond_to do |format|
         format.html
         format.json 
