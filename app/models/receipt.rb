@@ -274,16 +274,25 @@ class Receipt < ApplicationRecord
   end
 
   def items_processing_status(screen_type_key = nil)
-    receipts = self.find_grouped_receipts
+    receipts = self.find_grouped_receipts if self.group_order
 
     screen_items = []
-    receipts.each do |r|
+    if self.group_order
+      receipts.each do |r|
+        if screen_type_key.present?
+          screen_items += r.screen_items.select{|d| d['item_screen_type_key'] == screen_type_key}
+        else
+          screen_items += r.screen_items
+        end
+      end
+    else
       if screen_type_key.present?
-        screen_items += r.screen_items.select{|d| d['item_screen_type_key'] == screen_type_key}
+        screen_items += self.screen_items.select{|d| d['item_screen_type_key'] == screen_type_key}
       else
-        screen_items += r.screen_items
+        screen_items += self.screen_items
       end
     end
+
 
     statuses = []
     screen_items.each do |i|
