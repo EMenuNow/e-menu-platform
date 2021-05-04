@@ -46,7 +46,6 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Queued")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def send_to_kitchen
@@ -62,7 +61,6 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Accepted")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def preparing
@@ -88,7 +86,6 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Preparing")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def is_ready
@@ -104,7 +101,6 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Ready")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def complete
@@ -120,19 +116,15 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Complete")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def is_item_ready
     @screen_item.ready = !@screen_item.ready?
     @screen_item.save
     @restaurant = @receipt.restaurant
-    path = manager_live_food_path(@restaurant) if @screen_item.item_screen_type_key == "FOOD"
-    path = manager_live_drinks_path(@restaurant) if @screen_item.item_screen_type_key == "DRINK"
     
     @receipt.broadcast
     @receipt.broadcast_items
-    # redirect_to path
   end
   
   def is_item_process # cycles screen item state
@@ -169,12 +161,9 @@ class ReceiptsController < ApplicationController
       end
     end
     @restaurant = @receipt.restaurant
-    path = manager_live_food_path(@restaurant) if @screen_item.item_screen_type_key == "FOOD"
-    path = manager_live_drinks_path(@restaurant) if @screen_item.item_screen_type_key == "DRINK"
     
     @receipt.broadcast
     @receipt.broadcast_items
-    # redirect_to path
   end
   
   def is_items_ready
@@ -197,12 +186,9 @@ class ReceiptsController < ApplicationController
     end
 
     @restaurant = @receipt.restaurant
-    path = manager_live_food_path(@restaurant) if params[:item_screen_type_key] == "FOOD"
-    path = manager_live_drinks_path(@restaurant) if params[:item_screen_type_key] == "DRINK"
     
     @receipt.broadcast
     @receipt.broadcast_items
-    # redirect_to path
   end
   
   def is_items_preparing
@@ -228,19 +214,14 @@ class ReceiptsController < ApplicationController
       end
     end
     @restaurant = @receipt.restaurant
-    path = manager_live_food_path(@restaurant) if params[:item_screen_type_key] == "FOOD"
-    path = manager_live_drinks_path(@restaurant) if params[:item_screen_type_key] == "DRINK"
   
     @receipt.broadcast
     @receipt.broadcast_items
-    # redirect_to path
   end
 
   def item_creation_broadcast
     @receipt = Receipt.find(params[:receipt_id])
     @receipt.broadcast_items
-
-    # redirect_to manager_live_orders_path(@receipt.restaurant_id)
   end
 
 

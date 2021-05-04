@@ -1,5 +1,7 @@
 <% content_for :js do %>
   <script>
+    var filterParams = {};
+
     $(function() {
       $(".delay-button").on("click", function() {
         var delay = this.id.match(/\d+/);
@@ -19,19 +21,19 @@
 
     <div class='row'>
       <div class='col-md-4 pb-1'>
-        <%= link_to manager_live_orders_path(@restaurant), class: "d-inline-block border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'orders'}" do %>
+        <%= link_to manager_live_orders_path(@restaurant), class: "d-inline-block border rounded p-2 text-decoration-none text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'orders'}" do %>
           <i class="fa fa-1x fa-bars text-white <%='text-muted' if params[:action] != 'orders'%>"></i><span class="d-none d-lg-inline"> Manager</span>
         <% end %>
-        <%= link_to manager_live_orders_kitchen_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'kitchen'}" do %>
+        <%= link_to manager_live_orders_kitchen_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-decoration-none text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'kitchen'}" do %>
           <i class="fa fa-1x fa-th text-white <%='text-muted' if params[:action] != 'kitchen'%>"></i><span class="d-none d-lg-inline"> Kitchen</span>
         <% end %>
         <% if ItemScreen.where(restaurant_id: @restaurant).joins(:item_screen_type).where("item_screen_types.key = 'FOOD'").presence %>
-          <%= link_to manager_live_food_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'food'}" do %>
+          <%= link_to manager_live_food_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-decoration-none text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'food'}" do %>
             <i class="fa fa-1x fa-utensils text-white <%='text-muted' if params[:action] != 'food'%>"></i><span class="d-none d-lg-inline"> Food</span>
           <% end %>
         <% end %>
         <% if ItemScreen.where(restaurant_id: @restaurant).joins(:item_screen_type).where("item_screen_types.key = 'DRINK'").presence %>
-          <%= link_to manager_live_drinks_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'drinks'}" do %>
+          <%= link_to manager_live_drinks_path(@restaurant), class: "d-inline-block ml-1 border rounded p-2 text-decoration-none text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'drinks'}" do %>
             <i class="fa fa-1x fa-coffee text-white <%='text-muted' if params[:action] != 'drinks'%>"></i><span class="d-none d-lg-inline"> Drink</span>
           <% end %>
         <% end %>
@@ -45,16 +47,16 @@
         <% end %>
       </div>
       <div class='col-md-4 text-right pb-1'>
-        <%= link_to "#", class: "d-inline-block border rounded p-2 text-uppercase mr-1 text-white #{'text-muted border-secondary' if !params[:date].present? and !params[:start].present?}", data: { toggle: "modal", target: "#dateModal" } do %>
-          <i class="far fa-calendar-alt"></i><span class="d-none d-lg-inline"><%= params[:date].present? ? " #{params[:date].humanize}" : params[:start].present? ? " Date Range" : " Date" %></span>
+        <%= link_to "#", id:"date-filter-button", class: "d-inline-block border rounded p-2 text-decoration-none text-uppercase mr-1 text-white text-muted border-secondary", data: { toggle: "modal", target: "#dateModal" } do %>
+          <i class="far fa-calendar-alt"></i> <span class="d-none d-lg-inline">Date</span>
         <% end %>
-        <%= link_to "#", class: "d-none border rounded p-2 text-uppercase mr-1 text-white #{'text-muted border-secondary' if !params[:filter].present?}", data: { toggle: "modal", target: "#filterModal" } do %>
+        <%= link_to "#", class: "d-none border rounded p-2 text-decoration-none text-uppercase mr-1 text-white #{'text-muted border-secondary' if !params[:filter].present?}", data: { toggle: "modal", target: "#filterModal" } do %>
           <i class="fas fa-filter"></i><span class="d-none d-lg-inline"> Filter</span>
         <% end %>
-        <%= link_to "#", class: "d-inline-block bg-warning rounded p-2 text-uppercase mr-1 text-white", data: { toggle: "modal", target: "#kitchen_delayModal" } do %>
+        <%= link_to "#", class: "d-inline-block bg-warning rounded p-2 text-decoration-none text-uppercase mr-1 text-white", data: { toggle: "modal", target: "#kitchen_delayModal" } do %>
           <i class="fa fas fa-stopwatch text-white"></i><span id="kitchen-delay" class="d-none d-lg-inline"><%= @restaurant.opening_time_kitchen_delay_minutes == 0 ? " Kitchen Delay" : " #{@restaurant.opening_time_kitchen_delay_minutes} min. Delay" %></span>
         <% end %>
-        <%= link_to "#", class: "d-inline-block bg-secondary rounded p-2 text-uppercase text-white", data: { toggle: "modal", target: "#settingsModal" } do %>
+        <%= link_to "#", class: "d-inline-block bg-secondary rounded p-2 text-decoration-none text-uppercase text-white", data: { toggle: "modal", target: "#settingsModal" } do %>
           <i class="fa fa-1x fa-cog"></i><span class="d-none d-lg-inline"> Settings</span>
         <% end %>
       </div>

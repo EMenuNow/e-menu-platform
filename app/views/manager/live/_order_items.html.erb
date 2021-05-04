@@ -1,8 +1,3 @@
-<% content_for :js do %>
-  <script>
-  </script>
-<% end %> 
-
 <%
   restaurant_id ||= nil
 %>
@@ -10,18 +5,9 @@
 <% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
 <div class="row text-left text-white">
   <div id="refreshed-time" class='col-12'>
-    Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
+    Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %>
   </div>
 </div>
-<%
-=begin%>
- <div class="row text-right">
-  <div id="refreshed-time" class='col'>
-    refreshed at: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
-  </div>
-</div> 
-<%
-=end%>
 
 <div id="receipt-group" class="bg-dark pb-3 row">
   <div class="col-12">
@@ -72,110 +58,84 @@
         </div>
       </div>
     </div>
-    <%# .each do |receipts| %>
+      <% if @data.blank? %>
+        <div class="col pt-5 my-3 text-white text-center">
+          <h3>No orders to view</h3>
+        </div>
+      <% else %>
+        <% @data.each do |t, receipts| %>
+          <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
+          <% receipt = receipts.first %>
+          <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>
 
-      <% if params[:date].present? and params[:start].present? and params[:end].present? %>
-        <% start_date = (params[:start]).in_time_zone(@restaurant.time_zone) %>
-        <% end_date = (params[:end]).in_time_zone(@restaurant.time_zone) %>
-        <% first_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", start_date, end_date).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
-        <% second_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).where("#{params[:date]} BETWEEN ? AND ?", start_date, end_date).includes(order: :refunds).order(id: :DESC)).reverse %>
-      <% elsif params[:date].present? and params[:day].present? %>
-        <% case params[:day] %>
-        <% when "yesterday" %>
-          <% day = Date.yesterday.in_time_zone(@restaurant.time_zone).all_day %>
-          <% first_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
-          <% second_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(order: :refunds).order(id: :DESC)).reverse %>
-        <% when "today" %>
-          <% day = Date.today.in_time_zone(@restaurant.time_zone).all_day %>
-          <% first_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
-          <% second_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(order: :refunds).order(id: :DESC)).reverse %>
-        <% when "tomorrow" %>
-          <% day = Date.tomorrow.in_time_zone(@restaurant.time_zone).all_day %>
-          <% first_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
-          <% second_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(order: :refunds).order(id: :DESC)).reverse %>
-        <% end %>
-      <% end %>
+          <% new_order = receipt.processing_status == "new" %>
+          <% queued = receipt.processing_status == "queued" %>
+          <% accepted = receipt.processing_status == "accepted" %>
+          <% preparing = receipt.processing_status == "preparing" %>
+          <% ready = receipt.processing_status == "ready" %>
+          <% complete = receipt.processing_status == "complete" %>
 
+          <% status_pill = 'badge-secondary' %>
+          <% status_pill = 'badge-danger' if new_order %>
+          <% status_pill = 'badge-info' if preparing %>
+          <% status_pill = 'badge-dark' if queued %>
+          <% status_pill = 'badge-warning' if ready %>
+          <% status_pill = 'badge-success' if complete %>
 
-      <% first_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} unless first_search_data %>
-      <% second_search_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).includes(order: :refunds).order(id: :DESC).limit(50)).reverse unless second_search_data %>
-      
-      <% @data = [] %>
-      <% @data += first_search_data %>
-      <% @data += second_search_data %>
+          <% order_pill = 'badge-light' %>
+          <% order_pill = 'badge-danger' if new_order or queued or accepted %>
+          <% order_pill = 'badge-warning' if preparing %>
 
-      <% @data.each do |t, receipts| %>
-        <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
-        <% receipt = receipts.first %>
-        <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>
-
-        <% new_order = receipt.processing_status == "new" %>
-        <% queued = receipt.processing_status == "queued" %>
-        <% accepted = receipt.processing_status == "accepted" %>
-        <% preparing = receipt.processing_status == "preparing" %>
-        <% ready = receipt.processing_status == "ready" %>
-        <% complete = receipt.processing_status == "complete" %>
-
-        <% status_pill = 'badge-secondary' %>
-        <% status_pill = 'badge-danger' if new_order %>
-        <% status_pill = 'badge-info' if preparing %>
-        <% status_pill = 'badge-dark' if queued %>
-        <% status_pill = 'badge-warning' if ready %>
-        <% status_pill = 'badge-success' if complete %>
-
-        <% order_pill = 'badge-light' %>
-        <% order_pill = 'badge-danger' if new_order or queued or accepted %>
-        <% order_pill = 'badge-warning' if preparing %>
-
-        <div class="row m-0 my-1">
-          <%
+          <div class="row m-0 my-1">
+            <%
 =begin%>
- <div class="" style="width: 4%;">
+<div class="" style="width: 4%;">
             <p class="text-center m-0 pt-2 d-none d-md-block"><%= check_box_tag "Check", class: "bg-secondary" %></p>
           </div> 
 <%
 =end%>
-          <%= link_to "#", class: "col-md-12 bg-light rounded py-2 text-dark text-decoration-none", data: { toggle: "modal", target: "#modal#{receipt.order_id}" } do %>
-            <div class="">
-              <div class="row">
-                <div class="col-md-1 px-1 text-center">
-                  <div style="font-size: 100%;" class="m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></div>
-                </div>
-                <div class="col-md-2 px-1 text-center">
-                  <div class="d-inline m-0"><%=receipt.name.presence&.titleize || "Table #{receipt.table_number}" %> <%=receipt.group_order ? "(Group)" : ""%></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                  <div class="d-inline m-0"><%= pluralize(receipts.sum{|x|x.items['items'].size || 0}, 'item') %></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                  <div class="d-inline m-0"><%= placed_datetime_format(receipt.created_at, @restaurant.time_zone) %></div>
-                </div>
-                <div class="col-md-2 px-1 text-center">
-                  <div class="d-inline m-0"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
-                </div>
-                <div class="col-md-2 px-1 text-center">
-                  <div class="d-inline m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize%></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                  <% paid_status = receipt&.order&.stripe_data.try(:[], "payment_status") %>
-                  <div class="d-inline m-0 <%= paid_status == 'paid' ? 'badge badge-pill badge-success' : '' %>"><%= paid_status&.titleize %></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                  <div class="d-inline m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                    <div class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
-                </div>
-                <%
+            <%= link_to "#", class: "col-md-12 bg-light rounded py-2 text-dark text-decoration-none", data: { toggle: "modal", target: "#modal#{receipt.order_id}" } do %>
+              <div class="">
+                <div class="row">
+                  <div class="col-md-1 px-1 text-center">
+                    <div style="font-size: 100%;" class="m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></div>
+                  </div>
+                  <div class="col-md-2 px-1 text-center">
+                    <div class="d-inline m-0"><%=receipt.name.presence&.titleize || "Table #{receipt.table_number}" %> <%=receipt.group_order ? "(Group)" : ""%></div>
+                  </div>
+                  <div class="col-md-1 px-1 text-center">
+                    <div class="d-inline m-0"><%= pluralize(receipts.sum{|x|x.items['items'].size || 0}, 'item') %></div>
+                  </div>
+                  <div class="col-md-1 px-1 text-center">
+                    <div class="d-inline m-0"><%= placed_datetime_format(receipt.created_at, @restaurant.time_zone) %></div>
+                  </div>
+                  <div class="col-md-2 px-1 text-center">
+                    <div class="d-inline m-0"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
+                  </div>
+                  <div class="col-md-2 px-1 text-center">
+                    <div class="d-inline m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize%></div>
+                  </div>
+                  <div class="col-md-1 px-1 text-center">
+                    <% paid_status = receipt&.order&.stripe_data.try(:[], "payment_status") %>
+                    <div class="d-inline m-0 <%= paid_status == 'paid' ? 'badge badge-pill badge-success' : '' %>"><%= paid_status&.titleize %></div>
+                  </div>
+                  <div class="col-md-1 px-1 text-center">
+                    <div class="d-inline m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></div>
+                  </div>
+                  <div class="col-md-1 px-1 text-center">
+                      <div class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
+                  </div>
+                  <%
 =begin%>
- <div class="col-md-1 px-1">
+<div class="col-md-1 px-1">
                 </div> 
 <%
 =end%>
+                </div>
               </div>
-            </div>
-          <% end %>
-        </div>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
     <%# end %>
   </div>
