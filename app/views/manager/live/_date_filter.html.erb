@@ -1,0 +1,165 @@
+<% content_for :js do %>
+  <script>
+    $(function (){
+      $('.input-daterange').datepicker({
+          format: "yyyy-mm-dd",
+          todayBtn: "linked",
+          autoclose: false,
+          disableTouchKeyboard: true,
+          todayHighlight: true
+      });
+
+
+      function validate() {
+        var dateSelected = $('#date-select input:radio:checked').length;
+        var daySelected = $('#day-select input:radio:checked').length;
+        var dateRangeSelected = $('#start-date').val() != "" && $('#end-date').val() != "";
+
+        if (daySelected) {
+          $('#start-date').val("");
+          $('#end-date').val("");
+        };
+        
+        if (dateSelected && (daySelected || dateRangeSelected )) {
+          $('input[type="submit"]').prop("disabled", false);
+        } else {
+          $('input[type="submit"]').prop("disabled", true);
+        };
+      };
+
+      function clearDateRange() {
+        var daySelected = $('#day-select input:radio:checked').length;
+        if (daySelected) {
+          $('#start-date').val("");
+          $('#end-date').val("");
+        };
+      };
+
+      function clearDay() {
+        $('.day-select').prop('checked', false);
+      };
+
+      validate();
+
+      $('#date-filter').on("change", validate);
+      $('#day-select').on("change", clearDateRange);
+      $('.input-daterange').on("click", clearDay);
+
+      $('#date-filter-form').submit(function(e) {
+        e.preventDefault();
+        $('#dateModal').modal('hide');
+        var url = $(this).attr("action");
+        var form_data = new FormData(e.target);
+        filterParams = Object.fromEntries(form_data.entries());
+
+        $.ajax({
+          url: url,
+          type: "get",
+          data: filterParams,
+          success: function (response) {
+            var orderData = $(response).find("#current-orders").html();
+            $("#current-orders").html(orderData);
+            $('#date-filter-button').removeClass('text-muted border-secondary');
+            $('#date-filter-button span').text(filterParams.day ? filterParams.date.split('_')[0] + ' ' + filterParams.day : filterParams.date.replace("_", " "));
+            validate();
+          },
+          error: function (xhr) {
+            console.log(xhr);
+          },
+        });
+      });
+
+      $('#date-filter-clear').on('click', function(e) {
+        e.preventDefault();
+        $('#date-filter-form').trigger("reset");
+        $('#dateModal').modal('hide');
+        var url = $(this).attr("href");
+
+        $.ajax({
+          url: url,
+          type: "get",
+          success: function (response) {
+            var orderData = $(response).find("#current-orders").html();
+            $("#current-orders").html(orderData);
+            $('#date-filter-button').addClass('text-muted border-secondary');
+            $('#date-filter-button span').text("Date");
+          },
+          error: function (xhr) {
+            console.log(xhr);
+          },
+        });
+      });
+
+    });
+
+  </script>
+<% end %>
+
+<%
+  redirect_path = params[:action]
+%>
+<div id="date-filter">
+  <%= form_tag({}, {id: 'date-filter-form', :method => :get}) do %>
+    <div class="row justify-content-center mb-3" id="date-select">
+      <div class="col-auto px-1">
+        <div class="ck-button">
+          <%= label_tag :date_created_at do %> 
+            <%= radio_button_tag(:date, "created_at", false, autocomplete: 'off', class: 'date-select') %>
+            <span>Order Placed</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-auto px-1">
+        <div class="ck-button">
+          <%= label_tag :date_due_date do %>
+            <%= radio_button_tag(:date, "due_date", false, autocomplete: 'off', class: 'date-select') %>
+            <span>Order Due</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mb-3" id="day-select">
+      <div class="col-auto px-1">
+        <div class="ck-button">
+          <%= label_tag :day_yesterday do %> 
+            <%= radio_button_tag(:day, "yesterday", false, autocomplete: 'off', class: 'day-select') %>
+            <span>Yesterday</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-auto px-1">
+        <div class="ck-button">
+          <%= label_tag :day_today do %> 
+            <%= radio_button_tag(:day, "today", false, autocomplete: 'off', class: 'day-select') %>
+            <span>Today</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-auto px-1">
+        <div class="ck-button">
+          <%= label_tag :day_tomorrow do %> 
+            <%= radio_button_tag(:day, "tomorrow", false, autocomplete: 'off', class: 'day-select') %>
+            <span>Tomorrow</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3 input-group input-daterange">
+      
+      <%= text_field_tag :start, params[:start], placeholder: 'YYYY-MM-DD', hide_label: true, class: 'input-group-text form-control datepicker', id: 'start-date', autocomplete: 'off' %>
+
+      <div class="input-group-prepend input-group-append">
+        <span class="input-group-text"> to </span>
+      </div>
+
+      <%= text_field_tag :end, params[:end], placeholder: 'YYYY-MM-DD', hide_label: true, class: 'input-group-text form-control datepicker', id: 'end-date', autocomplete: 'off' %>
+      
+    </div>
+    <div class="mb-3 form-group">
+      <%= link_to "Clear", '#', class: 'btn btn-secondary', id: 'date-filter-clear' %>
+      <%= submit_tag("Filter", class: 'btn btn-warning', disabled: true) %>
+    </div>
+  <% end %>
+</div>
