@@ -3,9 +3,23 @@
   
     $(document).ready(updatePath);
     function updatePath() {
-      var path = $("#restaurant_path").val() || 'your-path-here';
+      var path = $("#restaurant_path").val() || 'your-website-name-here';
       $("#path-span").text(path);
-    }
+    };
+
+    $("#restaurant_path").on('keypress', function(e) {
+      var regex = new RegExp("^[a-zA-Z\-0-9 ]+$");
+      var key = String.fromCharCode(!e.charCode ? e.keyCode : e.charCode);
+      if (!regex.test(key)) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    $("#restaurant_path").on('input', function(e) {
+      e.target.value = e.target.value.replace(/\s+/g, '-').toLowerCase();
+    });
+
     $("#restaurant_path").keyup(updatePath);
 
   </script>
@@ -75,22 +89,22 @@
         </div>
       </div>
       <div class="row">
-        <%= form.label :path, 'Choose a path for your menu.', class: 'h4 w-100 text-center mb-3' %>
+        <%= form.label :path, 'Choose a website name for your menu.', class: 'h5 w-100 text-center mb-3' %>
         <div class="col-md-6 mx-auto">
           <div class="form-group">
-            <%= form.text_field :path, class: 'form-control form-control-sm', placeholder: 'your-path-here' %>
+            <%= form.text_field :path, class: 'form-control form-control-sm', placeholder: 'your-website-name-here' %>
           </div>
         </div>
       </div>
       <div class="row my-3">
         <h5 class="w-100 text-center mb-3">Access your menu from this address:</h5>
-        <p class="w-100 text-center mb-3 restaurant-path">eat.emenunow.com/<span id="path-span">your-path-here</span></p>
+        <p class="w-100 text-center mb-3 restaurant-path">eat.emenunow.com/<span id="path-span">your-website-name-here</span></p>
       </div>
     </div>
   </div>
   <div class="row my-5">
     <div class="col-md-8 mx-auto text-center">
-      <%= form.submit (action_name == 'new' ? 'Set up business' : 'Edit business'), class: "btn btn-warning" %> 
+      <%= form.submit ('Submit'), class: "btn btn-warning" %> 
     </div>
   </div>
 <% end %>
