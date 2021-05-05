@@ -20,6 +20,7 @@ class Restaurant < ApplicationRecord
   # has_many :tables, through: :restaurant_tables
 
   validates_presence_of :name, on: %i[create update], message: "can't be blank"
+  validates_format_of :name, :with => /\A[;-} -9]*\z/i, on: %i[create update], message: "has invalid characters"
   validates_presence_of :address, on: %i[create update], message: "can't be blank"
   validates_presence_of :postcode, on: %i[create update], message: "can't be blank"
   validates_presence_of :telephone, on: %i[create update], message: "can't be blank"
