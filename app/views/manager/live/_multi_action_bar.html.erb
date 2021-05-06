@@ -1,0 +1,30 @@
+<% @printers = Printer.where(restaurant_id: @restaurant.id) if @printers.blank? %>
+
+<div id="live-multi-action-bar" class="row mx-0 bg-secondary fixed-bottom">
+  <div class='px-2 col-12' style='z-index:100;left:0;'>
+
+    <div class='row justify-content-between'>
+      <div class='col-auto py-2 my-auto mr-auto'>
+        <div style="font-size: 85%;", id="mab-order-count", class="badge badge-pill badge-secondary pill-outline-dark">Zero Selected</div> 
+      </div>
+      <div class='col-auto py-3'>
+        <%= button_tag "Queue", name: "submit", value: "queued", class: 'btn btn-info mab-confirm d-none text-uppercase p-0 px-2', id: "all-queued", data: { confirm: "Send 0 orders to queue?" } %>
+        <%= button_tag "To Kitchen", name: "submit", value: "accepted", class: 'btn btn-success mab-confirm text-uppercase p-0 px-2', id: "all-accepted", data: { confirm: "Send 0 orders to kitchen?" } %>
+        <%= button_tag "Preparing", name: "submit", value: "preparing", class: 'btn btn-danger mab-confirm text-uppercase p-0 px-2', id: "all-preparing", data: { confirm: "Mark 0 orders as preparing?" } %>
+        <%= button_tag "Ready", name: "submit", value: "ready", class: 'btn btn-warning mab-confirm text-uppercase p-0 px-2', id: "all-ready", data: { confirm: "Mark 0 orders as ready?" } %>
+        <%= button_tag "Complete", name: "submit", value: "complete", class: 'btn btn-success mab-confirm text-uppercase p-0 px-2', id: "all-complete", data: { confirm: "Mark 0 orders as complete?" } %>
+      </div>
+      <div class='col-auto py-3'>
+        <% @printers.each do |printer|%>
+          <%= button_tag name: "submit", value: "print-#{printer.id}", class: 'btn btn-info mab-confirm p-0 px-2', id: "all-print-#{printer.id}", data: { confirm: "Send 0 orders to #{printer.name} printer?" } do %>
+            <i class="fas fa-print"></i> <%= printer.name %>
+          <% end %>
+        <% end %>
+      </div>
+      <div class='col-auto py-3 ml-auto'>
+        <%= button_tag "Send Receipt", name: "submit", value: 'send-receipt', class: 'btn btn-warning text-uppercase p-0 px-2', id: "all-receipt", data: { confirm: "Re-send receipt for 0 orders?" } %>
+        <button type="button" class="btn btn-outline-light text-uppercase p-0 px-2" id="all-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

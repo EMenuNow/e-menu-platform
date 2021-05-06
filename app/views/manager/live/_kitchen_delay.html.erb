@@ -11,14 +11,14 @@
   </script>
 <% end %> 
 
-<div class="row">
-  <div class='p-3 col-12 bg-dark' style='z-index:100;left:0;'>
+<div id="live-header" class="row mx-0 bg-dark fixed-top">
+  <div class='p-3 col-12' style='z-index:100;left:0;'>
     <%
       redirect_path = params[:action]
     %>
 
     <div class='row'>
-      <div class='col-md-8 pb-1'>
+      <div class='col-md-8'>
         <%= link_to manager_live_orders_path(@restaurant), class: "d-inline-block border rounded p-2 text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'orders'}" do %>
           <i class="fa fa-1x fa-bars text-white <%='text-muted' if params[:action] != 'orders'%>"></i> Manager
         <% end %>
@@ -43,7 +43,7 @@
   <%
 =end%>
       </div>
-      <div class='col-md-4 text-right pb-1'>
+      <div class='col-md-4 text-right'>
         <%= link_to "#", class: "d-inline-block bg-warning rounded p-2 text-uppercase mr-1 text-white", data: { toggle: "modal", target: "#kitchen_delayModal" } do %>
           <i class="fa fas fa-stopwatch pr-2 text-white"></i> <span id="kitchen-delay"><%= @restaurant.opening_time_kitchen_delay_minutes == 0 ? "Kitchen Delay" : "#{@restaurant.opening_time_kitchen_delay_minutes} min. Delay" %></span>
         <% end %>
@@ -53,6 +53,6 @@
       </div>
     </div>
   </div>
-  <%= render partial: "manager/live/modal_container", locals: { title: "Settings", type: "settings" } %>
-  <%= render partial: "manager/live/modal_container", locals: { title: "Kitchen Delay", type: "kitchen_delay" } %>
 </div>
+<%= render partial: "manager/live/modal_container", locals: { title: "Settings", type: "settings" } %>
+<%= render partial: "manager/live/modal_container", locals: { title: "Kitchen Delay", type: "kitchen_delay" } %>

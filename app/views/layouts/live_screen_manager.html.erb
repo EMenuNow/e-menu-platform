@@ -23,13 +23,13 @@
 
   <body>
     <%= render 'manager/components/global/sidebar' %>
-    <%= render 'manager/components/global/order-loader' %>
+    <%#= render 'manager/components/global/order-loader' %>
     <%= render 'manager/components/global/topbar' %>
     <%= render 'components/global/messages' %>
     <%= render 'components/global/environment' %>
     <%#= render 'manager/components/restaurant/navigation' if current_manager_restaurant_user %>
 
-    <div id="live-order" class="container-fluid bg-dark">
+    <div id="live-order" class="container-fluid">
       <%= yield %>
 
     </div>

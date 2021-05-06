@@ -1,0 +1,27 @@
+<% content_for :js do %>
+  <script>
+
+  </script>
+<% end %> 
+
+<div id="live-status-bar" class="row mx-0 bg-dark fixed-bottom">
+  <div class='p-2 col-12' style='z-index:100;left:0;'>
+    
+    <% Stripe.api_key = @restaurant.stripe_sk_api_key %>
+    <% available = Stripe::Balance.retrieve(stripe_account: @restaurant.stripe_connected_account_id)["available"].first %>
+
+    <% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
+
+    <div class='row justify-content-between'>
+      <div class='col-auto'>
+        <div style="font-size: 85%;" class="badge badge-pill badge-dark pill-outline-dark"><%= @order_count %> Orders</div> 
+        <% if params[:action] == 'orders' %>
+          <div style="font-size: 85%;" class="badge badge-pill badge-dark pill-outline-dark">Stripe Balance: <%= number_to_currency(available["amount"] / 100.0, unit: @restaurant.currency_symbol) %></div> 
+        <% end %>
+      </div>
+      <div class='col-auto d-none d-sm-block'>
+        <div style="font-size: 85%;" class="badge badge-pill badge-dark pill-outline-dark pl-1"><i class="far fa-clock"></i> Last updated at: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%H:%M:%S") %></div> 
+      </div>
+    </div>
+  </div>
+</div>
