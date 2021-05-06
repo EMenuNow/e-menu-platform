@@ -19,8 +19,8 @@
       redirect_path = params[:action]
     %>
 
-    <div class='row'>
-      <div class='col-md-4 pb-1'>
+    <div class='row justify-content-between'>
+      <div class='col-auto pb-1'>
         <%= link_to manager_live_orders_path(@restaurant), class: "d-inline-block border rounded p-2 text-decoration-none text-uppercase text-white #{'text-muted border-secondary' if params[:action] != 'orders'}" do %>
           <i class="fa fa-1x fa-bars text-white <%='text-muted' if params[:action] != 'orders'%>"></i><span class="d-none d-lg-inline"> Manager</span>
         <% end %>
@@ -38,26 +38,26 @@
           <% end %>
         <% end %>
       </div>
-      <div class="col-md-4 text-center pb-1">
+      <div class="col-auto d-none text-center pb-1">
         <%= link_to manager_restaurant_open_early_path(@restaurant, redirect_path: redirect_path), method: :post, remote: true, class: "d-none rounded p-2 text-uppercase mr-1 text-white bg-success", data: { confirm: 'Start accepting orders for today?' } do %>
-          <i class="fa fas fa-power-off text-white"></i><span class="d-none d-lg-inline">  Start Orders</span>
+          <i class="fa fas fa-power-off text-white"></i><span class="d-md-inline">  Start Orders</span>
         <% end %>
         <%= link_to manager_restaurant_close_early_path(@restaurant, redirect_path: redirect_path), method: :post, remote: true, class: "d-none bg-danger rounded p-2 text-uppercase ml-1 text-white", data: { confirm: 'Stop accepting orders for today?' } do %>
-          <i class="fa fas fa-ban text-white"></i><span class="d-none d-lg-inline"> Stop Orders</span>
+          <i class="fa fas fa-ban text-white"></i><span class="d-md-inline"> Stop Orders</span>
         <% end %>
       </div>
-      <div class='col-md-4 text-right pb-1'>
+      <div class='col-auto text-right pb-1'>
         <%= link_to "#", id:"date-filter-button", class: "d-inline-block border rounded p-2 text-decoration-none text-uppercase mr-1 text-white text-muted border-secondary", data: { toggle: "modal", target: "#dateModal" } do %>
-          <i class="far fa-calendar-alt"></i> <span class="d-none d-lg-inline">Date</span>
+          <i class="far fa-calendar-alt"></i> <span class="d-none d-md-inline">Date</span>
         <% end %>
         <%= link_to "#", class: "d-none border rounded p-2 text-decoration-none text-uppercase mr-1 text-white #{'text-muted border-secondary' if !params[:filter].present?}", data: { toggle: "modal", target: "#filterModal" } do %>
-          <i class="fas fa-filter"></i><span class="d-none d-lg-inline"> Filter</span>
+          <i class="fas fa-filter"></i><span class="d-none d-md-inline"> Filter</span>
         <% end %>
         <%= link_to "#", class: "d-inline-block bg-warning rounded p-2 text-decoration-none text-uppercase mr-1 text-white", data: { toggle: "modal", target: "#kitchen_delayModal" } do %>
-          <i class="fa fas fa-stopwatch text-white"></i><span id="kitchen-delay" class="d-none d-lg-inline"><%= @restaurant.opening_time_kitchen_delay_minutes == 0 ? " Kitchen Delay" : " #{@restaurant.opening_time_kitchen_delay_minutes} min. Delay" %></span>
+          <i class="fa fas fa-stopwatch text-white"></i><span id="kitchen-delay" class="d-none d-md-inline"><%= @restaurant.opening_time_kitchen_delay_minutes == 0 ? " Kitchen Delay" : " #{@restaurant.opening_time_kitchen_delay_minutes} min. Delay" %></span>
         <% end %>
         <%= link_to "#", class: "d-inline-block bg-secondary rounded p-2 text-decoration-none text-uppercase text-white", data: { toggle: "modal", target: "#settingsModal" } do %>
-          <i class="fa fa-1x fa-cog"></i><span class="d-none d-lg-inline"> Settings</span>
+          <i class="fa fa-1x fa-cog"></i><span class="d-none d-md-inline"> Settings</span>
         <% end %>
       </div>
     </div>
