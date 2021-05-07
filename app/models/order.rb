@@ -9,8 +9,7 @@ class Order < ApplicationRecord
     has_many :refunds
 
     def first_or_create_receipt
-      self.receipts.first_or_create(
-        uuid: uuid,
+      self.receipts.where(uuid: uuid).first_or_create.update(
         restaurant_id: self.restaurant_id,
         basket_total: self.basket_total,
         items: self.items,
@@ -37,6 +36,7 @@ class Order < ApplicationRecord
         group_order: self.group_order,
         processing_status: "accepted" # temporary until pending payments is built
       )
+      self.receipts.find_by(uuid: uuid)
     end
 
     private
