@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_19_144956) do
+ActiveRecord::Schema.define(version: 2021_04_23_091630) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -546,6 +546,7 @@ ActiveRecord::Schema.define(version: 2021_04_19_144956) do
     t.float "commision_percentage", default: 0.0
     t.boolean "stripe_chargeback_enabled", default: false
     t.boolean "subscription_enabled", default: true
+    t.string "outletID"
     t.index ["cuisine_id"], name: "index_restaurants_on_cuisine_id"
     t.index ["currency_id"], name: "index_restaurants_on_currency_id"
     t.index ["restaurant_user_id"], name: "index_restaurants_on_restaurant_user_id"
@@ -566,6 +567,7 @@ ActiveRecord::Schema.define(version: 2021_04_19_144956) do
     t.datetime "updated_at", null: false
     t.string "uuid"
     t.boolean "secondary", default: false
+    t.string "processing_status", default: "pending"
     t.index ["menu_id"], name: "index_screen_items_on_menu_id"
     t.index ["receipt_id"], name: "index_screen_items_on_receipt_id"
     t.index ["restaurant_id"], name: "index_screen_items_on_restaurant_id"
