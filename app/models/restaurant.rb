@@ -20,6 +20,7 @@ class Restaurant < ApplicationRecord
   # has_many :tables, through: :restaurant_tables
 
   validates_presence_of :name, on: %i[create update], message: "can't be blank"
+  validates_format_of :name, :with => /\A[;-} -9]*\z/i, on: %i[create update], message: "has invalid characters"
   validates_presence_of :address, on: %i[create update], message: "can't be blank"
   validates_presence_of :postcode, on: %i[create update], message: "can't be blank"
   validates_presence_of :telephone, on: %i[create update], message: "can't be blank"
@@ -77,6 +78,20 @@ class Restaurant < ApplicationRecord
       token_length = 6
       self.slug = Array.new(token_length) { token_chars[rand(token_chars.length)] }.join
     end
+  end
+
+  def opening_time_today
+    t = Time.new.in_time_zone(time_zone)
+    today_day = t.strftime("%A").downcase
+    today_opening_time = opening_time_times[today_day]['open']
+    today_opening_time.presence || "00:00"
+  end
+  
+  def closing_time_today
+    t = Time.new.in_time_zone(time_zone)
+    today_day = t.strftime("%A").downcase
+    today_closing_time = opening_time_times[today_day]['close']
+    today_closing_time.presence || "00:00"
   end
 
   def is_open

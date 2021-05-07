@@ -1,8 +1,3 @@
-<% content_for :js do %>
-  <script>
-  </script>
-<% end %> 
-
 <%
   item_screen_type_key ||= nil
   restaurant_id ||= nil
@@ -11,209 +6,210 @@
 <% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
 <div class="row text-left text-white bg-dark">
   <div id="refreshed-time" class='col-12'>
-    Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
+    Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %>
   </div>
 </div>
+
 <div id="receipt-group" class="row bg-dark pb-2">
   <div class="col-12">
     <div class="row my-1 m-0">
-      <% @data = Receipt.group_by_time(@restaurant.receipts.includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
-      <% @data.each do |t, receipts| %>
-        <% items = nil %>
-        <% receipts.each do |receipt| %>
-          <%
-            items = receipt.find_grouped_receipts.collect{|r| r.items['items']}.flatten
-            items = receipt.find_grouped_receipts.collect{|r| r.items['items']}.flatten.select{|d| d['item_screen_type_key'] == item_screen_type_key} if item_screen_type_key.present?
-          %>
-        <% end %>
-        <% next if items.blank? %>
-        <% receipt = receipts.first %>
-
-        <% new_order = receipt.processing_status == "new" %>
-        <% queued = receipt.processing_status == "queued" %>
-        <% accepted = receipt.processing_status == "accepted" %>
-        <% preparing = receipt.processing_status == "preparing" %>
-        <% ready = receipt.processing_status == "ready" %>
-        <% complete = receipt.processing_status == "complete" %>
-
-        <% if item_screen_type_key.present? %>
-          <% new_order = receipt.items_processing_status(item_screen_type_key) == "new" %>
-          <% queued = receipt.items_processing_status(item_screen_type_key) == "queued" %>
-          <% accepted = receipt.items_processing_status(item_screen_type_key) == "accepted" %>
-          <% preparing = receipt.items_processing_status(item_screen_type_key) == "preparing" %>
-          <% ready = receipt.items_processing_status(item_screen_type_key) == "ready" %>
-          <% complete = receipt.items_processing_status(item_screen_type_key) == "complete" %>
-        <% end %>
-
-        <% status_pill = 'badge-secondary' %>
-        <% status_pill = 'badge-danger' if new_order %>
-        <% status_pill = 'badge-info' if preparing %>
-        <% status_pill = 'badge-dark' if queued %>
-        <% status_pill = 'badge-warning' if ready %>
-        <% status_pill = 'badge-success' if complete %>
-
-        <% order_pill = 'badge-light' %>
-        <% order_pill = 'badge-danger' if new_order or queued or accepted %>
-        <% order_pill = 'badge-warning' if preparing %>
-
-        <% header_color = '#B6F2B6' if receipt.table_number.present? %>
-        <% header_color = '#F2F2B6' if receipt.delivery_or_collection == 'collection' %>
-        <% header_color = '#F2DEB6' if receipt.delivery_or_collection == 'delivery' %>
-
-        <% time_placed = receipt.created_at.in_time_zone(@restaurant.time_zone) %>
-        <% dd = receipt.due_date.in_time_zone(@restaurant.time_zone) %>
-
-        <%  if item_screen_type_key.present? %>
-          <% order_is_new = receipt.items_processing_status(item_screen_type_key) != 'ready' && receipt.items_processing_status(item_screen_type_key) != 'complete' %>
-        <% else %>
-          <% order_is_new = !receipt.is_ready? %>
-        <% end %>
-        <% next if !order_is_new %>
-        <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
-        <div class="col-lg-6 p-0" id="receipt-<%= receipt.id %>-card">
-          <div class="bg-light rounded m-1" style="border-radius: 10px!important;">
-            <div class="row m-0 px-0 py-2" style="background-color: <%= header_color %>; border-radius: 10px 10px 0px 0px !important">
-              <div class="col-3 my-auto px-2 text-left">
-                <div style="font-size: 100%;" class="text-left m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></div>
-              </div>
-              <div class="col-6 mt-auto px-0 text-center">
-                <h5 class="d-inline m-0"><%=receipt.group_order ? "Group Order" : receipt.name.present? ? receipt.name.titleize : receipt.table_number.present? ? "Table #{receipt.table_number}" : "" %></h4>
-              </div>
-              <div class="col-3 mt-auto px-2 text-right">
-                <h6 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %></h5>
-              </div>
-            </div>
-            <div class="row m-0 px-0 py-2 w-100 border-bottom">
-              <div class="col-md-6 mt-auto px-2 text-left">
-                <% if item_screen_type_key.present? %>
-                  <% printers.each do |printer|%>
-                    <%= link_to print_items_receipt_url(receipt.id, item_screen_type_key, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send #{item_screen_type_key.titleize} items to #{printer.name} printer?" } do %>
-                      <i class="fas fa-print"></i> <%= printer.name %>
-                    <% end %>
-                  <% end %>
-                <% else %>
-                  <% printers.each do |printer|%>
-                    <%= link_to print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send order to #{printer.name} printer?" } do %>
-                      <i class="fas fa-print"></i> <%= printer.name %>
-                    <% end %>
-                  <% end %>
-                <% end %>
-              </div>
-              <div class="col-md-6 px-2 mt-auto text-right">
-                <div class="text-right align-bottom m-0 d-inline-block"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
-              </div>
-            </div>
-            <div class="row m-0 px-0 py-2 w-100 border-bottom">
-              <div class="col-6 px-2 my-auto text-left">
-                <% if item_screen_type_key.present? %>
-                  <div style="font-size:100%;" class="text-left m-0 badge badge-pill badge-light"><%= pluralize(receipts.sum{|x|x.items['items'].select{|d| d['item_screen_type_key'] == item_screen_type_key}.size}, 'item') %></div>
-                  <div id="statuspill<%receipt.order_id%>" class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.items_processing_status(item_screen_type_key)&.titleize %></div>
-                <% else %>
-                  <div style="font-size:100%;" class="text-left m-0 badge badge-pill badge-light"><%= pluralize(receipts.sum{|x|x.items['items'].size}, 'item') %></div>
-                  <div id="statuspill<%receipt.order_id%>" class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
-                <% end %>
-              </div>
-              <div class="col-6 px-2 my-auto text-right">
-                <% if item_screen_type_key.present? %>
-                  <%= link_to "#{preparing ? 'Preparing' : 'Prepare' }",receipt_screen_items_preparing_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }text-uppercase p-0 px-2 receipt-ready", id: "receipt-#{receipt.id}-preparing", data: { confirm: "Order ##{receipt.order_id} - #{preparing ? "Reset status of all #{item_screen_type_key.titleize} items in order?" : "Preparing all #{item_screen_type_key.titleize} items in order?" }" } %>
-                <% else %>
-                  <%= link_to "#{preparing ? 'Preparing' : 'Prepare' }",receipt_preparing_path(receipt.id, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - #{preparing ? 'Reset status of all items in order?' : 'Preparing all items in order?' }" } %>
-                <% end %>
-              </div>
-            </div>
-            <div class="row m-0" style="height: 300px; overflow-y: auto;">
-              <div class="col">
-                <% receipts.each do |receipt| %>
-                  <% sis = receipt.screen_items %>
-                    <%
-                      items = receipt.items['items']
-                      items = receipt.items['items'].select{|d| d['item_screen_type_key'] == item_screen_type_key} if item_screen_type_key.present?
-                    %>
-                  <% items.each do |item| %>
-                    <% screen_item = sis.select{|x|x.uuid == item['uuid']}.first %>
-
-                    <% si_accepted = screen_item&.processing_status == "accepted" %>
-                    <% si_preparing = screen_item&.processing_status == "preparing" %>
-                    <% si_ready = screen_item&.processing_status == "ready" %>
-
-                    <% si_status_pill = 'badge-secondary' %>
-                    <% si_status_pill = 'badge-info' if si_preparing %>
-                    <% si_status_pill = 'badge-warning' if si_ready %>
-
-                    <% menu_id = item['menu_id'] %>
-
-
-                      <div class="row border-bottom">
-                        <div class="col">
-                          <div class="row py-1">
-                            <div class="col-4 px-2 text-left">
-                              <small class="d-inline-block text-truncate text-muted" style="max-width: 300px;"><%= Menu.find_by(id: menu_id)&.ancestry&.split('/')&.map{|a| Menu.find_by(id: a)&.name&.titleize}&.join(' • ') %></small>
-                            </div>
-                            <div class="col-8 px-2 text-right">
-                              <% if screen_item.present? %>
-                                  <div class="d-inline m-0 text-decoration-none badge badge-pill <%= si_status_pill %>"><%= screen_item&.processing_status&.titleize %></div>
-                              <% end %>
-                              <% if receipt.name.present? %>
-                                <div class="d-inline m-0 badge badge-user"><%= receipt.name.split.first.titleize %> <i class="fas fa-user"></i></div>
-                              <% end %>
-                              <% if item_screen_type_key.present? %>
-                                <small class="d-inline text-muted"><%= item_screen_type_key.titleize %></small>
-                              <% else %>
-                                <small class="d-inline text-muted"><%= item['item_screen_type_key'].presence&.titleize %></small>
-                              <% end %>
-                            </div>
-                          </div>
-                          <div class="row pb-2">
-                            <% if screen_item.present? %>
-                              <div class="col-8">
-                                <%= link_to receipt_screen_item_process_path(receipt.id, screen_item.id, only_path: true), method: :post, remote: true, data: { confirm: "Order ##{receipt.order_id} - #{screen_item.processing_status == 'accepted' ? 'Preparing item?' : screen_item.processing_status == 'preparing' ? 'Mark item ready?' : 'Reset item status' }" } do %>
-                                  <%= item['item'].html_safe %>
-                                <% end %>
-                              </div>
-                            <% else %>
-                              <div class="col-8">
-                                <%= item['item'].html_safe %>
-                              </div>
-                            <% end %>
-                            <div class="col-4">
-                              <small>
-                                <%= item['optionals'].join('<br> ').html_safe %>
-                              </small>
-                            </div>
-                          </div>
-                          <% if item['note'].present? %>
-                            <div class="row pb-2">
-                              <div class="col text-left">
-                                <small><i>Note: </i> <%=item['note']%></small>
-                              </div>
-                            </div>
-                          <% end %>
-                        </div>
-                      </div>
-
-                  <% end %>
-                <% end %>
-              </div>
-            </div>
-            <div class="row m-0 px-0 py-2 border-top">
-              <div class="col-8 my-auto px-2 text-muted text-left">
-                <small><i class="far fa-clock"></i> <%= time_placed.strftime("%H:%M") %> &nbsp; <i class="far fa-calendar-alt"></i> <%= time_placed.strftime("%A, #{time_placed.day.ordinalize} %B") %> </small>
-              </div>
-              <div class="col-4 px-2 my-auto text-right">
-                <% if item_screen_type_key.present? %>
-                  <%= link_to "Ready",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark all #{item_screen_type_key.downcase} items as ready?" } %>
-                <% else %>
-                  <%= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } %>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        </div>
-      <% end %>
       <% if @data.blank? %>
         <div class="col pt-5 my-3 text-white text-center">
           <h3>No orders to view</h3>
         </div>
+      <% else %>
+        <% @data.each do |t, receipts| %>
+          <% items = nil %>
+          <% receipts.each do |receipt| %>
+            <%
+              items = receipt.find_grouped_receipts.collect{|r| r.items['items']}.flatten
+              items = receipt.find_grouped_receipts.collect{|r| r.items['items']}.flatten.select{|d| d['item_screen_type_key'] == item_screen_type_key} if item_screen_type_key.present?
+            %>
+          <% end %>
+          <% next if items.blank? %>
+          <% receipt = receipts.first %>
+
+          <% new_order = receipt.processing_status == "new" %>
+          <% queued = receipt.processing_status == "queued" %>
+          <% accepted = receipt.processing_status == "accepted" %>
+          <% preparing = receipt.processing_status == "preparing" %>
+          <% ready = receipt.processing_status == "ready" %>
+          <% complete = receipt.processing_status == "complete" %>
+
+          <% if item_screen_type_key.present? %>
+            <% new_order = receipt.items_processing_status(item_screen_type_key) == "new" %>
+            <% queued = receipt.items_processing_status(item_screen_type_key) == "queued" %>
+            <% accepted = receipt.items_processing_status(item_screen_type_key) == "accepted" %>
+            <% preparing = receipt.items_processing_status(item_screen_type_key) == "preparing" %>
+            <% ready = receipt.items_processing_status(item_screen_type_key) == "ready" %>
+            <% complete = receipt.items_processing_status(item_screen_type_key) == "complete" %>
+          <% end %>
+
+          <% status_pill = 'badge-secondary' %>
+          <% status_pill = 'badge-danger' if new_order %>
+          <% status_pill = 'badge-info' if preparing %>
+          <% status_pill = 'badge-dark' if queued %>
+          <% status_pill = 'badge-warning' if ready %>
+          <% status_pill = 'badge-success' if complete %>
+
+          <% order_pill = 'badge-light' %>
+          <% order_pill = 'badge-danger' if new_order or queued or accepted %>
+          <% order_pill = 'badge-warning' if preparing %>
+
+          <% header_color = '#B6F2B6' if receipt.table_number.present? %>
+          <% header_color = '#F2F2B6' if receipt.delivery_or_collection == 'collection' %>
+          <% header_color = '#F2DEB6' if receipt.delivery_or_collection == 'delivery' %>
+
+          <% time_placed = receipt.created_at.in_time_zone(@restaurant.time_zone) %>
+          <% dd = receipt.due_date.in_time_zone(@restaurant.time_zone) %>
+
+          <%  if item_screen_type_key.present? %>
+            <% order_is_new = receipt.items_processing_status(item_screen_type_key) != 'ready' && receipt.items_processing_status(item_screen_type_key) != 'complete' %>
+          <% else %>
+            <% order_is_new = !receipt.is_ready? %>
+          <% end %>
+          <% next if !order_is_new %>
+          <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
+          <div class="col-lg-6 p-0" id="receipt-<%= receipt.id %>-card">
+            <div class="bg-light rounded m-1" style="border-radius: 10px!important;">
+              <div class="row m-0 px-0 py-2" style="background-color: <%= header_color %>; border-radius: 10px 10px 0px 0px !important">
+                <div class="col-3 my-auto px-2 text-left">
+                  <div style="font-size: 100%;" class="text-left m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></div>
+                </div>
+                <div class="col-6 mt-auto px-0 text-center">
+                  <h5 class="d-inline m-0"><%=receipt.group_order ? "Group Order" : receipt.name.present? ? receipt.name.titleize : receipt.table_number.present? ? "Table #{receipt.table_number}" : "" %></h4>
+                </div>
+                <div class="col-3 mt-auto px-2 text-right">
+                  <h6 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %></h5>
+                </div>
+              </div>
+              <div class="row m-0 px-0 py-2 w-100 border-bottom">
+                <div class="col-md-6 mt-auto px-2 text-left">
+                  <% if item_screen_type_key.present? %>
+                    <% printers.each do |printer|%>
+                      <%= link_to print_items_receipt_url(receipt.id, item_screen_type_key, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send #{item_screen_type_key.titleize} items to #{printer.name} printer?" } do %>
+                        <i class="fas fa-print"></i> <%= printer.name %>
+                      <% end %>
+                    <% end %>
+                  <% else %>
+                    <% printers.each do |printer|%>
+                      <%= link_to print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send order to #{printer.name} printer?" } do %>
+                        <i class="fas fa-print"></i> <%= printer.name %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                </div>
+                <div class="col-md-6 px-2 mt-auto text-right">
+                  <div class="text-right align-bottom m-0 d-inline-block"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
+                </div>
+              </div>
+              <div class="row m-0 px-0 py-2 w-100 border-bottom">
+                <div class="col-6 px-2 my-auto text-left">
+                  <% if item_screen_type_key.present? %>
+                    <div style="font-size:100%;" class="text-left m-0 badge badge-pill badge-light"><%= pluralize(receipts.sum{|x|x.items['items'].select{|d| d['item_screen_type_key'] == item_screen_type_key}.size}, 'item') %></div>
+                    <div id="statuspill<%receipt.order_id%>" class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.items_processing_status(item_screen_type_key)&.titleize %></div>
+                  <% else %>
+                    <div style="font-size:100%;" class="text-left m-0 badge badge-pill badge-light"><%= pluralize(receipts.sum{|x|x.items['items'].size}, 'item') %></div>
+                    <div id="statuspill<%receipt.order_id%>" class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
+                  <% end %>
+                </div>
+                <div class="col-6 px-2 my-auto text-right">
+                  <% if item_screen_type_key.present? %>
+                    <%= link_to "#{preparing ? 'Preparing' : 'Prepare' }",receipt_screen_items_preparing_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }text-uppercase p-0 px-2 receipt-ready", id: "receipt-#{receipt.id}-preparing", data: { confirm: "Order ##{receipt.order_id} - #{preparing ? "Reset status of all #{item_screen_type_key.titleize} items in order?" : "Preparing all #{item_screen_type_key.titleize} items in order?" }" } %>
+                  <% else %>
+                    <%= link_to "#{preparing ? 'Preparing' : 'Prepare' }",receipt_preparing_path(receipt.id, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - #{preparing ? 'Reset status of all items in order?' : 'Preparing all items in order?' }" } %>
+                  <% end %>
+                </div>
+              </div>
+              <div class="row m-0" style="height: 300px; overflow-y: auto;">
+                <div class="col">
+                  <% receipts.each do |receipt| %>
+                    <% sis = receipt.screen_items %>
+                      <%
+                        items = receipt.items['items']
+                        items = receipt.items['items'].select{|d| d['item_screen_type_key'] == item_screen_type_key} if item_screen_type_key.present?
+                      %>
+                    <% items.each do |item| %>
+                      <% screen_item = sis.select{|x|x.uuid == item['uuid']}.first %>
+
+                      <% si_accepted = screen_item&.processing_status == "accepted" %>
+                      <% si_preparing = screen_item&.processing_status == "preparing" %>
+                      <% si_ready = screen_item&.processing_status == "ready" %>
+
+                      <% si_status_pill = 'badge-secondary' %>
+                      <% si_status_pill = 'badge-info' if si_preparing %>
+                      <% si_status_pill = 'badge-warning' if si_ready %>
+
+                      <% menu_id = item['menu_id'] %>
+
+
+                        <div class="row border-bottom">
+                          <div class="col">
+                            <div class="row py-1">
+                              <div class="col-4 px-2 text-left">
+                                <small class="d-inline-block text-truncate text-muted" style="max-width: 300px;"><%= Menu.find_by(id: menu_id)&.ancestry&.split('/')&.map{|a| Menu.find_by(id: a)&.name&.titleize}&.join(' • ') %></small>
+                              </div>
+                              <div class="col-8 px-2 text-right">
+                                <% if screen_item.present? %>
+                                    <div class="d-inline m-0 text-decoration-none badge badge-pill <%= si_status_pill %>"><%= screen_item&.processing_status&.titleize %></div>
+                                <% end %>
+                                <% if receipt.name.present? %>
+                                  <div class="d-inline m-0 badge badge-user"><%= receipt.name.split.first.titleize %> <i class="fas fa-user"></i></div>
+                                <% end %>
+                                <% if item_screen_type_key.present? %>
+                                  <small class="d-inline text-muted"><%= item_screen_type_key.titleize %></small>
+                                <% else %>
+                                  <small class="d-inline text-muted"><%= item['item_screen_type_key'].presence&.titleize %></small>
+                                <% end %>
+                              </div>
+                            </div>
+                            <div class="row pb-2">
+                              <% if screen_item.present? %>
+                                <div class="col-8">
+                                  <%= link_to receipt_screen_item_process_path(receipt.id, screen_item.id, only_path: true), method: :post, remote: true, data: { confirm: "Order ##{receipt.order_id} - #{screen_item.processing_status == 'accepted' ? 'Preparing item?' : screen_item.processing_status == 'preparing' ? 'Mark item ready?' : 'Reset item status' }" } do %>
+                                    <%= item['item'].html_safe %>
+                                  <% end %>
+                                </div>
+                              <% else %>
+                                <div class="col-8">
+                                  <%= item['item'].html_safe %>
+                                </div>
+                              <% end %>
+                              <div class="col-4">
+                                <small>
+                                  <%= item['optionals'].join('<br> ').html_safe %>
+                                </small>
+                              </div>
+                            </div>
+                            <% if item['note'].present? %>
+                              <div class="row pb-2">
+                                <div class="col text-left">
+                                  <small><i>Note: </i> <%=item['note']%></small>
+                                </div>
+                              </div>
+                            <% end %>
+                          </div>
+                        </div>
+
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+              <div class="row m-0 px-0 py-2 border-top">
+                <div class="col-8 my-auto px-2 text-muted text-left">
+                  <small><i class="far fa-clock"></i> <%= time_placed.strftime("%H:%M") %> &nbsp; <i class="far fa-calendar-alt"></i> <%= time_placed.strftime("%A, #{time_placed.day.ordinalize} %B") %> </small>
+                </div>
+                <div class="col-4 px-2 my-auto text-right">
+                  <% if item_screen_type_key.present? %>
+                    <%= link_to "Ready",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark all #{item_screen_type_key.downcase} items as ready?" } %>
+                  <% else %>
+                    <%= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
       <% end %>
     </div>
   </div>
