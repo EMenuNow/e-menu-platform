@@ -26,6 +26,7 @@ class Restaurant < ApplicationRecord
   validates_presence_of :telephone, on: %i[create update], message: "can't be blank"
   validates_presence_of :email, on: %i[create update], message: "can't be blank"
   validates_uniqueness_of :path, on: %i[create update], message: "must be unique"
+  validates_format_of :path, :with => /\A[a-z\-0-9]*\z/, on: %i[create update], message: "has invalid characters"
   validates_uniqueness_of :restaurant_user_id, on: %i[create update], message: "must be unique"
   validates :commision_percentage, :inclusion => { :in => 0..10, message: "must be between 0% and 10%" }
   validates :image, size: { less_than: 2.megabytes, message: 'is more than 2 megabytes'},
