@@ -9,6 +9,9 @@ Restaurant Configuration - <%= @restaurant&.name ? @restaurant.name : "Welcome" 
       <%= image_tag @restaurant.image.variant(resize_and_pad: [200, 200]), class: "img-fluid"  %>
       <% end %>
       <h1 class=" text-dark">Restaurant configuration</h1>
+      <% if @restaurant.demo %>
+        <h5 class="text-muted">(Demo restaurant)</h5>
+      <% end %>
       <p class="pt-3">
         Complete all the below information
       </p>

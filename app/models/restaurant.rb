@@ -58,21 +58,31 @@ class Restaurant < ApplicationRecord
   end
 
   def stripe_sk_api_key
+    stripe_pro_test_key = 'sk_test_51IEEKiJyyGTIkLikMKhhmkTY4raz9JHFXp9qiQYwvJNRviHXdBqwpIez4Kva9vtbw6iMaT5qZML5vvGAK1n71i0c0013EXKJPf'
+    stripe_test_key = 'sk_test_hOj5WqYB26UV1v5uuqXsADSG'
+    
     if stripe_chargeback_enabled
-      Rails.env == 'production' ? ENV['STRIPE_PRO_API_KEY'] : 'sk_test_51IEEKiJyyGTIkLikMKhhmkTY4raz9JHFXp9qiQYwvJNRviHXdBqwpIez4Kva9vtbw6iMaT5qZML5vvGAK1n71i0c0013EXKJPf'
+      self.demo? ? stripe_pro_test_key : Rails.env == 'production' ? ENV['STRIPE_PRO_API_KEY'] : stripe_pro_test_key
     else
-      Rails.env == 'production' ? ENV['STRIPE_API_KEY'] : 'sk_test_hOj5WqYB26UV1v5uuqXsADSG'
+      self.demo? ? stripe_test_key : Rails.env == 'production' ? ENV['STRIPE_API_KEY'] : stripe_test_key
     end
   end
   
   def stripe_pk_api_key
+    stripe_pro_private_test_key = 'pk_test_51IEEKiJyyGTIkLikJM25yV1oCLrbVhvDwWRXfvtDG3AZlXWvMmzusQQLUajhKyHezbGugPkI25j1qGCYIlwddvBq00lYPYNmZn'
+    stripe_private_test_key = 'pk_test_WK72bUcdjoVsncoNFQGrFkcv'
+
     if stripe_chargeback_enabled
-      Rails.env == 'production' ? ENV['STRIPE_PRO_PK_API_KEY'] : 'pk_test_51IEEKiJyyGTIkLikJM25yV1oCLrbVhvDwWRXfvtDG3AZlXWvMmzusQQLUajhKyHezbGugPkI25j1qGCYIlwddvBq00lYPYNmZn'
+      self.demo? ? stripe_pro_private_test_key : Rails.env == 'production' ? ENV['STRIPE_PRO_PK_API_KEY'] : stripe_pro_private_test_key
     else
-      Rails.env == 'production' ? ENV['STRIPE_PK_API_KEY'] : 'pk_test_WK72bUcdjoVsncoNFQGrFkcv'
+      self.demo? ? stripe_private_test_key : Rails.env == 'production' ? ENV['STRIPE_PK_API_KEY'] : stripe_private_test_key
     end
   end  
-    
+  
+  def stripe_connected_account_id
+    self.demo? ? 'acct_1GvfmzIYdU9EtEhv' : super
+  end
+
   def set_slug
     if slug.blank? 
       token_chars = ('A'..'Z').to_a.delete_if { |i| i == 'O' } + ('1'..'9').to_a
