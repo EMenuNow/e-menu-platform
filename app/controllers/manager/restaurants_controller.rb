@@ -7,7 +7,7 @@ module Manager
     before_action :set_restaurant_new, only: %i[show edit update]
     before_action :set_restaurant, only: %i[active toggle_active set_delay]
     before_action :set_cuisine, only: %i[new create show edit update]
-    before_action :get_stripe_account, only: %i[show edit update]
+    before_action :get_stripe_account, only: :edit
 
     before_action :set_features, only: %i[show edit update new]
 
