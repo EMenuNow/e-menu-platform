@@ -1,7 +1,11 @@
 <% content_for :js do %>
-  <script>
+  <script type="text/javascript">
+    $('.order-progress').on('ajax:send', function(ev) {
+      $('#order-progress-overlay').addClass("active");
+      $('.lds-ellipsis').addClass("active");
+    })
   </script>
-<% end %> 
+<% end %>
 
 <%
   restaurant_id ||= nil
