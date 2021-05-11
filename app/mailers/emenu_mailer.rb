@@ -12,7 +12,7 @@ class EmenuMailer < ActionMailer::Base
     @connect = stripe_link if stripe_link
 
     from = "EMenu Now <noreply@emenunow.com>"
-    subject = "#{@restaurant.name}, welcome to EMenu Now"
+    subject = "#{@restaurant.name.gsub(':',' -')}, welcome to EMenu Now"
 
     mail(to: @restaurant_user.email, from: from , subject: subject )
   end
