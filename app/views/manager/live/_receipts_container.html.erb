@@ -194,7 +194,7 @@
                     <p class="text-center m-0"><%=receipts.map{|x|x&.order&.email}.compact.join(",").gsub(",",", ")%></p>
                   </div>
                 </div>
-                <% unless receipts.map{|x|x&.telephone}.any? %>
+                <% unless receipts.map{|x|x&.telephone}.all?(&:blank?) %>
                   <div class="row pt-3">
                     <div class="col-4 text-right">
                       <h5><b>Phone</b></p>
