@@ -307,7 +307,7 @@ $(function(){
       </div>
     </div>
     <div class="row pb-5">
-      <div class="col-md-7">         
+      <div class="col-md-7 pb-3">         
         <%
           service_types = []
           service_types << ['Collection', 'collection'] if is_takeaway?(@restaurant) 
@@ -471,8 +471,11 @@ $(function(){
                     </div>
                   <% else %>
                     <div class="row mt-4 mb-4 " id='pay-now-button'>
-                      <div class='col'>
+                      <div class='col-12'>
                         <button id="checkout-button" class="btn btn-primary btn-block">Pay Now</button>
+                      </div>
+                      <div class='col-12 mt-2 text-center'>
+                          <small>Please only press pay once to avoid duplicate orders, and wait up to 20 seconds for your receipt.</small>
                       </div>
                     </div>
                     <script src="https://js.stripe.com/v3/"></script>
