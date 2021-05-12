@@ -1,7 +1,11 @@
 <% content_for :js do %>
-  <script>
+  <script type="text/javascript">
+    $('.order-progress').on('ajax:send', function(ev) {
+      $('#order-progress-overlay').addClass("active");
+      $('.lds-ellipsis').addClass("active");
+    })
   </script>
-<% end %> 
+<% end %>
 
 <%
   item_screen_type_key ||= nil
@@ -115,9 +119,9 @@
               </div>
               <div class="col-6 px-2 my-auto text-right">
                 <% if item_screen_type_key.present? %>
-                  <%= link_to "#{preparing ? 'Preparing' : 'Prepare' }",receipt_screen_items_preparing_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }text-uppercase p-0 px-2 receipt-ready", id: "receipt-#{receipt.id}-preparing", data: { confirm: "Order ##{receipt.order_id} - #{preparing ? "Reset status of all #{item_screen_type_key.titleize} items in order?" : "Preparing all #{item_screen_type_key.titleize} items in order?" }" } %>
+                  <%= link_to "#{preparing ? 'Preparing' : 'Prepare' }",receipt_screen_items_preparing_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }order-progress text-uppercase p-0 px-2 receipt-ready", id: "receipt-#{receipt.id}-preparing", data: { confirm: "Order ##{receipt.order_id} - #{preparing ? "Reset status of all #{item_screen_type_key.titleize} items in order?" : "Preparing all #{item_screen_type_key.titleize} items in order?" }" } %>
                 <% else %>
-                  <%= link_to "#{preparing ? 'Preparing' : 'Prepare' }",receipt_preparing_path(receipt.id, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - #{preparing ? 'Reset status of all items in order?' : 'Preparing all items in order?' }" } %>
+                  <%= link_to "#{preparing ? 'Preparing' : 'Prepare' }",receipt_preparing_path(receipt.id, only_path: true), method: :post, remote: true, class: "btn #{preparing ? 'btn-outline-success ' : 'btn-success ' }order-progress text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - #{preparing ? 'Reset status of all items in order?' : 'Preparing all items in order?' }" } %>
                 <% end %>
               </div>
             </div>
@@ -166,7 +170,7 @@
                           <div class="row pb-2">
                             <% if screen_item.present? %>
                               <div class="col-8">
-                                <%= link_to receipt_screen_item_process_path(receipt.id, screen_item.id, only_path: true), method: :post, remote: true, data: { confirm: "Order ##{receipt.order_id} - #{screen_item.processing_status == 'accepted' ? 'Preparing item?' : screen_item.processing_status == 'preparing' ? 'Mark item ready?' : 'Reset item status' }" } do %>
+                                <%= link_to receipt_screen_item_process_path(receipt.id, screen_item.id, only_path: true), method: :post, remote: true, class:"order-progress", data: { confirm: "Order ##{receipt.order_id} - #{screen_item.processing_status == 'accepted' ? 'Preparing item?' : screen_item.processing_status == 'preparing' ? 'Mark item ready?' : 'Reset item status' }" } do %>
                                   <%= item['item'].html_safe %>
                                 <% end %>
                               </div>
@@ -201,9 +205,9 @@
               </div>
               <div class="col-4 px-2 my-auto text-right">
                 <% if item_screen_type_key.present? %>
-                  <%= link_to "Ready",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark all #{item_screen_type_key.downcase} items as ready?" } %>
+                  <%= link_to "Ready",receipt_screen_items_ready_path(receipt.id, item_screen_type_key: item_screen_type_key, only_path: true), method: :post, remote: true, class: 'btn btn-warning order-progress text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark all #{item_screen_type_key.downcase} items as ready?" } %>
                 <% else %>
-                  <%= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } %>
+                  <%= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning order-progress text-uppercase p-0 px-2 receipt-ready', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } %>
                 <% end %>
               </div>
             </div>

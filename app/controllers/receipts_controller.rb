@@ -34,9 +34,14 @@ class ReceiptsController < ApplicationController
   end
 
   def queue_order
-    @receipts.each do |r|
-      r.update(is_ready: false, processing_status: 'queued')
-      r.screen_items.update_all(ready: false, processing_status: 'queued') if r.screen_items.any?
+    if @receipt.group_order
+      @receipts.each do |r|
+        r.update(is_ready: false, processing_status: 'queued')
+        r.screen_items.update_all(ready: false, processing_status: 'queued') if r.screen_items.any?
+      end
+    else
+      @receipt.update(is_ready: false, processing_status: 'queued')
+      @receipt.screen_items.update_all(ready: false, processing_status: 'queued') if @receipt.screen_items.any?
     end
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Queued")
@@ -45,9 +50,14 @@ class ReceiptsController < ApplicationController
   end
   
   def send_to_kitchen
-    @receipts.each do |r|
-      r.update(is_ready: false, processing_status: 'accepted')
-      r.screen_items.update_all(ready: false, processing_status: 'accepted') if r.screen_items.any?
+    if @receipt.group_order
+      @receipts.each do |r|
+        r.update(is_ready: false, processing_status: 'accepted')
+        r.screen_items.update_all(ready: false, processing_status: 'accepted') if r.screen_items.any?
+      end
+    else
+      @receipt.update(is_ready: false, processing_status: 'accepted')
+      @receipt.screen_items.update_all(ready: false, processing_status: 'accepted') if @receipt.screen_items.any?
     end
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Accepted")
@@ -56,13 +66,23 @@ class ReceiptsController < ApplicationController
   end
   
   def preparing
-    @receipts.each do |r|
-      if r.processing_status == "preparing"
-        r.update(is_ready: false, processing_status: 'accepted')
-        r.screen_items.update_all(ready: false, processing_status: 'accepted') if r.screen_items.any?
+    if @receipt.group_order
+      @receipts.each do |r|
+        if r.processing_status == "preparing"
+          r.update(is_ready: false, processing_status: 'accepted')
+          r.screen_items.update_all(ready: false, processing_status: 'accepted') if r.screen_items.any?
+        else
+          r.update(is_ready: false, processing_status: 'preparing')
+          r.screen_items.update_all(ready: false, processing_status: 'preparing') if r.screen_items.any?
+        end
+      end
+    else
+      if @receipt.processing_status == "preparing"
+        @receipt.update(is_ready: false, processing_status: 'accepted')
+        @receipt.screen_items.update_all(ready: false, processing_status: 'accepted') if @receipt.screen_items.any?
       else
-        r.update(is_ready: false, processing_status: 'preparing')
-        r.screen_items.update_all(ready: false, processing_status: 'preparing') if r.screen_items.any?
+        @receipt.update(is_ready: false, processing_status: 'preparing')
+        @receipt.screen_items.update_all(ready: false, processing_status: 'preparing') if @receipt.screen_items.any?
       end
     end
     @restaurant = @receipt.restaurant
@@ -72,9 +92,14 @@ class ReceiptsController < ApplicationController
   end
   
   def is_ready
-    @receipts.each do |r|
-      r.update(is_ready: true, processing_status: 'ready')
-      r.screen_items.update_all(ready: true, processing_status: 'ready') if r.screen_items.any?
+    if @receipt.group_order
+      @receipts.each do |r|
+        r.update(is_ready: true, processing_status: 'ready')
+        r.screen_items.update_all(ready: true, processing_status: 'ready') if r.screen_items.any?
+      end
+    else
+      @receipt.update(is_ready: true, processing_status: 'ready')
+      @receipt.screen_items.update_all(ready: true, processing_status: 'ready') if @receipt.screen_items.any?
     end
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Ready")
@@ -83,9 +108,14 @@ class ReceiptsController < ApplicationController
   end
   
   def complete
-    @receipts.each do |r|
-      r.update(is_ready: true, processing_status: 'complete')
-      r.screen_items.update_all(ready: true, processing_status: 'complete') if r.screen_items.any?
+    if @receipt.group_order
+      @receipts.each do |r|
+        r.update(is_ready: true, processing_status: 'complete')
+        r.screen_items.update_all(ready: true, processing_status: 'complete') if r.screen_items.any?
+      end
+    else
+      @receipt.update(is_ready: true, processing_status: 'complete')
+      @receipt.screen_items.update_all(ready: true, processing_status: 'complete') if @receipt.screen_items.any?
     end
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Complete")
@@ -114,16 +144,28 @@ class ReceiptsController < ApplicationController
       @screen_item.update(ready: false, processing_status: 'accepted')
     end
     if @receipt.items_processing_status == "accepted"
-      @receipts.each do |r|
-        r.update(is_ready: false, processing_status: 'accepted')
+      if @receipt.group_order
+        @receipts.each do |r|
+          r.update(is_ready: false, processing_status: 'accepted')
+        end
+      else
+        @receipt.update(is_ready: false, processing_status: 'accepted')
       end
     elsif @receipt.items_processing_status == "ready"
-      @receipts.each do |r|
-        r.update(is_ready: true, processing_status: 'ready')
+      if @receipt.group_order
+        @receipts.each do |r|
+          r.update(is_ready: true, processing_status: 'ready')
+        end
+      else
+        @receipt.update(is_ready: true, processing_status: 'ready')
       end
     else
-      @receipts.each do |r|
-        r.update(is_ready: false, processing_status: 'preparing')
+      if @receipt.group_order
+        @receipts.each do |r|
+          r.update(is_ready: false, processing_status: 'preparing')
+        end
+      else
+        @receipt.update(is_ready: false, processing_status: 'preparing')
       end
     end
     @restaurant = @receipt.restaurant
@@ -136,14 +178,24 @@ class ReceiptsController < ApplicationController
   end
   
   def is_items_ready
-    @receipts.each do |r|
-      r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: true, processing_status: 'ready')
-      if r.items_processing_status == "ready"
-        r.update(is_ready: true, processing_status: 'ready')
+    if @receipt.group_order
+      @receipts.each do |r|
+        r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: true, processing_status: 'ready')
+        if r.items_processing_status == "ready"
+          r.update(is_ready: true, processing_status: 'ready')
+        else
+          r.update(is_ready: false, processing_status: 'preparing')
+        end
+      end
+    else
+      @receipt.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: true, processing_status: 'ready')
+      if @receipt.items_processing_status == "ready"
+        @receipt.update(is_ready: true, processing_status: 'ready')
       else
-        r.update(is_ready: false, processing_status: 'preparing')
+        @receipt.update(is_ready: false, processing_status: 'preparing')
       end
     end
+
     @restaurant = @receipt.restaurant
     path = manager_live_food_path(@restaurant) if params[:item_screen_type_key] == "FOOD"
     path = manager_live_drinks_path(@restaurant) if params[:item_screen_type_key] == "DRINK"
@@ -154,16 +206,25 @@ class ReceiptsController < ApplicationController
   end
   
   def is_items_preparing
-    # if r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).where.not(processing_status: 'preparing').any?
     if @receipt.items_processing_status(params[:item_screen_type_key]) != 'preparing'
-      @receipts.each do |r|
-        r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'preparing')
-        r.update(is_ready: false, processing_status: 'preparing')
+      if @receipt.group_order
+        @receipts.each do |r|
+          r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'preparing')
+          r.update(is_ready: false, processing_status: 'preparing')
+        end
+      else
+        @receipt.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'preparing')
+        @receipt.update(is_ready: false, processing_status: 'preparing')
       end
     else
-      @receipts.each do |r|
-        r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'accepted')
-        r.update(is_ready: false, processing_status: 'accepted') if r.items_processing_status == "accepted"
+      if @receipt.group_order
+        @receipts.each do |r|
+          r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'accepted')
+          r.update(is_ready: false, processing_status: 'accepted') if r.items_processing_status == "accepted"
+        end
+      else
+        @receipt.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: false, processing_status: 'accepted')
+        @receipt.update(is_ready: false, processing_status: 'accepted') if @receipt.items_processing_status == "accepted"
       end
     end
     @restaurant = @receipt.restaurant
@@ -239,13 +300,13 @@ class ReceiptsController < ApplicationController
 
   def set_live_receipt
     @receipt = Receipt.find(params[:receipt_id])
-    @receipts = @receipt.find_grouped_receipts
+    @receipts = @receipt.find_grouped_receipts if @receipt.group_order
   end
   
   def set_live_screen_item
     @screen_item = ScreenItem.find(params[:screen_item_id])
     @receipt = @screen_item.receipt
-    @receipts = @receipt.find_grouped_receipts
+    @receipts = @receipt.find_grouped_receipts if @receipt.group_order
   end
 
   # Only allow a list of trusted parameters through.
