@@ -29,17 +29,9 @@ App.snippets = App.cable.subscriptions.create(
       order_bell.play();
       setTimeout((order_bell.currentTime = 0), 1000);
     }
-
-    $('.order-progress').on('ajax:send', function(ev) {
-      $('#order-progress-overlay').addClass("active");
-      $('.lds-ellipsis').addClass("active");
-    })
-
     $('#check-all-orders').on('click', function() {    
       $('.check-order:checkbox').prop('checked', this.checked);    
     });
-
-   // console.log("Data received: " + data)
 
     $('.check-order').on('click', function() {
       var checkedOrderCount = $(".checked-order:checkbox:checked").length;
@@ -74,12 +66,24 @@ App.snippets = App.cable.subscriptions.create(
       $("#live-multi-action-bar").removeClass("active");
       $("#live-order").removeClass("mab-active");
       $('.check-order:checkbox').prop('checked', false);    
-
     });
-    
-    // console.log("Data received: " + data)
 
-    // console.log(data);
+    $('.order-progress').on('ajax:send', function(ev) {
+      var $btn = $(document.activeElement);
+      if ($btn.hasClass('no-broadcast')) {
+        $("#mab-order-count").text(`0 Orders`);
+        $("#live-multi-action-bar").removeClass("active");
+        $("#live-order").removeClass("mab-active");
+        $('.check-order:checkbox').prop('checked', false);    
+        $('#order-progress-overlay').removeClass("active");
+        $('.lds-ellipsis').removeClass("active");
+      } else {
+        $('#order-progress-overlay').addClass("active");
+        $('.lds-ellipsis').addClass("active");
+      };
+    })
+
+
   },
  }
 );

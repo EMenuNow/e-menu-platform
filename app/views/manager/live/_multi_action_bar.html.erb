@@ -16,13 +16,13 @@
       </div>
       <div class='col-auto py-3'>
         <% @printers.each do |printer|%>
-          <%= button_tag name: "submit", value: "print-#{printer.id}", class: 'btn btn-info mab-confirm p-0 px-2', id: "all-print-#{printer.id}", data: { confirm: "Send 0 orders to #{printer.name} printer?" } do %>
+          <%= button_tag name: "submit", value: "print-#{printer.id}", class: 'btn btn-info mab-confirm no-broadcast p-0 px-2', id: "all-print-#{printer.id}", data: { confirm: "Send 0 orders to #{printer.name} printer?" } do %>
             <i class="fas fa-print"></i> <%= printer.name %>
           <% end %>
         <% end %>
       </div>
       <div class='col-auto py-3 ml-auto'>
-        <%= button_tag "Send Receipt", name: "submit", value: 'send-receipt', class: 'btn btn-warning text-uppercase p-0 px-2', id: "all-receipt", data: { confirm: "Re-send receipt for 0 orders?" } %>
+        <%= button_tag "Send Receipt", name: "submit", value: 'send-receipt', class: 'btn btn-warning no-broadcast text-uppercase p-0 px-2', id: "all-receipt", data: { confirm: "Re-send receipt for 0 orders?" } %>
         <button type="button" class="btn btn-outline-light text-uppercase p-0 px-2" id="all-cancel">Cancel</button>
       </div>
     </div>

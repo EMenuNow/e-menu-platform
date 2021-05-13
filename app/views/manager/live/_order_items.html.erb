@@ -38,12 +38,21 @@
         $("#live-multi-action-bar").removeClass("active");
         $("#live-order").removeClass("mab-active");
         $('.check-order:checkbox').prop('checked', false);    
-
       });
 
       $('.order-progress').on('ajax:send', function(ev) {
-        $('#order-progress-overlay').addClass("active");
-        $('.lds-ellipsis').addClass("active");
+        var $btn = $(document.activeElement);
+        if ($btn.hasClass('no-broadcast')) {
+          $("#mab-order-count").text(`0 Orders`);
+          $("#live-multi-action-bar").removeClass("active");
+          $("#live-order").removeClass("mab-active");
+          $('.check-order:checkbox').prop('checked', false);    
+          $('#order-progress-overlay').removeClass("active");
+          $('.lds-ellipsis').removeClass("active");
+        } else {
+          $('#order-progress-overlay').addClass("active");
+          $('.lds-ellipsis').addClass("active");
+        };
       })
 
     });
