@@ -43,15 +43,15 @@
       </div>
       <div class="modal-body text-center p-0">
         <div class="col">
-          <div class="row px-0 py-2 border-bottom">
-            <div class="col-6 mt-auto px-2 text-left">
+          <div class="row px-0 py-2 border-bottom justify-content-between">
+            <div class="col-auto mt-auto px-2 text-left">
               <% printers.each do |printer|%>
                 <%= link_to print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send order to #{printer.name} printer?" } do %>
                   <i class="fas fa-print"></i> <%= printer.name %>
                 <% end %>
               <% end %>
             </div>
-            <div class="col-6 px-2 mt-auto text-right">
+            <div class="col-auto px-2 mt-auto text-right">
               <div class="text-center align-bottom m-0 d-inline-block"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
             </div>
           </div>
