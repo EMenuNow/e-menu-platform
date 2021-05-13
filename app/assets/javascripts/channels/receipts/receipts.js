@@ -22,15 +22,24 @@ App.snippets = App.cable.subscriptions.create(
     $("body").css("padding-right","");
     $(".modal-backdrop").remove();
     $("#live-order").removeClass("mab-active");
+    $("#order-progress-overlay").removeClass("active");
+    $(".lds-ellipsis").removeClass("active");
     $("#current-orders").html(data.html);
     if (data.message == "New") {
       order_bell.play();
       setTimeout((order_bell.currentTime = 0), 1000);
     }
 
+    $('.order-progress').on('ajax:send', function(ev) {
+      $('#order-progress-overlay').addClass("active");
+      $('.lds-ellipsis').addClass("active");
+    })
+
     $('#check-all-orders').on('click', function() {    
       $('.check-order:checkbox').prop('checked', this.checked);    
     });
+
+   // console.log("Data received: " + data)
 
     $('.check-order').on('click', function() {
       var checkedOrderCount = $(".checked-order:checkbox:checked").length;

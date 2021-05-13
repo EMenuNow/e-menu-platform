@@ -2,6 +2,9 @@
   <div class="jumbotron jumbotron-fluid">
     <div class="container text-center">
       <h2 class="text-dark">Welcome to <%= @restaurant.name %></h2>
+      <% if @restaurant.demo %>
+        <h5 class="text-muted">(Demo restaurant)</h5>
+      <% end %>
       <p>Manage your account here</p>
     </div>
   </div>

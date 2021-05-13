@@ -41,6 +41,11 @@
 
       });
 
+      $('.order-progress').on('ajax:send', function(ev) {
+        $('#order-progress-overlay').addClass("active");
+        $('.lds-ellipsis').addClass("active");
+      })
+
     });
   </script>
 <% end %>
@@ -120,7 +125,7 @@
     <% @data += first_data %>
     <% @data += second_data %>
     <% @order_count = 0 %>
-    <%= form_tag all_receipts_receipts_path, method: :post, remote: true do |form| %>
+    <%= form_tag all_receipts_receipts_path, method: :post, remote: true, class: "order-progress" do |form| %>
     <% @data.each do |t, receipts| %>
       <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
       <% @order_count += 1 %>
