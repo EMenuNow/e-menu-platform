@@ -68,14 +68,14 @@ module Manager
     end
 
     def send_receipt
-        @receipt = Receipt.find(params[:receipt_id])
-        receipts = @receipt.find_grouped_receipts
-        receipts.each do |r|
-          r.email_receipt if r.email.present?
-        end
-        respond_to do |format|
-          format.html { redirect_to manager_live_orders_path(@receipt.restaurant.id), notice: 'Receipt Sent.' }
-        end
+      @receipt = Receipt.find(params[:receipt_id])
+      receipts = @receipt.find_grouped_receipts
+      receipts.each do |r|
+        r.email_receipt if r.email.present?
+      end
+      respond_to do |format|
+        format.html { redirect_to manager_live_orders_path(@receipt.restaurant.id), notice: 'Receipt Sent.' }
+      end
     end
 
     def receipts

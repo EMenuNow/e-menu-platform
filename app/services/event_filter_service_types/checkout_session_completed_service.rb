@@ -13,6 +13,6 @@ class CheckoutSessionCompletedService
       stripe_data: @data,
       status: @data[:payment_status]
     )
-    # @receipt = @order.first_or_create_receipt if @order.stripe_data["payment_status"] == "paid"
+    @receipt = @order.first_or_create_receipt if @order.stripe_data["payment_status"] == "paid"
   end
 end
