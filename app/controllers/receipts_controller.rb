@@ -214,9 +214,32 @@ class ReceiptsController < ApplicationController
       end
     end
     @restaurant = @receipt.restaurant
-  
+
     @receipt.broadcast
     @receipt.broadcast_items
+  end
+  
+  def all_receipts
+    @receipt = Receipt.find(params[:receipt_ids].first)
+    @restaurant = @receipt.restaurant
+    
+    receipt_ids = params[:receipt_ids].map{|id| Receipt.find(id).find_grouped_receipts.map{|r| r.id.to_s}}.flatten
+    screen_item_ids = receipt_ids.map{|id| Receipt.find(id).screen_items.map{|i| i.id.to_s}}.flatten
+
+    if params[:submit] == "send-receipt"
+      Receipt.where(id: receipt_ids).each{|r| r.email_receipt} if receipt_ids.any?
+    elsif params[:submit].start_with?('print-')
+      p_id = params[:submit].split("-")[1].to_i
+      printer = Printer.find(p_id)
+      Receipt.where(id: receipt_ids).each {|r| r.print_receipt(printer)} if receipt_ids.any?
+    else    
+      ready = false
+      ready = true if params[:submit] == "ready" || params[:submit] == "complete"
+      Receipt.where(id: receipt_ids).update_all(is_ready: ready, processing_status: params[:submit]) if receipt_ids.any?
+      ScreenItem.where(id: screen_item_ids).update_all(ready: ready, processing_status: params[:submit]) if screen_item_ids.any?
+      @receipt.broadcast(message: params[:submit].capitalize)
+      @receipt.broadcast_items
+    end
   end
   
   def all_receipts
