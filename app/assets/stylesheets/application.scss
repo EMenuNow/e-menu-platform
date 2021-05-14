@@ -41,6 +41,8 @@
  --font-weight-secondary: var(--emenu-font-weight-secondary);
  --text-transform-secondary: var(--emenu-text-transform-secondary);
  --font-style-secondary: var(--emenu-font-style-secondary);
+
+ --topbar-height: 48px;
 }
 
 code {
@@ -48,13 +50,43 @@ code {
 }
 
 body {
- margin-top: 48px;
+ margin-top: var(--topbar-height);
  overscroll-behavior: none;
 
  font-family: var(--emenu-font-primary);
 
  & #live-order {
-   min-height: calc(100vh - 48px);
+   --header-height: 74px;
+   --footer-height: 40px;
+   --multi-action-bar-height: 58.69px;
+
+   background-color: var(--emenu-darkest);
+   padding-top: var(--header-height);
+   padding-bottom: var(--footer-height);
+   min-height: calc(100vh - var(--topbar-height));
+   
+   &.mab-active {
+     padding-bottom: calc(var(--footer-height) + var(--multi-action-bar-height));
+   }
+   
+    & #live-header {
+      top: 48px;
+      z-index: 1020;
+     //  border-radius: 0px 0px 10px 10px !important;
+    }
+   
+   //  & #live-status-bar {
+   //    border-radius: 10px 10px 0px 0px !important;
+   //  }
+   
+    & #live-multi-action-bar {
+      bottom: calc(var(--footer-height) - var(--multi-action-bar-height));
+      transition: all 0.3s;
+
+      &.active {
+        bottom: var(--footer-height);
+      }
+    }
  }
 
  &.onboarding-layout {
@@ -988,6 +1020,10 @@ div.scrollmenu::-webkit-scrollbar {
  border: 2px solid var(--emenu-dark);
  width: 100px;
  height: 100px;
+}
+
+.pill-outline-dark {
+  border: 1px solid var(--emenu-light);
 }
 
 // Toggle switches for checkboxes

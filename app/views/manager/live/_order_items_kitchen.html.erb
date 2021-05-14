@@ -11,17 +11,13 @@
   item_screen_type_key ||= nil
   restaurant_id ||= nil
 %>
-
 <% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
-<div class="row text-left text-white bg-dark">
-  <div id="refreshed-time" class='col-12'>
-    Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
-  </div>
-</div>
-<div id="receipt-group" class="row bg-dark pb-2">
+
+<div id="receipt-group" class="row pb-2">
   <div class="col-12">
     <div class="row my-1 m-0">
       <% @data = Receipt.group_by_time(@restaurant.receipts.includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %>
+      <% @order_count = 0 %>
       <% @data.each do |t, receipts| %>
         <% items = nil %>
         <% receipts.each do |receipt| %>
@@ -74,6 +70,7 @@
         <% end %>
         <% next if !order_is_new %>
         <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
+        <% @order_count += 1 %>
         <div class="col-lg-6 p-0" id="receipt-<%= receipt.id %>-card">
           <div class="bg-light rounded m-1" style="border-radius: 10px!important;">
             <div class="row m-0 px-0 py-2" style="background-color: <%= header_color %>; border-radius: 10px 10px 0px 0px !important">
