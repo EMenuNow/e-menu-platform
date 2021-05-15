@@ -15,10 +15,6 @@ App.snippets = App.cable.subscriptions.create(
 
     received: function (data) {
       console.log("Received data from DrinkItemsChannel");
-      $(".modal").modal("hide");
-      $("body").removeClass("modal-open");
-      $("body").css("padding-right", "");
-      $(".modal-backdrop").remove();
       $.ajax({
         url: window.location.href,
         type: "get",
@@ -28,6 +24,10 @@ App.snippets = App.cable.subscriptions.create(
           var totalOrderCount = $(response).find("#total-order-count").html();
           $("#current-orders").html(orderData);
           $("#status-order-count").html(totalOrderCount);
+          $(".modal").modal("hide");
+          $("body").removeClass("modal-open");
+          $("body").css("padding-right", "");
+          $(".modal-backdrop").remove();
           $("#order-progress-overlay").removeClass("active");
           $(".lds-ellipsis").removeClass("active");
 

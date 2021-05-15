@@ -48,8 +48,8 @@ class Receipt < ApplicationRecord
     item_screens = ItemScreen.where(restaurant_id: restaurant_id).joins(:item_screen_type).where("item_screen_types.key <> 'FULL'")
     if item_screens.present?
       items['items'].each do |item|
-        ScreenItem.create(restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['item_screen_type_key'], uuid: item['uuid'], processing_status: 'accepted') if item['item_screen_type_key'].present?
-        ScreenItem.create(secondary: true, restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['secondary_item_screen_type_key'], uuid: item['uuid'], processing_status: 'accepted') if item['secondary_item_screen_type_key'].present?
+        ScreenItem.where(uuid: item['uuid']).first_or_create.update(restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['item_screen_type_key'], processing_status: 'accepted') if item['item_screen_type_key'].present?
+        ScreenItem.where(uuid: item['uuid']).first_or_create.update(secondary: true, restaurant_id: restaurant_id, menu_id: item['menu_id'], receipt_id: id, item_screen_type_key: item['secondary_item_screen_type_key'], processing_status: 'accepted') if item['secondary_item_screen_type_key'].present?
       end
       broadcast_items
       creation_print_grouped('FOOD') if self.group_receipt_items.select{|s| s['item_screen_type_key'] == 'FOOD'}.present?

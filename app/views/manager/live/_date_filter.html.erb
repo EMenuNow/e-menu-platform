@@ -144,6 +144,7 @@
         $('#date-filter-form').trigger("reset");
         $('#dateModal').modal('hide');
         var url = $(this).attr("href");
+        filterParams = {};
 
         $.ajax({
           url: url,
