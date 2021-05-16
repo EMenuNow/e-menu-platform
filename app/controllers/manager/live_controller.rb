@@ -121,7 +121,7 @@ module Manager
           @data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).where("#{params[:date]} BETWEEN ? AND ?", day.first, day.last).includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date}
         end
       end
-      @data = Receipt.group_by_time(@restaurant.receipts.includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} unless @data
+      @data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).includes(:screen_items, order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} unless @data
     end
 
     def manager_data

@@ -27,6 +27,7 @@ App.snippets = App.cable.subscriptions.create(
           $(".modal").modal("hide");
           $("body").removeClass("modal-open");
           $("body").css("padding-right", "");
+          $("#live-header").css("padding-right", "");
           $(".modal-backdrop").remove();
           $("#live-order").removeClass("mab-active");
           $("#order-progress-overlay").removeClass("active");
