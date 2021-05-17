@@ -17,7 +17,7 @@ class RestaurantsController < ApplicationController
 
   def get_restaurant
     @path = params[:id]
-    if @path =~ /\A[[:upper:]]+\z/
+    if @path !~ /\A[a-z\-0-9]*\z/
       redirect_to restaurant_path(@path.downcase), status: :moved_permanently
     end 
     @restaurant = Restaurant.where("lower(path) = ?", @path.downcase).first
