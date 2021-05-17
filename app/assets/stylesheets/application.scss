@@ -80,11 +80,12 @@ body {
    //  }
    
     & #live-multi-action-bar {
-      bottom: calc(var(--footer-height) - var(--multi-action-bar-height));
+      // bottom: calc(var(--footer-height) - var(--multi-action-bar-height));
+      bottom: calc(-2 * var(--multi-action-bar-height));
       transition: all 0.3s;
 
       &.active {
-        bottom: var(--footer-height);
+        bottom: calc(var(--footer-height) - 3rem);
       }
     }
  }
@@ -1022,6 +1023,37 @@ div.scrollmenu::-webkit-scrollbar {
  height: 100px;
 }
 
+.ck-button {
+  margin:4px;
+}
+
+.ck-button label {
+  margin: 4px;
+}
+
+.ck-button label span {
+  text-align:center;
+  padding: 5px 15px;
+  text-transform: uppercase;
+  color: var(--emenu-light);
+  cursor: pointer;
+  border-radius:100px;
+  border:1.5px solid var(--emenu-lighter);
+}
+
+.ck-button label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.ck-button input:checked + span {
+  border:2px solid var(--emenu-darkest);
+  color: var(--emenu-darkest);
+}
+
 .pill-outline-dark {
   border: 1px solid var(--emenu-light);
 }
@@ -1052,7 +1084,6 @@ div.scrollmenu::-webkit-scrollbar {
   width: 50px;
   height: 26px;
   border-radius: 15px;
-  // box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4);
   background: var(--emenu-dark);
   transition: all 0.3s;
  }

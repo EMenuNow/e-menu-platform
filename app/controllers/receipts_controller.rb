@@ -46,7 +46,6 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Queued")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def send_to_kitchen
@@ -62,7 +61,6 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Accepted")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def preparing
@@ -88,7 +86,6 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Preparing")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def is_ready
@@ -104,7 +101,6 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Ready")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def complete
@@ -120,19 +116,15 @@ class ReceiptsController < ApplicationController
     @restaurant = @receipt.restaurant
     @receipt.broadcast(message: "Complete")
     @receipt.broadcast_items
-    # redirect_to manager_live_orders_path(@restaurant.id)
   end
   
   def is_item_ready
     @screen_item.ready = !@screen_item.ready?
     @screen_item.save
     @restaurant = @receipt.restaurant
-    path = manager_live_food_path(@restaurant) if @screen_item.item_screen_type_key == "FOOD"
-    path = manager_live_drinks_path(@restaurant) if @screen_item.item_screen_type_key == "DRINK"
     
     @receipt.broadcast
     @receipt.broadcast_items
-    # redirect_to path
   end
   
   def is_item_process # cycles screen item state
@@ -143,38 +135,22 @@ class ReceiptsController < ApplicationController
     else
       @screen_item.update(ready: false, processing_status: 'accepted')
     end
-    if @receipt.items_processing_status == "accepted"
-      if @receipt.group_order
-        @receipts.each do |r|
-          r.update(is_ready: false, processing_status: 'accepted')
-        end
-      else
-        @receipt.update(is_ready: false, processing_status: 'accepted')
-      end
-    elsif @receipt.items_processing_status == "ready"
-      if @receipt.group_order
-        @receipts.each do |r|
-          r.update(is_ready: true, processing_status: 'ready')
-        end
-      else
-        @receipt.update(is_ready: true, processing_status: 'ready')
-      end
+    
+    case @receipt.items_processing_status
+    when "accepted"
+      @receipt.find_grouped_receipts.map{|r| r.update(is_ready: false, processing_status: 'accepted')}
+    when "ready"
+      @receipt.find_grouped_receipts.map{|r| r.update(is_ready: true, processing_status: 'ready')}
+    when "preparing"
+      @receipt.find_grouped_receipts.map{|r| r.update(is_ready: false, processing_status: 'preparing')}
     else
-      if @receipt.group_order
-        @receipts.each do |r|
-          r.update(is_ready: false, processing_status: 'preparing')
-        end
-      else
-        @receipt.update(is_ready: false, processing_status: 'preparing')
-      end
+      @receipt.find_grouped_receipts.map{|r| r.update(is_ready: false, processing_status: 'error')}
     end
+
     @restaurant = @receipt.restaurant
-    path = manager_live_food_path(@restaurant) if @screen_item.item_screen_type_key == "FOOD"
-    path = manager_live_drinks_path(@restaurant) if @screen_item.item_screen_type_key == "DRINK"
     
     @receipt.broadcast
     @receipt.broadcast_items
-    # redirect_to path
   end
   
   def is_items_ready
@@ -182,9 +158,9 @@ class ReceiptsController < ApplicationController
       @receipts.each do |r|
         r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: true, processing_status: 'ready')
         if r.items_processing_status == "ready"
-          r.update(is_ready: true, processing_status: 'ready')
+          r.find_grouped_receipts.map{|r| r.update(is_ready: true, processing_status: 'ready')}
         else
-          r.update(is_ready: false, processing_status: 'preparing')
+          r.find_grouped_receipts.map{|r| r.update(is_ready: false, processing_status: 'preparing')}
         end
       end
     else
@@ -195,14 +171,10 @@ class ReceiptsController < ApplicationController
         @receipt.update(is_ready: false, processing_status: 'preparing')
       end
     end
-
     @restaurant = @receipt.restaurant
-    path = manager_live_food_path(@restaurant) if params[:item_screen_type_key] == "FOOD"
-    path = manager_live_drinks_path(@restaurant) if params[:item_screen_type_key] == "DRINK"
     
     @receipt.broadcast
     @receipt.broadcast_items
-    # redirect_to path
   end
   
   def is_items_preparing
@@ -228,12 +200,9 @@ class ReceiptsController < ApplicationController
       end
     end
     @restaurant = @receipt.restaurant
-    path = manager_live_food_path(@restaurant) if params[:item_screen_type_key] == "FOOD"
-    path = manager_live_drinks_path(@restaurant) if params[:item_screen_type_key] == "DRINK"
-    
+
     @receipt.broadcast
     @receipt.broadcast_items
-    # redirect_to path
   end
   
   def all_receipts
@@ -262,8 +231,6 @@ class ReceiptsController < ApplicationController
   def item_creation_broadcast
     @receipt = Receipt.find(params[:receipt_id])
     @receipt.broadcast_items
-
-    # redirect_to manager_live_orders_path(@receipt.restaurant_id)
   end
 
 

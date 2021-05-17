@@ -153,6 +153,8 @@ Rails.application.routes.draw do
     resources :restaurants do
       
       post 'set_delay'
+      post 'open_early'
+      post 'close_early'
       post 'reporting/daily'
       get 'reporting/daily'
       get 'reporting/zreport_show/:daily_reporting_id', to: 'reporting#zreport_show', as: :zreport

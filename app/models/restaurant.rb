@@ -91,6 +91,20 @@ class Restaurant < ApplicationRecord
     end
   end
 
+  def opening_time_today
+    t = Time.new.in_time_zone(time_zone)
+    today_day = t.strftime("%A").downcase
+    today_opening_time = opening_time_times[today_day]['open']
+    today_opening_time.presence || "00:00"
+  end
+  
+  def closing_time_today
+    t = Time.new.in_time_zone(time_zone)
+    today_day = t.strftime("%A").downcase
+    today_closing_time = opening_time_times[today_day]['close']
+    today_closing_time.presence || "00:00"
+  end
+
   def is_open
     t = Time.new.in_time_zone(time_zone)
     today_day = t.strftime("%A").downcase
