@@ -42,14 +42,16 @@ end
 
 
   # belongs_to :menu_item_categorisation, optional: true
-  has_and_belongs_to_many :menu_item_categorisation
+  # has_and_belongs_to_many :menu_item_categorisation
+  has_many :menu_item_categorisations_menus
+  has_many :menu_item_categorisations, through: :menu_item_categorisations_menus
   has_and_belongs_to_many :cook_level
 
   has_ancestry
 
   has_one_attached :image
   validates :image, size: { less_than: 2.megabytes, message: 'is more than 2 megabytes'},
-                    content_type: { in: ['image/png', 'image/jpg'], message: 'is not a png or jpg' }
+                    content_type: { in: ['image/png', 'image/jpeg'], message: 'is not a png or jpg' }
 
   translates :name, :description, fallbacks_for_empty_translations: true
 

@@ -109,26 +109,63 @@
 
     <div class="row border-top mt-3 pt-3">
       <div class="col-sm-6">
-
-
         <div class="row">
           <div class="col-lg-3">
-              <strong>Ingredients:</strong>
+            <strong>Allergens:</strong>
           </div>
           <div class="col-lg-9">
-              <% @menu.menu_item_categorisation.each do |category| %>
-                <i class="<%= category.icon %>"> <%= category.name %></i>
-              <% end %>
+            <% if @menu.menu_item_categorisations_menus.allergies.any? %>
+              <p class="text-left ng-scope">
+                <% if @menu.menu_item_categorisations_menus.contains_allergen.any? %>
+                  <span class="badge badge-pill badge-danger">Contains</span>
+                <% end %>
+                <% if @menu.menu_item_categorisations_menus.may_contain_allergen.any? %>
+                  <span class="badge badge-pill badge-warning">May contain</span>
+                <% end %>
+                <% if @menu.menu_item_categorisations_menus.dietary.any? %>
+                  <span class="badge badge-pill badge-success">Suitable for</span>
+                <% end %>
+              </p>
+              <ul class="eicon-list ng-scope">
+                <% @menu.menu_item_categorisations_menus.contains_allergen.each do |allergen| %>
+                  <li class="allergen-level-yes"><span class="<%= allergen&.menu_item_categorisation.icon %>"></span><%= allergen&.menu_item_categorisation&.name&.humanize %></li>
+                <% end %>
+                <% @menu.menu_item_categorisations_menus.may_contain_allergen.each do |allergen| %>
+                  <li class="allergen-level-may"><span class="<%= allergen&.menu_item_categorisation.icon %>"></span><%= allergen&.menu_item_categorisation&.name&.humanize %></li>
+                <% end %>
+                <% @menu.menu_item_categorisations_menus.dietary.each do |diet| %>
+                  <li class="suitable-level-yes"><span class="<%= diet&.menu_item_categorisation.icon %>"></span><%= diet&.menu_item_categorisation&.name&.humanize %></li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="text-left text-muted ng-scope">No allergen information present</p>
+            <% end %>
           </div>
         </div>
         <div class="row">
           <div class="col-lg-3">
-              <strong>Spice:</strong>
+              <strong>Categories:</strong>
           </div>
-          <div class="col-lg-9">
-              <%= @menu.spice_level_name %>
-          </div>
+          <% if @menu.menu_item_categorisations_menus.category.any? %>
+            <div class="col-lg-9">
+                <% @menu.menu_item_categorisations_menus.category.each do |category| %>
+                  <i class="<%= category&.menu_item_categorisation&.icon %> mr-1"> <%= category&.menu_item_categorisation&.name&.humanize %></i>
+                <% end %>
+            </div>
+          <% else %>
+            <p class="text-left text-muted ng-scope">No category data present</p>
+          <% end %>
         </div>
+        <% unless @menu.spice_level_name.blank? %>
+          <div class="row pb-2">
+            <div class="col-lg-3">
+                <strong>Spice:</strong>
+            </div>
+            <div class="col-lg-9">
+                <strong><%= @menu.spice_level_name %></strong>
+            </div>
+          </div>
+          <% end %>
 
 
         <div class="row mt-3 pt-3 border-top">

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_10_113956) do
+ActiveRecord::Schema.define(version: 2021_05_21_102448) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -204,9 +204,13 @@ ActiveRecord::Schema.define(version: 2021_05_10_113956) do
     t.string "type", default: "Allergen"
   end
 
-  create_table "menu_item_categorisations_menus", id: false, force: :cascade do |t|
+  create_table "menu_item_categorisations_menus", force: :cascade do |t|
     t.bigint "menu_id", null: false
     t.bigint "menu_item_categorisation_id", null: false
+    t.boolean "contains"
+    t.boolean "may_contain"
+    t.boolean "dietary"
+    t.boolean "category"
   end
 
   create_table "menu_translations", force: :cascade do |t|
@@ -243,6 +247,7 @@ ActiveRecord::Schema.define(version: 2021_05_10_113956) do
     t.jsonb "old_custom_lists"
     t.bigint "item_screen_type_id"
     t.integer "secondary_item_screen_type_id"
+    t.float "tax_rate", default: 0.0
     t.index ["ancestry"], name: "index_menus_on_ancestry"
     t.index ["item_screen_type_id"], name: "index_menus_on_item_screen_type_id"
     t.index ["menu_item_categorisation_id"], name: "index_menus_on_menu_item_categorisation_id"
@@ -309,6 +314,7 @@ ActiveRecord::Schema.define(version: 2021_05_10_113956) do
     t.boolean "group_order"
     t.datetime "due_date"
     t.bigint "discount_code_id"
+    t.jsonb "tax_rates"
     t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
     t.index ["restaurant_id"], name: "index_orders_on_restaurant_id"
   end
@@ -461,6 +467,7 @@ ActiveRecord::Schema.define(version: 2021_05_10_113956) do
     t.string "processing_status", default: "pending"
     t.string "first_print_status"
     t.string "print_status"
+    t.jsonb "tax_rates"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"
     t.index ["restaurant_id"], name: "index_receipts_on_restaurant_id"
