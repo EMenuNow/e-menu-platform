@@ -29,4 +29,6 @@ Connect to payment provider
   <div class="col-md-8 mx-auto text-center">
     <%= link_to("Connect Stripe", @connect, class: "btn btn-warning") %>
   </div>
+  <div class="col-6 text-left pt-3"><small><%= link_to "Log Off", destroy_onboarding_restaurant_user_session_path, method: :delete %></small></div>
+  <div class="col-6 text-right pt-3"><small><%= link_to "Skip for now", onboarding_restaurant_complete_path %></small></div>
 </div>
