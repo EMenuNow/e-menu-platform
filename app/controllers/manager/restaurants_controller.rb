@@ -7,7 +7,7 @@ module Manager
     before_action :set_restaurant_new, only: %i[show edit update]
     before_action :set_restaurant, only: %i[active toggle_active set_delay open_early close_early]
     before_action :set_cuisine, only: %i[new create show edit update]
-    before_action :get_stripe_account, only: :edit
+    # before_action :get_stripe_account, only: :edit
 
     before_action :set_features, only: %i[show edit update new]
 
@@ -21,8 +21,9 @@ module Manager
     # GET /restaurants/1/edit
     def edit
       connect_service = ConnectService.new(@restaurant)
-      if @restaurant.stripe_connected_account_id
+      unless @restaurant.stripe_connected_account_id.blank?
         @connect = connect_service.refresh_account(@restaurant.stripe_connected_account_id)
+        @account = connect_service.get_account
       else
         create_account = connect_service.create_account
         session[:account_id] = create_account[:account_id]
