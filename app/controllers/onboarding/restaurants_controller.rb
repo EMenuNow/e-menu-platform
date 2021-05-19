@@ -89,6 +89,7 @@ module Onboarding
       EmenuMailer.welcome(@restaurant.id, @connect).deliver_now if @onboard&.completed.nil?
       @account[:details_submitted] ? @onboard.update_attribute(:completed, true) : @onboard.update_attribute(:completed, false) # stripe onboarding details submitted
       @progress[:connect] = @account[:details_submitted] ? 'complete' : 'failed'
+      session.delete(:account_id)
     end
 
     def dashboard_login

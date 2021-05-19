@@ -47,6 +47,7 @@ Partner with EMenu Now
     <div class="col-8 col-md-3 mx-auto text-center">
       <p>Continue your onboarding journey with the link below:</p>
       <%= link_to("Continue", onboarding_continue_path, class: 'btn btn-warning') %>
+      <div class="text-left pt-3"><small><%= link_to "Log Off", destroy_onboarding_restaurant_user_session_path, method: :delete %></small></div>
     </div>
   </div>
 
