@@ -119,7 +119,7 @@ class CheckoutService < ApplicationController
   end
 
   def calculate_vat_amounts(all_items)
-    ai = all_items.group_by{|x|x['tax_rate']}
+    ai = all_items.group_by{|x|x['tax_rate'].to_f}
     tax_rates = {}
     ai.each do |g, items|
       is = items.map{|x|x['tax_rate']}
