@@ -1,33 +1,30 @@
-
 <% content_for :js do %>
 
 <script>
-$(document).ready(function() {
-  $("#data-<%=by%>").dataTable({
-         dom: '<"row pt-4 pb-4"<"col"l><"col"f><"col text-right"B>><"row"<"col"t>><"row"<"col justify-content-center"ip >>',
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                title: '<%=daily_reporting.date.strftime("%Y_%B_%d_zreport_by_#{by}_emenunow")%>'
-            },
-            {
-                extend: 'csvHtml5',
-                title: '<%=daily_reporting.date.strftime("%Y_%B_%d_zreport_by_#{by}_emenunow")%>'
-            }
-        ]
+  $(document).ready(function() {
+    $("#data-<%=by%>").dataTable({
+      dom: '<"row pt-4 pb-4"<"col"l><"col"f><"col text-right"B>><"row"<"col"t>><"row"<"col justify-content-center"ip >>',
+      buttons: [{
+          extend: 'excelHtml5',
+          title: '<%=daily_reporting.date.strftime("%Y_%B_%d_zreport_by_#{by}_emenunow")%>'
+        },
+        {
+          extend: 'csvHtml5',
+          title: '<%=daily_reporting.date.strftime("%Y_%B_%d_zreport_by_#{by}_emenunow")%>'
+        }
+      ]
+    });
   });
-});
-
 </script>
 
 <% end %>
 
-<div class='row bg-dark text-light'>
+<div class='row bg-dark text-light mt-4'>
   <div class='col pt-1'>
     <h2>Sales By <%= by.camelcase %> on <%= daily_reporting.date.strftime('%d %B %Y') %></h2>
   </div>
   <div class='col text-right pt-2'>
-   <%= link_to 'Back to Daily Reports', manager_restaurant_reporting_daily_path(@restaurant), class: 'btn btn-primary btn-sm' %>
+    <%= link_to 'Back to Daily Reports', manager_restaurant_reporting_daily_path(@restaurant), class: 'btn btn-primary btn-sm' %>
   </div>
 </div>
 
@@ -39,40 +36,43 @@ $(document).ready(function() {
           <th>Section</th>
           <th class='text-right'>Count</th>
           <th class='text-right'>Total</th>
+          <th class='text-right'>Total VAT</th>
           <th class='text-right'>Percentage Items</th>
           <th class='text-right'>Percentage Sales</th>
         </tr>
       </thead>
       <tbody>
         <% daily_reporting.data.map{|a| a['menu_parent_name'] }.uniq.each do |menu_id|%>
-        
-          <% 
+        <% 
             totals = daily_reporting.data.select{|a| a['menu_parent_name'] == menu_id } 
             total_sales = totals.map{|x| x['total']}.inject(:+)
+            total_tax = totals.map{|x| x['total'] * (x['tax_rate'].to_f/100.0)}.sum
             menu_name = totals.map{|x| x['menu_name']}.uniq.join(',')
             menu_parent_name = totals.map{|x| x['menu_parent_name']}.uniq.join(',')
             percent_count =  daily_reporting.items_count == 0 ? 0 : (totals.count.to_f / daily_reporting.items_count.to_f )*100
             percent_total =  daily_reporting.total == 0 ? 0 : (total_sales.to_f / daily_reporting.total.to_f )*100
-          %> 
+          %>
         <tr>
           <td><%= menu_parent_name  %><%#= get_menu_item_name(menu_id)%></td>
           <td class='text-right'><%= totals.count%></td>
           <td class='text-right'><%= number_to_currency(total_sales.to_f / 100.to_f, unit: @restaurant.currency_symbol )%></td>
+          <td class='text-right'><%= number_to_currency(total_tax / 100.0, unit: @restaurant.currency_symbol ) %></td>
           <td class='text-right'><%= number_to_percentage(percent_count, precision: 2) %></td>
           <td class='text-right'><%= number_to_percentage(percent_total, precision: 2) %></td>
         </tr>
         <% end %>
-        
+
       </tbody>
       <tfoot>
         <tr class='font-weight-bold bg-dark text-light'>
           <td>Total</td>
           <td class='text-right'><%= @daily_reporting.items_count%></td>
           <td class='text-right'><%= number_to_currency(@daily_reporting.total.to_f / 100.to_f, unit: @restaurant.currency_symbol )%></td>
+          <td class='text-right'><%= number_to_currency(daily_reporting.get_vat_total / 100.0, unit: @restaurant.currency_symbol ) %></td>
           <td class='text-right'><%= number_to_percentage(100, precision: 0) %></td>
           <td class='text-right'><%= number_to_percentage(100, precision: 0) %></td>
         </tr>
-    </tfoot>
+      </tfoot>
     </table>
   </div>
 </div>

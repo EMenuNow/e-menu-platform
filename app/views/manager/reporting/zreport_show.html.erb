@@ -1,31 +1,28 @@
-
 <main role="main" class="container">
   <div class='row pt-3'>
     <div class='col'>
-        <h1>Z Report</h1>
-        <% if @daily_reporting.date == DateTime.current.to_date %><h6>Updates every hour on the hour</h6><% end %>
+      <h1>Z Report</h1>
+      <% if @daily_reporting.date == DateTime.current.to_date %><h6>Updates every hour on the hour</h6><% end %>
     </div>
   </div>
-<div class='row mb-4'>
-  <div class='col'>
-    <%= render 'manager/reporting/datatable_by_category', daily_reporting: @daily_reporting, by: 'category' %>
-  </div>
-</div>
-
-
-<div class='row bg-light text-light pb-4 '>
-  <div class='col p-0 m-0 bg-info'>
-  &nbsp;
+  <div class='row mb-4'>
+    <div class='col'>
+      <%= render 'manager/reporting/datatable_by_category', daily_reporting: @daily_reporting, by: 'category' %>
+    </div>
   </div>
 
-</div>
 
+  <div class='row bg-light text-light pb-4 '>
+    <div class='col p-0 m-0 bg-info'>
+      &nbsp;
+    </div>
 
-<div class='row mb-4'>
-  <div class='col'>
-    <%= render 'manager/reporting/datatable', daily_reporting: @daily_reporting, by: 'item' %>
   </div>
-</div>
 
 
+  <div class='row mb-4'>
+    <div class='col'>
+      <%= render 'manager/reporting/datatable', daily_reporting: @daily_reporting, by: 'item' %>
+    </div>
+  </div>
 </main>

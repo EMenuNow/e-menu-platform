@@ -79,6 +79,7 @@ class CheckoutService < ApplicationController
       application_fee_amount: @application_fee_amount,
       stripe_processing_fee: @stripe_processing_fee,
       emenu_commission: @emenu_commission,
+      tax_rates: calculate_vat_amounts(@basket_service.get_basket_db.contents['ids']),
       chargeback_fee: @chargeback_fee,
       chargeback_enabled: @chargeback_enabled,
       emenu_vat_charge: @emenu_vat_charge,
@@ -117,4 +118,12 @@ class CheckoutService < ApplicationController
     ['GB'].include?(@restaurant.currency_code)
   end
 
+  def calculate_vat_amounts(all_items)
+    ai = all_items.group_by{|x|x['tax_rate'].to_f}
+    tax_rates = {}
+    ai.each do |g, items|
+      is = items.map{|x|x['tax_rate']}
+      tax_rates[g] = (is.sum / is.size) * 100.0
+    end
+  end
 end

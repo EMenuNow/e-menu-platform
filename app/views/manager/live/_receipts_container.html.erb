@@ -37,7 +37,7 @@
             <h5 class="d-inline m-0"><%=receipt.group_order ? "Group Order" : receipt.name.present? ? receipt.name.titleize : receipt.table_number.present? ? "Table #{receipt.table_number}" : "" %></h4>
           </div>
           <div class="col-3 mt-auto px-2 text-right">
-            <h6 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %> <%#= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
+            <h6 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize %> <%#= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
           </div>
         </div>
       </div>
@@ -164,7 +164,7 @@
                     <h5><b>Service</b></p>
                   </div>
                   <div class="col-8">
-                    <p class="text-center m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %></p>
+                    <p class="text-center m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize %></p>
                   </div>
                 </div>
                 <div class="row pt-3">
