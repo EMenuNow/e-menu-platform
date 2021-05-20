@@ -242,7 +242,8 @@ class Receipt < ApplicationRecord
         menu = Menu.find(item['menu_id'])
       i << {
         id: item['menu_id'], 
-        total: (item['total']*100.to_f).to_i, 
+        total: (item['total']*100.to_f).to_i,
+        tax_rate: item['tax_rate'],
         optional_ids: item['optionals'],
         menu_name: menu.name,
         menu_parent_name: menu.parent.name
