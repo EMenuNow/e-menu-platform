@@ -30,7 +30,7 @@ class Restaurant < ApplicationRecord
   validates_uniqueness_of :restaurant_user_id, on: %i[create update], message: "must be unique"
   validates :commision_percentage, :inclusion => { :in => 0..10, message: "must be between 0% and 10%" }
   validates :image, size: { less_than: 2.megabytes, message: 'is more than 2 megabytes'},
-                    content_type: { in: ['image/png', 'image/jpg'], message: 'is not a png or jpg' }
+                    content_type: { in: ['image/png', 'image/jpeg'], message: 'is not a png or jpg' }
 
   delegate :name, to: :cuisine, prefix: true
   delegate :ids, to: :features, prefix: true
