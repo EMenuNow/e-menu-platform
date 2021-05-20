@@ -49,7 +49,7 @@ end
 
   has_one_attached :image
   validates :image, size: { less_than: 2.megabytes, message: 'is more than 2 megabytes'},
-                    content_type: { in: ['image/png', 'image/jpg'], message: 'is not a png or jpg' }
+                    content_type: { in: ['image/png', 'image/jpeg'], message: 'is not a png or jpg' }
 
   translates :name, :description, fallbacks_for_empty_translations: true
 
