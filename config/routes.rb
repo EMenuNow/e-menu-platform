@@ -65,6 +65,7 @@ Rails.application.routes.draw do
     post 'item_creation_broadcast'
     post 'creation_broadcast'
     collection do 
+      post :all_receipts
       get 'view_receipt/:uuid', to: 'receipts#view_receipt', as: :view_receipt
     end
   end
@@ -152,6 +153,8 @@ Rails.application.routes.draw do
     resources :restaurants do
       
       post 'set_delay'
+      post 'open_early'
+      post 'close_early'
       post 'reporting/daily'
       get 'reporting/daily'
       get 'reporting/zreport_show/:daily_reporting_id', to: 'reporting#zreport_show', as: :zreport

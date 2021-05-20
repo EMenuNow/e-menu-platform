@@ -1,163 +1,237 @@
 <% content_for :js do %>
-  <script type="text/javascript">
-    $('.order-progress').on('ajax:send', function(ev) {
-      $('#order-progress-overlay').addClass("active");
-      $('.lds-ellipsis').addClass("active");
-    })
+  <script>
+    $(document).ready(function () {
+      $('#check-all-orders').on('click', function() {    
+        $('.check-order:checkbox').prop('checked', this.checked);    
+      });
+
+      $('.check-order').on('click', function() {
+        var checkedOrderCount = $(".checked-order:checkbox:checked").length;
+        if (checkedOrderCount > 0)
+          {
+            var n = new RegExp('^((\\S+ ){1})(\\S+)');
+            var o = new RegExp('^((\\S+ ){2})(\\S+)');
+            if (checkedOrderCount == 1 ) {
+              $("#mab-order-count").text(`${checkedOrderCount} Order`);
+              $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(n, `$1${checkedOrderCount}`);}));
+              $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(o, `$1order`);}));
+              $("#all-receipt").attr("data-confirm", `Re-send recipt for ${checkedOrderCount} order?`);
+              } else {
+                $("#mab-order-count").text(`${checkedOrderCount} Orders`);
+                $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(n, `$1${checkedOrderCount}`);}));
+                $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(o, `$1orders`);}));
+                $("#all-receipt").attr("data-confirm", `Re-send recipt for ${checkedOrderCount} orders?`);
+              };
+            $("#live-multi-action-bar").addClass("active");
+            $("#live-order").addClass("mab-active");
+          }
+          else
+          {
+            $("#mab-order-count").text(`0 Orders`);
+            $("#live-multi-action-bar").removeClass("active");
+            $("#live-order").removeClass("mab-active");
+          }
+      });
+
+      $('#all-cancel').on('click', function() {
+        $("#mab-order-count").text(`0 Orders`);
+        $("#live-multi-action-bar").removeClass("active");
+        $("#live-order").removeClass("mab-active");
+        $('.check-order:checkbox').prop('checked', false);    
+      });
+
+      $('.order-progress').on('ajax:send', function(ev) {
+        var $btn = $(document.activeElement);
+        if ($btn.hasClass('no-broadcast')) {
+          $("#mab-order-count").text(`0 Orders`);
+          $("#live-multi-action-bar").removeClass("active");
+          $("#live-order").removeClass("mab-active");
+          $('.check-order:checkbox').prop('checked', false);    
+          $('#order-progress-overlay').removeClass("active");
+          $('.lds-ellipsis').removeClass("active");
+        } else {
+          $('#order-progress-overlay').addClass("active");
+          $('.lds-ellipsis').addClass("active");
+        };
+      })
+
+    });
   </script>
 <% end %>
 
 <%
   restaurant_id ||= nil
 %>
-
 <% @restaurant = Restaurant.where(id: restaurant_id || restaurant.id).first if @restaurant.blank? %>
-<div class="row text-left text-white">
-  <div id="refreshed-time" class='col-12'>
-    Page last refreshed on: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
-  </div>
-</div>
-<%
-=begin%>
- <div class="row text-right">
-  <div id="refreshed-time" class='col'>
-    refreshed at: <%= Time.new.in_time_zone(@restaurant.time_zone).strftime("%d %b %Y - %H:%M:%S") %><%#= Time.new %>
-  </div>
-</div> 
-<%
-=end%>
 
-<div id="receipt-group" class="bg-dark pb-3 row">
-  <div class="col-12">
-    <div class="row my-1 d-none d-md-block">
-      <%
-=begin%>
- <div class="d-inline-block" style="width: 4%;">
-        <p class="bg-secondary text-white text-center rounded m-0"><%= check_box_tag "Check" %></p>
-      </div> 
-<%
-=end%>
-      <div class="d-inline-block col-md-12" style="">
+<div id="receipt-group" class="pb-0 row">
+  <div class="col pl-2">
+    <div class="position-absolute my-1 mx-auto d-none d-lg-block">
+      <div class="bg-secondary text-white text-center rounded d-inline-block px-2"><%= check_box_tag "check-all-orders", "check-all-orders", false, class:"check-order" %></div>
+    </div>
+    <div class="row pr-2 pl-5 my-1 d-none d-lg-flex">
+      <div class="col-1 px-0">
         <div class="row m-0">
-          <div class="col-1 px-0">
-            <p class="bg-secondary text-white text-center rounded m-0">ORDER</p>
+          <div class="col pl-0 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Order</p>
           </div>
-          <div class="col-2 pl-1 pr-0">
-            <p class="bg-secondary text-white text-center rounded m-0">NAME</p>
+        </div>
+      </div> 
+
+      <div class="col-3 px-0">
+        <div class="row m-0">
+          <div class="col-8 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Name</p>
           </div>
-          <div class="col-1 pl-1 pr-0">
-            <p class="bg-secondary text-white text-center rounded m-0">ITEMS</p>
+          <div class="col-4 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Items</p>
           </div>
-          <div class="col-1 pl-1 pr-0">
-            <p class="bg-secondary text-white text-center rounded m-0">PLACED</p>
+        </div>
+      </div> 
+
+      <div class="col-5 px-0">
+        <div class="row m-0">
+          <div class="col-4 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Placed</p>
           </div>
-          <div class="col-2 pl-1 pr-0">
-            <p class="bg-secondary text-white text-center rounded m-0">DUE</p>
+          <div class="col-5 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Due</p>
           </div>
-          <div class="col-2 pl-1 pr-0">
-            <p class="bg-secondary text-white text-center rounded m-0">SERVICE</p>
+          <div class="col-3 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Service</p>
           </div>
-          <div class="col-1 pl-1 pr-0">
-            <p class="bg-secondary text-white text-center rounded m-0">PAYMENT</p>
+        </div>
+      </div>
+
+      <div class="col-3 px-0">
+        <div class="row m-0">
+          <div class="col-4 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Payment</p>
           </div>
-          <div class="col-1 px-1">
-            <p class="bg-secondary text-white text-center rounded m-0">TOTAL</p>
+          <div class="col-4 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Total</p>
           </div>
-          <div class="col-1 px-0">
-            <p class="bg-secondary text-white text-center rounded m-0">STATUS</p>
+          <div class="col-4 pl-1 pr-0">
+            <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Status</p>
           </div>
-          <%
-=begin%>
- <div class="col-1 px-0">
-            <p class="bg-secondary text-white text-center rounded m-0">QUICK ACTION</p>
-          </div> 
-<%
-=end%>
         </div>
       </div>
     </div>
-    <%# .each do |receipts| %>
-      <%# @data = Receipt.group_by_time(@restaurant.receipts.includes(order: :refunds).order(id: :DESC).limit(70)).reverse %> <%# Default full order set %>
-      <% first_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: false).includes(order: :refunds).order(id: :DESC)).sort_by{|x,y|y.first.due_date} %> <%# Default not ready order set %>
-      <% second_data = Receipt.group_by_time(@restaurant.receipts.where(is_ready: true).includes(order: :refunds).order(id: :DESC).limit(50)).reverse %> <%# Default ready order set %>
-      
-      <% @data = [] %>
-      <% @data += first_data %>
-      <% @data += second_data %>
-      
-      <% @data.each do |t, receipts| %>
-        <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
-        <% receipt = receipts.first %>
-        <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>
+    <%#=
+    <div class="col-1 px-0">
+      <div class="row m-0">
+        <div class="col pl-1 pr-0">
+          <p class="bg-secondary text-white text-center text-uppercase rounded m-0">Quick Action</p>
+        </div> 
+      </div>
+    </div>
+    %>
 
-        <% new_order = receipt.processing_status == "new" %>
-        <% queued = receipt.processing_status == "queued" %>
-        <% accepted = receipt.processing_status == "accepted" %>
-        <% preparing = receipt.processing_status == "preparing" %>
-        <% ready = receipt.processing_status == "ready" %>
-        <% complete = receipt.processing_status == "complete" %>
+    <% @order_count = 0 %>
+    <% if @data.blank? %>
+      <div class="col pt-5 my-3 text-white text-center">
+        <h3>No orders to view</h3>
+      </div>
+    <% else %>
+      <%= form_tag all_receipts_receipts_path, method: :post, remote: true, class: "order-progress" do |form| %>
+        <% @data.each do |t, receipts| %>
+          <% next if receipts.first.is_recent_group_order? && !receipts.map{|x|x.print_status}.any? %>
+          <% @order_count += 1 %>
+          <% receipt = receipts.first %>
+          <%= render partial: "manager/live/receipts_container", locals: { receipts: receipts, printers: printers } %>
 
-        <% status_pill = 'badge-secondary' %>
-        <% status_pill = 'badge-danger' if new_order %>
-        <% status_pill = 'badge-info' if preparing %>
-        <% status_pill = 'badge-dark' if queued %>
-        <% status_pill = 'badge-warning' if ready %>
-        <% status_pill = 'badge-success' if complete %>
+          <% new_order = receipt.processing_status == "new" %>
+          <% queued = receipt.processing_status == "queued" %>
+          <% accepted = receipt.processing_status == "accepted" %>
+          <% preparing = receipt.processing_status == "preparing" %>
+          <% ready = receipt.processing_status == "ready" %>
+          <% complete = receipt.processing_status == "complete" %>
 
-        <% order_pill = 'badge-light' %>
-        <% order_pill = 'badge-danger' if new_order or queued or accepted %>
-        <% order_pill = 'badge-warning' if preparing %>
+          <% status_pill = 'badge-secondary' %>
+          <% status_pill = 'badge-danger' if new_order %>
+          <% status_pill = 'badge-info' if preparing %>
+          <% status_pill = 'badge-dark' if queued %>
+          <% status_pill = 'badge-warning' if ready %>
+          <% status_pill = 'badge-success' if complete %>
 
-        <div class="row m-0 my-1">
-          <%
-=begin%>
- <div class="" style="width: 4%;">
-            <p class="text-center m-0 pt-2 d-none d-md-block"><%= check_box_tag "Check", class: "bg-secondary" %></p>
-          </div> 
-<%
-=end%>
-          <%= link_to "#", class: "col-md-12 bg-light rounded py-2 text-dark text-decoration-none", data: { toggle: "modal", target: "#modal#{receipt.order_id}" } do %>
-            <div class="">
+          <% order_pill = 'badge-light' %>
+          <% order_pill = 'badge-danger' if new_order or queued or accepted %>
+          <% order_pill = 'badge-warning' if preparing %>
+
+          <div class="position-absolute d-none d-lg-block py-auto mx-auto">
+            <div class="bg-secondary text-white text-center rounded d-inline-block py-2 px-2"><%= check_box_tag "receipt_id[#{receipt.order_id}]", receipt.order_id, false, name: "receipt_ids[]", class: 'check-order checked-order' %></div>
+          </div>
+          <div class="row pr-2 pl-3 pl-lg-5 my-1">
+            <%= link_to "#", class: "col-md-12 bg-light rounded py-2 text-dark text-decoration-none", data: { toggle: "modal", target: "#modal#{receipt.order_id}" } do %>
               <div class="row">
-                <div class="col-md-1 px-1 text-center">
-                  <div style="font-size: 100%;" class="m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></div>
-                </div>
-                <div class="col-md-2 px-1 text-center">
-                  <div class="d-inline m-0"><%=receipt.name.presence&.titleize || "Table #{receipt.table_number}" %> <%=receipt.group_order ? "(Group)" : ""%></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                  <div class="d-inline m-0"><%= pluralize(receipts.sum{|x|x.items['items'].size || 0}, 'item') %></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                  <div class="d-inline m-0"><%= placed_datetime_format(receipt.created_at, @restaurant.time_zone) %></div>
-                </div>
-                <div class="col-md-2 px-1 text-center">
-                  <div class="d-inline m-0"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
-                </div>
-                <div class="col-md-2 px-1 text-center">
-                  <div class="d-inline m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize%></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                  <% paid_status = receipt&.order&.stripe_data.try(:[], "payment_status") %>
-                  <div class="d-inline m-0 <%= paid_status == 'paid' ? 'badge badge-pill badge-success' : '' %>"><%= paid_status&.titleize %></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                  <div class="d-inline m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></div>
-                </div>
-                <div class="col-md-1 px-1 text-center">
-                    <div class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
-                </div>
-                <%
-=begin%>
- <div class="col-md-1 px-1">
+                <div class="col-3 col-lg-1 px-0">
+                  <div class="row pb-3 pb-lg-0 m-0">
+                    <div class="col pl-2 pl-lg-1 pr-0 text-left text-lg-center">
+                      <div style="font-size: 100%;" class="m-0 badge badge-pill <%= order_pill %>">#<%=receipt.order_id%></div>
+                    </div>
+                  </div>
                 </div> 
-<%
-=end%>
+
+                <div class="col-9 col-lg-3 px-0">
+                  <div class="row pb-3 pb-lg-0 m-0">
+                    <div class="col-8 pl-1 pr-0 text-center">
+                      <div class="m-0 text-truncate"><%=receipt.name.presence&.titleize || "Table #{receipt.table_number}" %> <%=receipt.group_order ? "(Group)" : ""%></div>
+                    </div>
+                    <div class="col-4 pl-1 pr-2 pr-lg-0 text-right text-lg-center">
+                      <div class="m-0"><%= pluralize(receipts.sum{|x|x.items['items'].size || 0}, 'item') %></div>
+                    </div>
+                  </div>
+                </div> 
+
+                <div class="col-12 col-lg-3 px-0 order-lg-last">
+                  <div class="row pb-3 pb-lg-0 m-0">
+                    <div class="col-4 pl-2 pl-lg-1 pr-0 text-left text-lg-center">
+                      <% paid_status = receipt&.order&.stripe_data.try(:[], "payment_status") %>
+                      <div class="m-0 <%= paid_status == 'paid' ? 'badge badge-pill badge-success' : '' %>"><%= paid_status&.titleize %></div>
+                    </div>
+                    <div class="col-4 pl-1 pr-0 text-center">
+                      <div class="m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></div>
+                    </div>
+                    <div class="col-4 pl-1 pr-2 pr-lg-0 text-right text-lg-center">
+                        <div class="m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-lg-5 px-0">
+                  <div class="row m-0">
+                    <div class="col-12 col-lg-5 pl-2 pl-lg-1 pr-0 text-left text-lg-center">
+                      <div class="m-0"><small class="d-lg-none d-inline text-muted">Due: </small><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
+                    </div>
+                    <div class="col-8 col-sm-6 col-lg-4 pl-2 pl-lg-1 pr-0 text-left text-sm-left text-lg-center order-lg-first">
+                      <div class="m-0"><small class="d-lg-none d-inline text-muted">Placed: </small><%= placed_datetime_format(receipt.created_at, @restaurant.time_zone) %></div>
+                    </div>
+                    <div class="col-4 col-sm-6 col-lg-3 pl-1 pr-2 pr-lg-0 text-right text-sm-right text-lg-center">
+                      <div class="m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize%></div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
-            </div>
-          <% end %>
-        </div>
+            <% end %>
+              <%#
+              <div class="col-1 px-0">
+                <div class="row m-0">
+                  <div class="col pl-1 pr-0">
+                      
+                    <%#= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } if true %>
+                    <%#= link_to "Complete",receipt_complete_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-success text-uppercase p-0 px-2', id: "receipt-#{receipt.id}-complete", data: { confirm: "Order ##{receipt.order_id} - Mark order as complete?" } if false %>
+              <%#
+                  </div> 
+                </div>
+              </div>
+              %>
+          </div>
+
+        <% end %>
+        <%= render 'manager/live/multi_action_bar', locals: { f: form } %>
       <% end %>
-    <%# end %>
+    <% end %>
   </div>
 </div>
+<div id="total-order-count" class="d-none"><%= pluralize(@order_count, 'Order') %></div>

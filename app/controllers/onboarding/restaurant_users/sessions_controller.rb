@@ -17,9 +17,10 @@ module Onboarding
       # end
 
       # DELETE /resource/sign_out
-      # def destroy
-      #   super
-      # end
+      def destroy
+        super
+        session.delete(:account_id)
+      end
 
       def after_sign_in_path_for(_resource)
         onboarding_continue_path

@@ -41,6 +41,8 @@
  --font-weight-secondary: var(--emenu-font-weight-secondary);
  --text-transform-secondary: var(--emenu-text-transform-secondary);
  --font-style-secondary: var(--emenu-font-style-secondary);
+
+ --topbar-height: 48px;
 }
 
 code {
@@ -48,13 +50,44 @@ code {
 }
 
 body {
- margin-top: 48px;
+ margin-top: var(--topbar-height);
  overscroll-behavior: none;
 
  font-family: var(--emenu-font-primary);
 
  & #live-order {
-   min-height: calc(100vh - 48px);
+   --header-height: 74px;
+   --footer-height: 40px;
+   --multi-action-bar-height: 58.69px;
+
+   background-color: var(--emenu-darkest);
+   padding-top: var(--header-height);
+   padding-bottom: var(--footer-height);
+   min-height: calc(100vh - var(--topbar-height));
+   
+   &.mab-active {
+     padding-bottom: calc(var(--footer-height) + var(--multi-action-bar-height));
+   }
+   
+    & #live-header {
+      top: 48px;
+      z-index: 1020;
+     //  border-radius: 0px 0px 10px 10px !important;
+    }
+   
+   //  & #live-status-bar {
+   //    border-radius: 10px 10px 0px 0px !important;
+   //  }
+   
+    & #live-multi-action-bar {
+      // bottom: calc(var(--footer-height) - var(--multi-action-bar-height));
+      bottom: calc(-2 * var(--multi-action-bar-height));
+      transition: all 0.3s;
+
+      &.active {
+        bottom: calc(var(--footer-height) - 3rem);
+      }
+    }
  }
 
  &.onboarding-layout {
@@ -990,6 +1023,41 @@ div.scrollmenu::-webkit-scrollbar {
  height: 100px;
 }
 
+.ck-button {
+  margin:4px;
+}
+
+.ck-button label {
+  margin: 4px;
+}
+
+.ck-button label span {
+  text-align:center;
+  padding: 5px 15px;
+  text-transform: uppercase;
+  color: var(--emenu-light);
+  cursor: pointer;
+  border-radius:100px;
+  border:1.5px solid var(--emenu-lighter);
+}
+
+.ck-button label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.ck-button input:checked + span {
+  border:2px solid var(--emenu-darkest);
+  color: var(--emenu-darkest);
+}
+
+.pill-outline-dark {
+  border: 1px solid var(--emenu-light);
+}
+
 // Toggle switches for checkboxes
 .switches {
  max-width: 350px;
@@ -1016,7 +1084,6 @@ div.scrollmenu::-webkit-scrollbar {
   width: 50px;
   height: 26px;
   border-radius: 15px;
-  // box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4);
   background: var(--emenu-dark);
   transition: all 0.3s;
  }
