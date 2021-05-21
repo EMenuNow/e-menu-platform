@@ -103,7 +103,7 @@
   <div class="row">
     <div class="col">
       <div class="form-group ">
-        <%= form.label :price %>
+        <%= form.label "Price (VAT inclusive)" %>
         <%= form.number_field :price_a, class: 'form-control  form-control-sm', step: :any %>
       </div>
     </div>
@@ -113,6 +113,14 @@
       <div class="form-group ">
         <%= form.label :available %>
         <%= form.check_box :available, class: 'form-control  form-control-sm' %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="form-group ">
+        <%= form.label "VAT tax rate %" %>
+        <%= form.text_field :tax_rate, class: 'form-control  form-control-sm' %>
       </div>
     </div>
   </div>

@@ -37,7 +37,7 @@
             <h5 class="d-inline m-0"><%=receipt.group_order ? "Group Order" : receipt.name.present? ? receipt.name.titleize : receipt.table_number.present? ? "Table #{receipt.table_number}" : "" %></h4>
           </div>
           <div class="col-3 mt-auto px-2 text-right">
-            <h6 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %> <%#= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
+            <h6 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize %> <%#= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
           </div>
         </div>
       </div>
@@ -46,7 +46,7 @@
           <div class="row px-0 py-2 border-bottom justify-content-between">
             <div class="col-auto mt-auto px-2 text-left">
               <% printers.each do |printer|%>
-                <%= link_to print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send order to #{printer.name} printer?" } do %>
+                <%= link_to print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info no-broadcast p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send order to #{printer.name} printer?" } do %>
                   <i class="fas fa-print"></i> <%= printer.name %>
                 <% end %>
               <% end %>
@@ -164,7 +164,7 @@
                     <h5><b>Service</b></p>
                   </div>
                   <div class="col-8">
-                    <p class="text-center m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %></p>
+                    <p class="text-center m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize %></p>
                   </div>
                 </div>
                 <div class="row pt-3">
@@ -218,19 +218,17 @@
             </div>
           </div>
         </div>
-        <% if printers.any? %>
-          <div class="row m-0 px-0 py-2 w-100 border-top">
-            <div class="col px-2 text-left">
-              <% if receipt&.order&.refunds.present? %>
-                <div class="badge badge-success">Order has been refunded</div>
-              <% else %>
-                <% refund_amount = number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %>
-                <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-danger text-uppercase p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - Full refund? (#{refund_amount})" } if receipt&.order&.stripe_data.present? %>
-              <% end %>
-              <% if receipt&.email.present? %><%= link_to 'Send Receipt', manager_send_receipts_path(receipt.id), remote: true, class: "btn btn-warning text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - Re-send email receipt to #{receipt.group_order? ? "all in group" : receipt.email}?" } %><% end %>
-            </div>
+        <div class="row m-0 px-0 py-2 w-100 border-top">
+          <div class="col px-2 text-left">
+            <% if receipt&.order&.refunds.present? %>
+              <div class="badge badge-success">Order has been refunded</div>
+            <% else %>
+              <% refund_amount = number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %>
+              <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-danger text-uppercase p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - Full refund? (#{refund_amount})" } if receipt&.order&.stripe_data.present? %>
+            <% end %>
+            <% if receipt&.email.present? %><%= link_to 'Send Receipt', manager_send_receipts_path(receipt.id), remote: true, class: "btn btn-warning no-broadcast text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - Re-send email receipt to #{receipt.group_order? ? "all in group" : receipt.email}?" } %><% end %>
           </div>
-        <% end %>
+        </div>
         <div class="row m-0 px-0 py-2 w-100 border-top">
           <div class="col-6 my-auto px-2 text-muted text-left">
             <small><i class="far fa-clock"></i> <%= time_placed.strftime("%H:%M") %> &nbsp; <i class="far fa-calendar-alt"></i> <%= time_placed.strftime("%A, #{time_placed.day.ordinalize} %B") %> </small>

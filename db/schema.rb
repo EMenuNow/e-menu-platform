@@ -201,7 +201,7 @@ ActiveRecord::Schema.define(version: 2021_05_21_102448) do
     t.text "icon"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type", default: "Allergen"
+    t.string "type", default: "allergen"
   end
 
   create_table "menu_item_categorisations_menus", force: :cascade do |t|
@@ -409,6 +409,15 @@ ActiveRecord::Schema.define(version: 2021_05_21_102448) do
     t.index ["restaurant_id"], name: "index_pi_interfaces_on_restaurant_id"
   end
 
+  create_table "powerepos_auths", force: :cascade do |t|
+    t.string "token_type"
+    t.text "access_token"
+    t.integer "expires_in"
+    t.text "refresh_token"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "printers", force: :cascade do |t|
     t.string "name"
     t.bigint "pi_interface_id"
@@ -463,8 +472,8 @@ ActiveRecord::Schema.define(version: 2021_05_21_102448) do
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
     t.boolean "group_order"
-    t.datetime "due_date"
     t.string "processing_status", default: "pending"
+    t.datetime "due_date"
     t.string "first_print_status"
     t.string "print_status"
     t.jsonb "tax_rates"
@@ -544,6 +553,7 @@ ActiveRecord::Schema.define(version: 2021_05_21_102448) do
     t.float "commision_percentage", default: 0.0
     t.boolean "stripe_chargeback_enabled", default: false
     t.boolean "subscription_enabled", default: true
+    t.string "outletID"
     t.boolean "demo", default: false
     t.index ["cuisine_id"], name: "index_restaurants_on_cuisine_id"
     t.index ["currency_id"], name: "index_restaurants_on_currency_id"
@@ -624,6 +634,11 @@ ActiveRecord::Schema.define(version: 2021_05_21_102448) do
     t.text "custom_css"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "basket_colour", default: "#000"
+    t.string "item_colour", default: "#000"
+    t.string "basket_text_colour", default: "#fff"
+    t.string "item_text_colour", default: "#fff"
+    t.string "item_header_colour", default: "#000"
     t.index ["restaurant_id"], name: "index_themes_on_restaurant_id"
   end
 
