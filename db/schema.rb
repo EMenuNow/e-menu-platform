@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_13_160417) do
+ActiveRecord::Schema.define(version: 2021_05_21_102448) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -204,9 +204,13 @@ ActiveRecord::Schema.define(version: 2021_05_13_160417) do
     t.string "type", default: "allergen"
   end
 
-  create_table "menu_item_categorisations_menus", id: false, force: :cascade do |t|
+  create_table "menu_item_categorisations_menus", force: :cascade do |t|
     t.bigint "menu_id", null: false
     t.bigint "menu_item_categorisation_id", null: false
+    t.boolean "contains"
+    t.boolean "may_contain"
+    t.boolean "dietary"
+    t.boolean "category"
   end
 
   create_table "menu_translations", force: :cascade do |t|

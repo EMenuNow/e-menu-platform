@@ -97,7 +97,11 @@ module Manager
 
       Rails.cache.delete("api/restaurant/#{@restaurant.id}/menu")
       Rails.cache.delete("restaurant_order_menu_#{@restaurant.id}")
-  
+
+      @allergens.each{|a| ([params[:contains_allergen_ids], params[:may_contain_allergen_ids]].compact.reduce([], :|)).include?(a.id.to_s) ? MenuItemCategorisationsMenu.where(menu_id: @menu.id, menu_item_categorisation_id: a.id).first_or_create.update(contains: params[:contains_allergen_ids]&.include?(a.id.to_s), may_contain: params[:may_contain_allergen_ids]&.include?(a.id.to_s), dietary: nil, category: nil) : MenuItemCategorisationsMenu.find_by(menu_id: @menu.id, menu_item_categorisation_id: a.id)&.destroy}
+      @diets.each{|d| params[:dietary_ids]&.include?(d.id.to_s) ? MenuItemCategorisationsMenu.where(menu_id: @menu.id, menu_item_categorisation_id: d.id).first_or_create.update(dietary: true, contains: nil, may_contain: nil, category: nil) : MenuItemCategorisationsMenu.find_by(menu_id: @menu.id, menu_item_categorisation_id: d.id)&.destroy}
+      @categories.each{|c| params[:menu_item_categorisation_ids]&.include?(c.id.to_s) ? MenuItemCategorisationsMenu.where(menu_id: @menu.id, menu_item_categorisation_id: c.id).first_or_create.update(dietary: nil, contains: nil, may_contain: nil, category: true) : MenuItemCategorisationsMenu.find_by(menu_id: @menu.id, menu_item_categorisation_id: c.id)&.destroy}
+
       respond_to do |format|
         if @menu.update(menu_params)
 
@@ -145,8 +149,6 @@ module Manager
       @menu = Menu.find(params[:id])
     end
 
-
-
     def set_spice_levels
       @spice_levels = SpiceLevel.all
     end
@@ -156,11 +158,14 @@ module Manager
 
     def set_menu_item_categorisations
       @menu_item_categorisations = MenuItemCategorisation.all
+      @allergens = Allergen.all.sort_by &:id
+      @diets = Dietary.all.sort_by &:id
+      @categories = Category.all.sort_by &:id
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def menu_params
-      params.require(:menu).permit(:restaurant_id, :nutrition, :provenance, :tax_rate, :name, :description, :image, :spice_level_id, :node_type, :prices, :available, :calories, :position, :price_a, :price_b, :css_class, :item_screen_type_id, :secondary_item_screen_type_id, menu_item_categorisation_ids: [], custom_lists: {} )
+      params.require(:menu).permit(:restaurant_id, :nutrition, :provenance, :tax_rate, :name, :description, :image, :spice_level_id, :node_type, :prices, :available, :calories, :position, :price_a, :price_b, :css_class, :item_screen_type_id, :secondary_item_screen_type_id, menu_item_categorisation_ids: [], contains_allergen_ids: [], may_contain_allergen_ids: [], custom_lists: {} )
     end
   end
 end
