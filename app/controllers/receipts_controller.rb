@@ -135,31 +135,18 @@ class ReceiptsController < ApplicationController
     else
       @screen_item.update(ready: false, processing_status: 'accepted')
     end
-    if @receipt.items_processing_status == "accepted"
-      if @receipt.group_order
-        @receipts.each do |r|
-          r.update(is_ready: false, processing_status: 'accepted')
-        end
-      else
-        @receipt.update(is_ready: false, processing_status: 'accepted')
-      end
-    elsif @receipt.items_processing_status == "ready"
-      if @receipt.group_order
-        @receipts.each do |r|
-          r.update(is_ready: true, processing_status: 'ready')
-        end
-      else
-        @receipt.update(is_ready: true, processing_status: 'ready')
-      end
+    
+    case @receipt.items_processing_status
+    when "accepted"
+      @receipt.find_grouped_receipts.map{|r| r.update(is_ready: false, processing_status: 'accepted')}
+    when "ready"
+      @receipt.find_grouped_receipts.map{|r| r.update(is_ready: true, processing_status: 'ready')}
+    when "preparing"
+      @receipt.find_grouped_receipts.map{|r| r.update(is_ready: false, processing_status: 'preparing')}
     else
-      if @receipt.group_order
-        @receipts.each do |r|
-          r.update(is_ready: false, processing_status: 'preparing')
-        end
-      else
-        @receipt.update(is_ready: false, processing_status: 'preparing')
-      end
+      @receipt.find_grouped_receipts.map{|r| r.update(is_ready: false, processing_status: 'error')}
     end
+
     @restaurant = @receipt.restaurant
     
     @receipt.broadcast
@@ -171,9 +158,9 @@ class ReceiptsController < ApplicationController
       @receipts.each do |r|
         r.screen_items.where(item_screen_type_key: params[:item_screen_type_key]).update_all(ready: true, processing_status: 'ready')
         if r.items_processing_status == "ready"
-          r.update(is_ready: true, processing_status: 'ready')
+          r.find_grouped_receipts.map{|r| r.update(is_ready: true, processing_status: 'ready')}
         else
-          r.update(is_ready: false, processing_status: 'preparing')
+          r.find_grouped_receipts.map{|r| r.update(is_ready: false, processing_status: 'preparing')}
         end
       end
     else
@@ -184,7 +171,6 @@ class ReceiptsController < ApplicationController
         @receipt.update(is_ready: false, processing_status: 'preparing')
       end
     end
-
     @restaurant = @receipt.restaurant
     
     @receipt.broadcast
@@ -214,9 +200,32 @@ class ReceiptsController < ApplicationController
       end
     end
     @restaurant = @receipt.restaurant
-  
+
     @receipt.broadcast
     @receipt.broadcast_items
+  end
+  
+  def all_receipts
+    @receipt = Receipt.find(params[:receipt_ids].first)
+    @restaurant = @receipt.restaurant
+    
+    receipt_ids = params[:receipt_ids].map{|id| Receipt.find(id).find_grouped_receipts.map{|r| r.id.to_s}}.flatten
+    screen_item_ids = receipt_ids.map{|id| Receipt.find(id).screen_items.map{|i| i.id.to_s}}.flatten
+
+    if params[:submit] == "send-receipt"
+      Receipt.where(id: receipt_ids).each{|r| r.email_receipt} if receipt_ids.any?
+    elsif params[:submit].start_with?('print-')
+      p_id = params[:submit].split("-")[1].to_i
+      printer = Printer.find(p_id)
+      Receipt.where(id: receipt_ids).each {|r| r.print_receipt(printer)} if receipt_ids.any?
+    else    
+      ready = false
+      ready = true if params[:submit] == "ready" || params[:submit] == "complete"
+      Receipt.where(id: receipt_ids).update_all(is_ready: ready, processing_status: params[:submit]) if receipt_ids.any?
+      ScreenItem.where(id: screen_item_ids).update_all(ready: ready, processing_status: params[:submit]) if screen_item_ids.any?
+      @receipt.broadcast(message: params[:submit].capitalize)
+      @receipt.broadcast_items
+    end
   end
 
   def item_creation_broadcast

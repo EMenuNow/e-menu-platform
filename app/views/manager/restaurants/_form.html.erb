@@ -1,3 +1,21 @@
+<% content_for :js do %>
+  <script>
+    $("#restaurant_path").on('keypress', function(e) {
+      var regex = new RegExp("^[a-zA-Z\-0-9 ]+$");
+      var key = String.fromCharCode(!e.charCode ? e.keyCode : e.charCode);
+      if (!regex.test(key)) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    $("#restaurant_path").on('input', function(e) {
+      e.target.value = e.target.value.replace(/\s+/g, '-').toLowerCase();
+    });
+
+  </script>
+<% end %>
+
 <%= form_with(model: [:manager, restaurant], local: true) do |form| %>
 <% if restaurant.errors.any? %>
 <div id="error_explanation" class="alert alert-danger">
@@ -121,9 +139,10 @@ collection = restaurant.features.where(id: 12).present?
     <div class="row">
       <div class="col">
         <div class="form-group ">
-          <%= link_to("Connect stripe", @connect, class: "d-inline-block btn btn-warning#{' disabled' if @account[:details_submitted] && @account[:charges_enabled]}") %>
           <% if @account[:details_submitted] && @account[:charges_enabled] %>
-            <strong class="d-inline-block text-gray-dark">Stripe connection <span class="badge badge-pill badge-success">Complete</span></strong>
+            <strong class="d-inline-block text-gray-dark"><span class="badge badge-pill badge-success" style="font-size: 100%;">Stripe connection complete</span></strong>
+          <% else %>
+            <%= link_to("Connect stripe", @connect, class: "d-inline-block btn btn-warning") %>
           <% end %>
         </div>
       </div>
@@ -148,7 +167,7 @@ collection = restaurant.features.where(id: 12).present?
       <div class="col">
         <div class="form-group ">
           <%= form.label "URL Path" %>
-          <%= form.text_field :path, class: 'form-control  form-control-sm text-center', :disabled=>!admin %>
+          <%= form.text_field :path, id: "restaurant_path", class: 'form-control  form-control-sm text-center', :disabled=>!admin %>
         </div>
       </div>
     </div>
@@ -180,6 +199,18 @@ collection = restaurant.features.where(id: 12).present?
         </div>
       </div>
     </div>
+    <% if params[:admin] == "true" %>
+      <div class="row">
+        <div class="col">
+          <div class="form-group ">
+            <label>Demo Restaurant (Uses stripe test keys)
+              <br />
+              <%= form.check_box :demo, class: 'text-center', :disabled=>!admin %>
+            </label>
+          </div>
+        </div>
+      </div>
+      <% end %>
     <!-- Finance -->
   </div>
   <div class="tab-pane fade col-12 col-md-6 offset-md-3" id="settings" role="tabpanel" aria-labelledby="settings-tab">

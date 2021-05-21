@@ -1,3 +1,18 @@
+<% content_for :js do %>
+  <script>
+    $(function (){
+      $('.input-daterange').datepicker({
+          format: "dd-mm-yyyy",
+          todayBtn: "linked",
+          autoclose: false,
+          disableTouchKeyboard: true,
+          todayHighlight: true,
+          orientation: "bottom",
+      });
+    });
+  </script>
+<% end %>
+
 <%
   total_value = (@receipts.sum(&:basket_total)/100.0)
   total_emenu_commission_value = (@receipts.sum(&:application_fee_amount)/100.0)
@@ -17,14 +32,23 @@
 <div class="container pt-1 pb-5 text-center">
   <% if dates.present? %>
     <div class="row pb-1">
-      <div class="col-lg-12">
+      <div class="col-lg-6 mx-auto">
         <div class="pt-2 pb-5 bg-white rounded">
           <%= form_for manager_reports_path, :method => "get", html: { id: "options-form" } do |f| %>
-            <h6 class="m-0">Showing orders after:
-            <%= select_tag :after_created_at, options_for_select(dates, :selected => params[:after_created_at]) , :onchange => "$('#options-form').submit()" %>
-            and before
-            <%= select_tag :before_created_at, options_for_select(dates, :selected => params[:before_created_at]) , :onchange => "$('#options-form').submit()" %>
-            </h6>
+                
+            <h5>Showing orders between:</h5>
+            <div class="mb-2 input-group input-daterange">
+              <%= text_field_tag :after_created_at, params[:after_created_at] ? params[:after_created_at] : dates.last, hide_label: true, class: 'input-group-text form-control datepicker', id: 'after_created_at', autocomplete: 'off', :onchange => "$('#options-form').submit()" %>
+              <div class="input-group-prepend input-group-append">
+                <span class="input-group-text"> and </span>
+              </div>
+              <%= text_field_tag :before_created_at, params[:before_created_at] ? params[:before_created_at] : dates.first, hide_label: true, class: 'input-group-text form-control datepicker', id: 'before_created_at', autocomplete: 'off', :onchange => "$('#options-form').submit()" %>
+            </div>
+
+            <div class="mb-3 input-group">
+              <%= link_to "Reset", manager_reports_path, class: 'btn btn-warning mx-auto' %>
+            </div>
+
           <% end %>
         </div>
       </div>
@@ -158,7 +182,7 @@
         <% popular = @receipts.group_by{|t|t.items["items"].map{|j|j["item"]}.flatten}.sort_by{|x, y|y.size}.reverse.take(8) %>
         <div class="row pt-4 pb-1 justify-content-center">
           <% popular.each do |group, x| %>
-            <div class="col-3">
+            <div class="col-lg-3">
               <div class="card shadow p-3 mb-5 bg-white rounded"> 
                 <h3><b><%= x.size %> purchases</b></h3>
                 <%= group.first.html_safe %>

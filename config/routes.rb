@@ -65,6 +65,7 @@ Rails.application.routes.draw do
     post 'item_creation_broadcast'
     post 'creation_broadcast'
     collection do 
+      post :all_receipts
       get 'view_receipt/:uuid', to: 'receipts#view_receipt', as: :view_receipt
     end
   end

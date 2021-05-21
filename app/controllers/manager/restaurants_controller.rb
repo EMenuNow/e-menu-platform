@@ -7,7 +7,7 @@ module Manager
     before_action :set_restaurant_new, only: %i[show edit update]
     before_action :set_restaurant, only: %i[active toggle_active set_delay open_early close_early]
     before_action :set_cuisine, only: %i[new create show edit update]
-    before_action :get_stripe_account, only: %i[show edit update]
+    # before_action :get_stripe_account, only: :edit
 
     before_action :set_features, only: %i[show edit update new]
 
@@ -21,8 +21,9 @@ module Manager
     # GET /restaurants/1/edit
     def edit
       connect_service = ConnectService.new(@restaurant)
-      if @restaurant.stripe_connected_account_id
+      unless @restaurant.stripe_connected_account_id.blank?
         @connect = connect_service.refresh_account(@restaurant.stripe_connected_account_id)
+        @account = connect_service.get_account
       else
         create_account = connect_service.create_account
         session[:account_id] = create_account[:account_id]
@@ -211,7 +212,7 @@ module Manager
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def restaurant_params
-      params.require(:restaurant).permit(:name, :address, :postcode, :telephone, :email, :twitter, :facebook, :opening_times, :is_chain, :cuisine_id, :image, :restaurant_user_id, :slug, :path, :css_font_url, :css_font_class, :custom_css, :custom_styles, :url, :stripe_api_key, :stripe_publish_api_key, :stripe_connected_account_id, :commision_percentage, :stripe_chargeback_enabled, :delay_time_minutes, :subscription_enabled, :show_on_homepage, :facebook_pixel, :background_image, :subtle_background, :currency_id)
+      params.require(:restaurant).permit(:name, :address, :postcode, :telephone, :email, :twitter, :facebook, :opening_times, :is_chain, :cuisine_id, :image, :restaurant_user_id, :slug, :path, :css_font_url, :css_font_class, :custom_css, :custom_styles, :url, :stripe_api_key, :stripe_publish_api_key, :stripe_connected_account_id, :commision_percentage, :stripe_chargeback_enabled, :delay_time_minutes, :subscription_enabled, :show_on_homepage, :facebook_pixel, :background_image, :subtle_background, :currency_id, :demo)
     end
   end
 end

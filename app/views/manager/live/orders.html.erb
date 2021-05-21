@@ -7,6 +7,7 @@
     var order_bell;    
     document.getElementById("dismiss-loader").addEventListener("click", function() {
       order_bell = new Audio("<%= asset_path("order-bell.wav") %>");
+      order_bell.muted = false;
       order_bell.play().then(() => { order_bell.pause()} )
     });
   </script>
@@ -14,6 +15,8 @@
 <%= hidden_field_tag :restaurant_id, @restaurant.id%>
 <%= render 'manager/live/kitchen_delay' %>
 
-<div class="pb-2" id='current-orders'>
+<div class="py-1" id='current-orders'>
   <%= render 'manager/live/order_items', printers: @printers %>
 </div>
+
+<%= render 'manager/live/status_bar' %>

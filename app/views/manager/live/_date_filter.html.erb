@@ -48,6 +48,8 @@
       $('#date-filter-form').submit(function(e) {
         e.preventDefault();
         $('#dateModal').modal('hide');
+        $('#order-progress-overlay').addClass("active");
+        $('.lds-ellipsis').addClass("active");
         var url = $(this).attr("action");
         var form_data = new FormData(e.target);
         filterParams = Object.fromEntries(form_data.entries());
@@ -58,36 +60,171 @@
           data: filterParams,
           success: function (response) {
             var orderData = $(response).find("#current-orders").html();
+            var totalOrderCount = $(response).find("#total-order-count").text();
             $("#current-orders").html(orderData);
+            $("#status-order-count").text(totalOrderCount);
+            $("#live-order").removeClass("mab-active");
+            $("#order-progress-overlay").removeClass("active");
+            $(".lds-ellipsis").removeClass("active");
             $('#date-filter-button').removeClass('text-muted border-secondary');
             $('#date-filter-button span').text(filterParams.day ? filterParams.date.split('_')[0] + ' ' + filterParams.day : filterParams.date.replace("_", " "));
             validate();
+
+            $('#check-all-orders').on('click', function() {    
+              $('.check-order:checkbox').prop('checked', this.checked);    
+            });
+
+            $('.check-order').on('click', function() {
+              var checkedOrderCount = $(".checked-order:checkbox:checked").length;
+              if (checkedOrderCount > 0) {
+                var n = new RegExp('^((\\S+ ){1})(\\S+)');
+                var o = new RegExp('^((\\S+ ){2})(\\S+)');
+
+                if (checkedOrderCount == 1 ) {
+                  $("#mab-order-count").text(`${checkedOrderCount} Order`);
+                  $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(n, `$1${checkedOrderCount}`);}));
+                  $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(o, `$1order`);}));
+                  $("#all-receipt").attr("data-confirm", `Re-send recipt for ${checkedOrderCount} order?`);
+                  } else {
+                  $("#mab-order-count").text(`${checkedOrderCount} Orders`);
+                  $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(n, `$1${checkedOrderCount}`);}));
+                  $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(o, `$1orders`);}));
+                  $("#all-receipt").attr("data-confirm", `Re-send recipt for ${checkedOrderCount} orders?`);
+                };
+
+                $("#live-multi-action-bar").addClass("active");
+                $("#live-order").addClass("mab-active");
+
+              } else {
+                $("#mab-order-count").text(`0 Orders`);
+                $("#live-multi-action-bar").removeClass("active");
+                $("#live-order").removeClass("mab-active");
+              };
+
+            });
+
+            $('#all-cancel').on('click', function() {
+              $("#mab-order-count").text(`0 Orders`);
+              $("#live-multi-action-bar").removeClass("active");
+              $("#live-order").removeClass("mab-active");
+              $('.check-order:checkbox').prop('checked', false);   
+            });
+
+            $('.order-progress').on('ajax:send', function(ev) {
+              var $btn = $(document.activeElement);
+
+              if ($btn.hasClass('no-broadcast')) {
+                $("#mab-order-count").text(`0 Orders`);
+                $("#live-multi-action-bar").removeClass("active");
+                $("#live-order").removeClass("mab-active");
+                $('.check-order:checkbox').prop('checked', false);    
+                $('#order-progress-overlay').removeClass("active");
+                $('.lds-ellipsis').removeClass("active");
+              } else {
+                $('#order-progress-overlay').addClass("active");
+                $('.lds-ellipsis').addClass("active");
+              };
+
+            });
+
           },
+
           error: function (xhr) {
             console.log(xhr);
           },
+
         });
+        
       });
 
       $('#date-filter-clear').on('click', function(e) {
         e.preventDefault();
+        $('#order-progress-overlay').addClass("active");
+        $('.lds-ellipsis').addClass("active");
         $('#date-filter-form').trigger("reset");
         $('#dateModal').modal('hide');
         var url = $(this).attr("href");
+        filterParams = {};
 
         $.ajax({
           url: url,
           type: "get",
           success: function (response) {
             var orderData = $(response).find("#current-orders").html();
+            var totalOrderCount = $(response).find("#total-order-count").text();
             $("#current-orders").html(orderData);
+            $("#status-order-count").text(totalOrderCount);
+            $("#live-order").removeClass("mab-active");
+            $("#order-progress-overlay").removeClass("active");
+            $(".lds-ellipsis").removeClass("active");
             $('#date-filter-button').addClass('text-muted border-secondary');
             $('#date-filter-button span').text("Date");
+
+            $('#check-all-orders').on('click', function() {    
+              $('.check-order:checkbox').prop('checked', this.checked);    
+            });
+
+            $('.check-order').on('click', function() {
+              var checkedOrderCount = $(".checked-order:checkbox:checked").length;
+              if (checkedOrderCount > 0) {
+                var n = new RegExp('^((\\S+ ){1})(\\S+)');
+                var o = new RegExp('^((\\S+ ){2})(\\S+)');
+
+                if (checkedOrderCount == 1 ) {
+                  $("#mab-order-count").text(`${checkedOrderCount} Order`);
+                  $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(n, `$1${checkedOrderCount}`);}));
+                  $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(o, `$1order`);}));
+                  $("#all-receipt").attr("data-confirm", `Re-send recipt for ${checkedOrderCount} order?`);
+                  } else {
+                  $("#mab-order-count").text(`${checkedOrderCount} Orders`);
+                  $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(n, `$1${checkedOrderCount}`);}));
+                  $(".mab-confirm").attr("data-confirm", (function(k,v) {return v.replace(o, `$1orders`);}));
+                  $("#all-receipt").attr("data-confirm", `Re-send recipt for ${checkedOrderCount} orders?`);
+                };
+
+                $("#live-multi-action-bar").addClass("active");
+                $("#live-order").addClass("mab-active");
+
+              } else {
+                $("#mab-order-count").text(`0 Orders`);
+                $("#live-multi-action-bar").removeClass("active");
+                $("#live-order").removeClass("mab-active");
+              };
+
+            });
+
+            $('#all-cancel').on('click', function() {
+              $("#mab-order-count").text(`0 Orders`);
+              $("#live-multi-action-bar").removeClass("active");
+              $("#live-order").removeClass("mab-active");
+              $('.check-order:checkbox').prop('checked', false);   
+            });
+
+            $('.order-progress').on('ajax:send', function(ev) {
+              var $btn = $(document.activeElement);
+
+              if ($btn.hasClass('no-broadcast')) {
+                $("#mab-order-count").text(`0 Orders`);
+                $("#live-multi-action-bar").removeClass("active");
+                $("#live-order").removeClass("mab-active");
+                $('.check-order:checkbox').prop('checked', false);    
+                $('#order-progress-overlay').removeClass("active");
+                $('.lds-ellipsis').removeClass("active");
+              } else {
+                $('#order-progress-overlay').addClass("active");
+                $('.lds-ellipsis').addClass("active");
+              };
+
+            });
+
           },
+
           error: function (xhr) {
             console.log(xhr);
           },
+
         });
+
       });
 
     });
@@ -158,8 +295,8 @@
       
     </div>
     <div class="mb-3 form-group">
-      <%= link_to "Clear", '#', class: 'btn btn-secondary', id: 'date-filter-clear' %>
-      <%= submit_tag("Filter", class: 'btn btn-warning', disabled: true) %>
+      <%= link_to "Clear", '#', class: 'btn btn-secondary order-progress', id: 'date-filter-clear' %>
+      <%= submit_tag("Filter", class: 'btn btn-warning order-progress', disabled: true) %>
     </div>
   <% end %>
 </div>

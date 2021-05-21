@@ -37,21 +37,21 @@
             <h5 class="d-inline m-0"><%=receipt.group_order ? "Group Order" : receipt.name.present? ? receipt.name.titleize : receipt.table_number.present? ? "Table #{receipt.table_number}" : "" %></h4>
           </div>
           <div class="col-3 mt-auto px-2 text-right">
-            <h6 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %> <%#= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
+            <h6 class="text-right m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize %> <%#= receipt.delivery_or_collection == "delivery" && receipt.address.present? ? "Delivery" : ""%></h5>
           </div>
         </div>
       </div>
       <div class="modal-body text-center p-0">
         <div class="col">
-          <div class="row px-0 py-2 border-bottom">
-            <div class="col-6 mt-auto px-2 text-left">
+          <div class="row px-0 py-2 border-bottom justify-content-between">
+            <div class="col-auto mt-auto px-2 text-left">
               <% printers.each do |printer|%>
-                <%= link_to print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send order to #{printer.name} printer?" } do %>
+                <%= link_to print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info no-broadcast p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - send order to #{printer.name} printer?" } do %>
                   <i class="fas fa-print"></i> <%= printer.name %>
                 <% end %>
               <% end %>
             </div>
-            <div class="col-6 px-2 mt-auto text-right">
+            <div class="col-auto px-2 mt-auto text-right">
               <div class="text-center align-bottom m-0 d-inline-block"><%= due_date_format(receipt.due_date, @restaurant.time_zone) %> &bull; <%= due_time_format(receipt.due_date, receipt.collection_time.presence, @restaurant.time_zone) %></div>
             </div>
           </div>
@@ -61,13 +61,8 @@
               <div id="statuspill<%receipt.order_id%>" class="d-inline m-0 badge badge-pill <%= status_pill %>"><%= receipt.processing_status&.titleize %></div>
             </div>
             <div class="col-md-6 px-2 my-auto text-right">
-              <%= link_to "To Kitchen", receipt_send_to_kitchen_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-success text-uppercase p-0 px-2 send-to-kitchen', data: { confirm: "Order ##{receipt.order_id} - Send to kitchen?" }, :id => "acceptorder#{receipt.order_id}" unless accepted %>
-              <%= link_to "Preparing",receipt_preparing_path(receipt_id: receipt.order_id), method: :post, remote: true, class: 'btn btn-danger text-uppercase p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - Preparing?" } unless preparing %>
-              <script type="text/javascript">
-                $('#<%="acceptorder#{receipt.order_id}"%>').on('ajax:success', function(ev) {
-                  $('#<%="statuspill#{receipt.order_id}"%>').text("Accepted").addClass("badge-info")
-                })
-              </script>
+              <%= link_to "To Kitchen", receipt_send_to_kitchen_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-success order-progress text-uppercase p-0 px-2 send-to-kitchen', data: { confirm: "Order ##{receipt.order_id} - Send to kitchen?" }, :id => "acceptorder#{receipt.order_id}" unless accepted %>
+              <%= link_to "Preparing",receipt_preparing_path(receipt_id: receipt.order_id), method: :post, remote: true, class: 'btn btn-danger order-progress text-uppercase p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - Preparing?" } unless preparing %>
             </div>
           </div>
           <div class="row pt-2">
@@ -119,7 +114,7 @@
                           <div class="row pb-2">
                             <% if screen_item.present? %>
                               <div class="col-8 px-2 text-left">
-                                <%= link_to receipt_screen_item_process_path(receipt.id, screen_item.id, only_path: true), method: :post, remote: true, data: { confirm: "Order ##{receipt.order_id} - #{screen_item.processing_status == 'accepted' ? 'Preparing item?' : screen_item.processing_status == 'preparing' ? 'Mark item ready?' : 'Reset item status' }" } do %>
+                                <%= link_to receipt_screen_item_process_path(receipt.id, screen_item.id, only_path: true), method: :post, remote: true, class: "order-progress", data: { confirm: "Order ##{receipt.order_id} - #{screen_item.processing_status == 'accepted' ? 'Preparing item?' : screen_item.processing_status == 'preparing' ? 'Mark item ready?' : 'Reset item status' }" } do %>
                                   <%= item['item'].html_safe %>
                                 <% end %>
                               </div>
@@ -169,7 +164,7 @@
                     <h5><b>Service</b></p>
                   </div>
                   <div class="col-8">
-                    <p class="text-center m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection.titleize %></p>
+                    <p class="text-center m-0"><%=receipt.table_number.present? ? "Table #{receipt.table_number}" : receipt.delivery_or_collection&.titleize %></p>
                   </div>
                 </div>
                 <div class="row pt-3">
@@ -199,7 +194,7 @@
                     <p class="text-center m-0"><%=receipts.map{|x|x&.order&.email}.compact.join(",").gsub(",",", ")%></p>
                   </div>
                 </div>
-                <% unless receipts.map{|x|x&.telephone}.any? %>
+                <% unless receipts.map{|x|x&.telephone}.all?(&:blank?) %>
                   <div class="row pt-3">
                     <div class="col-4 text-right">
                       <h5><b>Phone</b></p>
@@ -223,26 +218,24 @@
             </div>
           </div>
         </div>
-        <% if printers.any? %>
-          <div class="row m-0 px-0 py-2 w-100 border-top">
-            <div class="col px-2 text-left">
-              <% if receipt&.order&.refunds.present? %>
-                <div class="btn btn-warning p-0 px-1">Order has been refunded</div>
-              <% else %>
-                <% refund_amount = number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %>
-                <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-danger text-uppercase p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - Full refund? (#{refund_amount})" } if receipt&.order&.stripe_data.present? %>
-              <% end %>
-              <% if receipt&.email.present? %><%= link_to 'Send Receipt', manager_send_receipts_path(receipt.id), remote: true, class: "btn btn-warning text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - Re-send email receipt to #{receipt.group_order? ? "all in group" : receipt.email}?" } %><% end %>
-            </div>
+        <div class="row m-0 px-0 py-2 w-100 border-top">
+          <div class="col px-2 text-left">
+            <% if receipt&.order&.refunds.present? %>
+              <div class="badge badge-success">Order has been refunded</div>
+            <% else %>
+              <% refund_amount = number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %>
+              <%= link_to "Refund",manager_refunds_path(restaurant_id: receipt.order.restaurant, id: receipt.order), method: :post, class: 'btn btn-danger text-uppercase p-0 px-2', data: { confirm: "Order ##{receipt.order_id} - Full refund? (#{refund_amount})" } if receipt&.order&.stripe_data.present? %>
+            <% end %>
+            <% if receipt&.email.present? %><%= link_to 'Send Receipt', manager_send_receipts_path(receipt.id), remote: true, class: "btn btn-warning no-broadcast text-uppercase p-0 px-2", data: { confirm: "Order ##{receipt.order_id} - Re-send email receipt to #{receipt.group_order? ? "all in group" : receipt.email}?" } %><% end %>
           </div>
-        <% end %>
+        </div>
         <div class="row m-0 px-0 py-2 w-100 border-top">
           <div class="col-6 my-auto px-2 text-muted text-left">
             <small><i class="far fa-clock"></i> <%= time_placed.strftime("%H:%M") %> &nbsp; <i class="far fa-calendar-alt"></i> <%= time_placed.strftime("%A, #{time_placed.day.ordinalize} %B") %> </small>
           </div>
           <div class="col-6 mt-auto px-2 text-right">
-            <%= link_to "Complete",receipt_complete_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-success text-uppercase p-0 px-2', id: "receipt-#{receipt.id}-complete", data: { confirm: "Order ##{receipt.order_id} - Mark order as complete?" } unless complete %>
-            <%= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning text-uppercase p-0 px-2', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } unless ready or complete %>
+            <%= link_to "Complete",receipt_complete_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-success order-progress text-uppercase p-0 px-2', id: "receipt-#{receipt.id}-complete", data: { confirm: "Order ##{receipt.order_id} - Mark order as complete?" } unless complete %>
+            <%= link_to "Ready",receipt_is_ready_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-warning order-progress text-uppercase p-0 px-2', id: "receipt-#{receipt.id}-ready", data: { confirm: "Order ##{receipt.order_id} - Mark order as ready?" } unless ready or complete %>
           </div>
         </div>
       </div>

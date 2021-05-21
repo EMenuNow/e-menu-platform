@@ -53,6 +53,14 @@
         </tr>
         <% end %>
         <tr>
+          <td>VAT Applied</td>
+          <td class='text-left' colspan=2>
+            <% @receipt.tax_rates.each do |g, tax_rate| %>
+              <span>VAT at <%= g %>% included <%= number_to_currency((tax_rate.map{|x|x['total']}.sum.to_f * (g.to_f/100.0)), unit: @restaurant.currency_symbol) %></span><br/>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
           <td>Total</td>
           <td></td>
           <td class='text-left'><%= number_to_currency(@receipt.basket_total.to_f / 100.0, unit: @restaurant.currency_symbol) %></td>

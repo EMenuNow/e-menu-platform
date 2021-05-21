@@ -82,7 +82,7 @@ class BasketService < ApplicationController
     total += cl.map{|s| ("%.2f" % s.price).to_f }.inject(:+) if optionals.present?
     uuid = SecureRandom.uuid
 
-    basket_ids << {uuid: uuid, total: total.round(2), note: note ,item: menu_item.id, optionals: cl.map{|s| s.id }, item_screen_type_key: menu_item.item_screen_type_key, menu_id: menu_item.id, item_screen_type_name: menu_item.item_screen_type_name }
+    basket_ids << {uuid: uuid, total: total.round(2), note: note, item: menu_item.id, tax_rate: menu_item.tax_rate, optionals: cl.map{|s| s.id }, item_screen_type_key: menu_item.item_screen_type_key, menu_id: menu_item.id, item_screen_type_name: menu_item.item_screen_type_name }
     @basket_db.contents = {
       restaurant: @restaurant.id,
       count: basket_ids.count,
@@ -127,7 +127,7 @@ class BasketService < ApplicationController
       cl = optionals.sort_by do |item|
         lookup.fetch(item.custom_list_id)
       end
-      basket_items << {'uuid' => id['uuid'], 'total' => id['total'], 'note' => id['note'] ,'item' => "<i>#{menu_item.parent.name}</i> - <strong>#{menu_item.name}</strong>" , 'optionals' => cl.map{|s| "- <strong>#{s.name}</strong>" }, 'item_screen_type_name' => menu_item.item_screen_type_name, 'item_screen_type_key' => menu_item.item_screen_type_key, 'menu_id' => menu_item.id, 'secondary_item_screen_type_name' => menu_item.secondary_item_screen_type_name, 'secondary_item_screen_type_key' => menu_item.secondary_item_screen_type_key }
+      basket_items << {'uuid' => id['uuid'], 'total' => id['total'], 'tax_rate' => id['tax_rate'], 'note' => id['note'] ,'item' => "<i>#{menu_item.parent.name}</i> - <strong>#{menu_item.name}</strong>" , 'optionals' => cl.map{|s| "- <strong>#{s.name}</strong>" }, 'item_screen_type_name' => menu_item.item_screen_type_name, 'item_screen_type_key' => menu_item.item_screen_type_key, 'menu_id' => menu_item.id, 'secondary_item_screen_type_name' => menu_item.secondary_item_screen_type_name, 'secondary_item_screen_type_key' => menu_item.secondary_item_screen_type_key }
     end
 
     { 'items' => basket_items }
