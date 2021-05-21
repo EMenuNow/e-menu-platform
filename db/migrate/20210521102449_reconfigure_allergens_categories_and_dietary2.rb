@@ -35,7 +35,7 @@ class ReconfigureAllergensCategoriesAndDietary2 < ActiveRecord::Migration[6.0]
           { 'name' => 'vegan', 'icon' => 'eicon eicon-circle-vegan' },
           { 'name' => 'kosher', 'icon' => 'eicon eicon-circle-kosher' },
           { 'name' => 'halal', 'icon' => 'eicon eicon-circle-halal' },
-          { 'name' => 'coeliac', 'icon' => 'eicon eicon-circle-coeliac' }
+          # { 'name' => 'coeliac', 'icon' => 'eicon eicon-circle-coeliac' }
         ].each do |obj|
           MenuItemCategorisation.where('lower(name) = ?', obj['name'].downcase)
           .first_or_create.update(
