@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_21_102449) do
+ActiveRecord::Schema.define(version: 2021_05_21_165809) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -201,7 +201,7 @@ ActiveRecord::Schema.define(version: 2021_05_21_102449) do
     t.text "icon"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type", default: "allergen"
+    t.string "type", default: "Allergen"
   end
 
   create_table "menu_item_categorisations_menus", force: :cascade do |t|
@@ -463,10 +463,10 @@ ActiveRecord::Schema.define(version: 2021_05_21_102449) do
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
     t.boolean "group_order"
-    t.string "print_status"
-    t.string "processing_status", default: "pending"
     t.datetime "due_date"
+    t.string "processing_status", default: "pending"
     t.string "first_print_status"
+    t.string "print_status"
     t.jsonb "tax_rates"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"
