@@ -17,7 +17,6 @@
 
       $('.allergen-check').on('change', function () {
         var allergenId = this.value
-        console.log(allergenId);
         $(`.allergen-check-group :input[type=checkbox][value=${allergenId}]`).not(this).prop("checked", false);
       })
     });

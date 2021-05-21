@@ -5,7 +5,7 @@
 <div class="modal fade" id="item-<%=item[:id]%>" tabindex="-1" role="dialog" aria-labelledby="<%=item[:name]%>" aria-hidden="true">
   <div class="modal-dialog override" role="document">
     
-    <% if false #Rails.env == 'development'%>
+    <% if Rails.env == 'development'%>
       <h1>DEVELOPMENT</h1>
     <% end %>
 
