@@ -8,6 +8,7 @@
     var order_bell;
     document.getElementById("dismiss-loader").addEventListener("click", function() {
       order_bell = new Audio("<%= asset_path("order-bell.wav") %>");
+      order_bell.muted = false;
       order_bell.play().then(() => { order_bell.pause()} )
     });
   </script>
