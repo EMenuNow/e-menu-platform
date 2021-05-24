@@ -2,6 +2,7 @@
 # colour = 'bg-light-70 text-dark' unless no_background  
 # colour = 'bg-orange-70 text-light' if ['King Prawn','Poffertjes','Salad Box','The Fizz', 'Hand Cut Fries with Rosmary and Truffle salt'].include?(item["name"])
 %>
+<% categorisations = item[:categorisations] %>
 
 <% if item[:node_type] == 'section' %>
 <div class="col-sm-12 text-left <%= item[:css_class] if item[:css_class].present?%>">
@@ -27,8 +28,35 @@
 <div class="item-default <%= item[:ancestry].split('/').count == 3 ? 'col' : 'col-sm-12' %> <%= item[:css_class] if item[:css_class].present?%>">
   <div class=" p-1 rounded cursor-pointer" data-toggle="modal" data-target="#item-<%=item[:id]%>">
     <div class="row pb-1">
-      <div class='col item-title'><strong class='item-name '><%=item[:name]%></strong></div>
-      <div class='col-4 text-right'><strong class='item-name'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></strong></div>
+      <div class="col">
+        <div class="row">
+          <div class='col-auto pr-0 item-title'>
+            <strong class='item-name '>
+              <%=item[:name]%> 
+            </strong>
+          </div>
+          <div class="col-auto pr-0">
+            <% if categorisations.allergies.any? %>
+              <ul class="eicon-list mb-0 pb-1 eicon-x-small ng-scope">
+                <% categorisations.contains_allergen.each do |allergen| %>
+                  <li class="allergen-level-yes mb-0 pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
+                <% end %>
+                <% categorisations.may_contain_allergen.each do |allergen| %>
+                  <li class="allergen-level-may mb-0 pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
+                <% end %>
+                <% categorisations.dietary.each do |diet| %>
+                  <li class="suitable-level-yes mb-0 pb-1"><span class="<%= diet.menu_item_categorisation.icon %>"></span></li>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <div class='col-auto text-right'>
+        <strong class='item-name'>
+          <%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%>
+        </strong>
+      </div>
     </div>
     <% if item[:image].present? or item[:description].present? %>
     <div class="row pt-2">
