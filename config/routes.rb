@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   
   resources :orders, :only => [:index, :show]
   resources :restaurants, :only => [:show], :path => "" do
+    get :filter
     member do
       get :order
       get :welcome
@@ -259,7 +260,7 @@ Rails.application.routes.draw do
   get 'home/table'
   post 'home/set_locale/:language_id' => 'home#set_locale', as: :home_set_locale
   
-  get '/:name', to: 'restaurant/menu#index'
+  # get '/:name', to: 'restaurant/menu#index'
   
   root 'home#index'
 

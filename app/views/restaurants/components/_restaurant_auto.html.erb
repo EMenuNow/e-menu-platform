@@ -34,33 +34,64 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
   </div>
   <div class="row">
     <div class='col-sm-8 menu-body'>
+      <% if params[:dietary_ids].present? or params[:contains_allergen_ids].present? or params[:may_contain_allergen_ids].present? %>
+        <div class='row bg-dark'>
+          <div class='col bg-dark p-0'>
+            <div class="pn-ProductNav_Wrapper">
+              <nav id="pnFilterNav" class="pn-ProductNav dragscroll" data-overflowing="both">
+                <ul id="pnFilterNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition eicon-list eicon-small ng-scope m-1" style="transform: none;">
+                  <span class="pn-ProductNav_Link" aria-selected="true">Menu Filters:</span>
+                  <%= link_to restaurant_filter_path(@restaurant.path, dietary_ids: params[:dietary_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], contains_allergen_ids: params[:contains_allergen_ids]) do %>
+                    <% @diets.each do |diet| %>
+                      <% if params[:dietary_ids]&.include?(diet.id.to_s) %>
+                        <li class="suitable-level-yes my-0 pt-1"><span class="<%= diet.icon %>"></span></li>
+                      <% end %>
+                    <% end %>
+                    <% @allergens.each do |allergen| %>
+                      <% if params[:contains_allergen_ids]&.include?(allergen.id.to_s) %>
+                        <li class="allergen-level-yes my-0 pt-1"><span class="<%= allergen.icon %>"></li>
+                      <% end %>
+                    <% end %>
+                    <% @allergens.each do |allergen| %>
+                      <% if params[:may_contain_allergen_ids]&.include?(allergen.id.to_s) %>
+                        <li class="allergen-level-may my-0 pt-1"><span class="<%= allergen.icon %>"></li>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                  <%= link_to "Clear filters", restaurant_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id]), class: 'pn-ProductNav_Link' %>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      <% end %>
       <% menu.each do |m| %>
-      <% if  m[:node_type] == 'menu' %>
-      <div class="row">
-        <div class="col">
-          <div class="">
-            <div class='row'>
-              <div class='col-sm-12 col-md-12 col-lg-12 col-xl-12'>
-                <div class="row pt-4">
-                  <% m[:children].each do |section| %>
-                  <% if section[:node_type] == 'section' %>
-                  <div class="col-sm-12 col-lg-12 pb-5 text-light">
-                    <h2 class="text-left section-title"><%= section[:name] %></h2>
-                    <div class='row'>
-                      <% section[:children].each do |item| %>
-                      <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false if section[:node_type] == 'section'  %>
-                      <% end  %>
+        <% if  m[:node_type] == 'menu' %>
+          <div class="row">
+            <div class="col">
+              <div class="">
+                <div class='row'>
+                  <div class='col-sm-12 col-md-12 col-lg-12 col-xl-12'>
+                    <div class="row pt-4">
+                      <% m[:children].each do |section| %>
+                        <% if section[:node_type] == 'section' %>
+                          <div class="col-sm-12 col-lg-12 pb-5 text-light">
+                            <h2 class="text-left section-title"><%= section[:name] %></h2>
+                            <div class='row'>
+                              <% section[:children].each do |item| %>
+                                <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false if section[:node_type] == 'section'  %>
+                              <% end  %>
+                            </div>
+                          </div>
+                        <% end %>
+                      <% end %>
                     </div>
                   </div>
-                  <% end %>
-                  <% end %>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <% end %>
+        <% end %>
       <% end %>
     </div>
     <div class='col-sm-4 basket-body'>

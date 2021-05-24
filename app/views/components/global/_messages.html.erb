@@ -8,7 +8,7 @@
     });
   </script>
 <% end %>
-<div class="m-2 position-fixed" role="alert" style="top: 48px; right: 0px; z-index: 1100;">
+<div class="<%= params[:controller] == 'restaurants' ? 'm-0' : 'm-2' %> position-fixed" role="alert" style="<%= params[:controller] == 'restaurants' ? 'top:0' : 'top:48px' %>; right: 0px; z-index: 1100;">
   <% if !notice.blank? %>
     <div class="alert alert-success alert-dismissible fade show my-0" role="alert">
       <%= notice %>
@@ -18,7 +18,7 @@
     </div>
   <% end %>
   <% if alert.present? %>
-    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show <%= notice.blank? ? 'mt-0' : 'mt-2' %>" role="alert">
       <%= alert %>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>

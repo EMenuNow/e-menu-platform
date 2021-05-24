@@ -2,6 +2,7 @@ class RestaurantsController < ApplicationController
   layout 'powered_by'
   before_action :get_restaurant
   before_action :basket_service
+  before_action :get_categories
 
   def show
     @menu = @restaurant.menus_live_menus
@@ -9,24 +10,32 @@ class RestaurantsController < ApplicationController
     @menu2 = get_serialized_menu(@restaurant)
   end
 
+  def filter
+  end
+  
   def welcome
     redirect_to restaurant_path(@restaurant.path) if patron_signed_in?
   end
-
+  
   private
-
+  
   def get_restaurant
-    @path = params[:id]
+    @path = params[:id] || params[:restaurant_id]
     if @path !~ /\A[a-z\-0-9]*\z/
       redirect_to restaurant_path(@path.downcase), status: :moved_permanently
     end 
     @restaurant = Restaurant.where("lower(path) = ?", @path.downcase).first
   end
-
+  
   def basket_service
     cookies.delete :emenu_basket if cookies['emenu_basket'].present? && @restaurant.id != JSON.parse(cookies['emenu_basket'])['key'].split('-').first.to_i
     @basket_service = BasketService.new(@restaurant, current_patron, cookies['emenu_basket'])
     cookies['emenu_basket'] = @basket_service.get_cookie
+  end
+  
+  def get_categories
+    @diets = Dietary.all.sort_by &:id
+    @allergens = Allergen.all.sort_by &:id
   end
 
   def get_serialized_menu restaurant
@@ -46,6 +55,7 @@ class RestaurantsController < ApplicationController
           image: image , 
           description: parent.description,
           custom_lists: parent.custom_lists,
+          categories: parent.menu_item_categorisations,
           categorisations: parent.menu_item_categorisations_menus,
           nutrition: parent.nutrition,
           provenance: parent.provenance, 

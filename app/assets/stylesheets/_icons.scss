@@ -50,6 +50,10 @@ $erudus-default : #d3d3d3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  &.eicon-medium {
+    font-size: 48px;
+  }
+
   &.eicon-small {
     font-size: 32px;
   }
@@ -58,6 +62,12 @@ $erudus-default : #d3d3d3;
     font-size: 24px;
   }
 
+}
+
+.eicon-medium{
+  .eicon{
+    font-size: 48px;
+  }
 }
 
 .eicon-small{
@@ -122,6 +132,13 @@ $erudus-default : #d3d3d3;
 
       color: $erudus-green;
 
+    }
+  }
+
+  &.eicon-medium{
+    li{
+      width: 48px;
+      margin-right: 8px;
     }
   }
 

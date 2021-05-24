@@ -15,18 +15,18 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
         <div class='col pt-3'>
           <h3>
             <% if is_takeaway_or_delivery?(@restaurant)%>
-            <% 
-              disable_basket_link = true 
-              if @basket_service.get_basket_item_count.present? and @basket_service.get_basket_item_count > 0
-                disable_basket_link = false 
-              end
-            %>
+              <% 
+                disable_basket_link = true 
+                if @basket_service.get_basket_item_count.present? and @basket_service.get_basket_item_count > 0
+                  disable_basket_link = false 
+                end
+              %>
 
-            <% unless disable_basket_link %>
-            <%= link_to "#basket" do %>
-            <i class="fas fa-shopping-basket"></i> <%= number_to_currency(@basket_service.get_basket_item_total, unit: @restaurant.currency_symbol) %>
-            <% end if @basket_service.basket %>
-            <% end %>
+              <% unless disable_basket_link %>
+                <%= link_to "#basket" do %>
+                  <i class="fas fa-shopping-basket"></i> <%= number_to_currency(@basket_service.get_basket_item_total, unit: @restaurant.currency_symbol) %>
+                <% end if @basket_service.basket %>
+              <% end %>
             <% end %>
           </h3>
         </div>
@@ -46,7 +46,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
         <% menu_nav.each do |menu| %>
         <div class="col p-0 m-1 ml-5 mr-5">
           <% button_css = menu[:menu_id] == menu_id ? 'btn-outline-dark' : 'btn-dark'%>
-          <%= link_to menu[:name], restaurant_path(@restaurant.path, menu_id: menu[:menu_id]), class: "btn #{button_css} btn-block" %>
+          <%= link_to menu[:name], restaurant_path(@restaurant.path, menu_id: menu[:menu_id], dietary_ids: params[:dietary_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], contains_allergen_ids: params[:contains_allergen_ids]), class: "btn #{button_css} btn-block" %>
         </div>
         <% end %>
       </div>
@@ -60,52 +60,104 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
   <div class='row'>
     <div class='col-md-8 pb-4 menu-body'>
       <% menu.select{|w| w[:id] == menu_id }.each do |m| %>
-      <% if m[:node_type] == 'menu' %>
-      <div class="row">
-        <div class="col">
-          <div class="container-fluid p-0">
-            <% nav_items = m[:children].map{|a| {name: a[:name], id: a[:id]}} %>
-            <% 
-              current_section = (params[:section_id] || nav_items.first[:id]).to_i
-            %>
-            <div class='row bg-dark'>
-              <div class='col bg-dark p-0'>
-                <div class="pn-ProductNav_Wrapper">
-                  <nav id="pnProductNav" class="pn-ProductNav dragscroll" data-overflowing="both">
-                    <div id="pnProductNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition" style="transform: none;">
-                      <% nav_items.each do |nav|%>
-                      <% selected = current_section == nav[:id] ? true : false %>
-                      <%= link_to nav[:name], restaurant_path(@restaurant.path, menu_id: m[:id], section_id: nav[:id]), class: 'pn-ProductNav_Link', 'aria-selected'=>"#{selected}" %>
-                      <% end %>
+        <% if m[:node_type] == 'menu' %>
+          <div class="row">
+            <div class="col">
+              <div class="container-fluid p-0">
+                <% nav_items = m[:children].map{|a| {name: a[:name], id: a[:id]}} %>
+                <% 
+                  current_section = (params[:section_id] || nav_items.first[:id]).to_i
+                %>
+                <div class='row bg-dark'>
+                  <div class='col bg-dark p-0'>
+                    <div class="pn-ProductNav_Wrapper">
+                      <nav id="pnProductNav" class="pn-ProductNav dragscroll" data-overflowing="both">
+                        <div id="pnProductNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition" style="transform: none;">
+                          <% nav_items.each do |nav|%>
+                          <% selected = current_section == nav[:id] ? true : false %>
+                          <%= link_to nav[:name], restaurant_path(@restaurant.path, menu_id: m[:id], section_id: nav[:id], dietary_ids: params[:dietary_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], contains_allergen_ids: params[:contains_allergen_ids]), class: 'pn-ProductNav_Link', 'aria-selected'=>"#{selected}" %>
+                          <% end %>
 
-                      <!--<span id="pnIndicator" class="pn-ProductNav_Indicator" style="transform: translateX(1680.5px) scaleX(1.1829687500000001); background-color: rgb(236, 187, 12);"></span>-->
-                    </div>
-                  </nav>
-                </div>
-              </div>
-            </div>
-            <div class='row'>
-              <div class='col-sm-12 col-md-12 col-lg-12 col-xl-12'>
-                <div class="row pt-4">
-                  <% m[:children].select{|a| a[:id] == current_section}.each do |section| %>
-                  <% if section[:node_type] == 'section' %>
-                  <div class="col-sm-12 col-lg-12 text-light">
-                    <h2 class="text-left section-title"><%= section[:name] %></h2>
-                    <div class='row'>
-                      <% section[:children].each do |item| %>
-                      <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false if section[:node_type] == 'section'  %>
-                      <% end  %>
+                          <!--<span id="pnIndicator" class="pn-ProductNav_Indicator" style="transform: translateX(1680.5px) scaleX(1.1829687500000001); background-color: rgb(236, 187, 12);"></span>-->
+                        </div>
+                      </nav>
                     </div>
                   </div>
-                  <% end %>
-                  <% end %>
+                </div>
+
+                <% if params[:dietary_ids].present? or params[:contains_allergen_ids].present? or params[:may_contain_allergen_ids].present? %>
+                  <div class='row bg-dark mt-1'>
+                    <div class='col bg-dark p-0'>
+                      <div class="pn-ProductNav_Wrapper">
+                        <nav id="pnFilterNav" class="pn-ProductNav dragscroll" data-overflowing="both">
+                          <ul id="pnFilterNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition eicon-list eicon-small ng-scope m-1" style="transform: none;">
+                            <span class="pn-ProductNav_Link" aria-selected="true">Menu Filters:</span>
+                            <%= link_to restaurant_filter_path(@restaurant.path, dietary_ids: params[:dietary_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], contains_allergen_ids: params[:contains_allergen_ids]) do %>
+                              <% @diets.each do |diet| %>
+                                <% if params[:dietary_ids]&.include?(diet.id.to_s) %>
+                                  <li class="suitable-level-yes my-0 pt-1"><span class="<%= diet.icon %>"></span></li>
+                                <% end %>
+                              <% end %>
+                              <% @allergens.each do |allergen| %>
+                                <% if params[:contains_allergen_ids]&.include?(allergen.id.to_s) %>
+                                  <li class="allergen-level-yes my-0 pt-1"><span class="<%= allergen.icon %>"></li>
+                                <% end %>
+                              <% end %>
+                              <% @allergens.each do |allergen| %>
+                                <% if params[:may_contain_allergen_ids]&.include?(allergen.id.to_s) %>
+                                  <li class="allergen-level-may my-0 pt-1"><span class="<%= allergen.icon %>"></li>
+                                <% end %>
+                              <% end %>
+                            <% end %>
+                            <%= link_to "Clear filters", restaurant_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id]), class: 'pn-ProductNav_Link' %>
+                          </ul>
+                        </nav>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+
+                <div class='row'>
+                  <div class='col-sm-12 col-md-12 col-lg-12 col-xl-12'>
+                    <div class="row pt-4">
+                      <% m[:children].select{|a| a[:id] == current_section}.each do |section| %>
+                        <% if section[:node_type] == 'section' %>
+                        <div class="col-sm-12 col-lg-12 text-light">
+                          <h2 class="text-left section-title"><%= section[:name] %></h2>
+                            <div class='row'>
+                              <% nodes = [] %>
+                              <% section[:children].each do |item| %>
+                                <% if params[:dietary_ids].present? && item[:node_type] == 'item' %>
+                                  <% veggie_id = MenuItemCategorisation.where("lower(name) = ?", 'vegetarian').first.id.to_s %>
+                                  <% also_veggie = item[:categories].where(name: 'vegan').any? && params[:dietary_ids].include?(veggie_id) %>
+                                  <% next unless (params[:dietary_ids] + (also_veggie ? [veggie_id] : []) - (item[:categorisations].dietary.map{|mic| mic.menu_item_categorisation_id.to_s} + (also_veggie ? [veggie_id] : []))).empty? %>
+                                <% end %>
+                                <% if params[:may_contain_allergen_ids].present? %>
+                                  <% next unless (item[:categorisations].allergies.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:may_contain_allergen_ids]).empty? %>
+                                <% end %>
+                                <% if params[:contains_allergen_ids].present? %>
+                                  <% next unless (item[:categorisations].contains_allergen.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:contains_allergen_ids]).empty? %>
+                                <% end %>
+                                <% nodes << item %>
+                              <% end %>
+                              <% if nodes.blank? %>
+                                <%= render 'restaurants/components/no_item' %>
+                              <% else %>
+                                <% nodes.each do |item| %>
+                                  <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false %>
+                                <% end %>
+                              <% end %>
+                            </div>
+                          </div>
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <% end %>
+        <% end %>
       <% end %>
     </div>
     <div class='col-md-4 basket-body'>
