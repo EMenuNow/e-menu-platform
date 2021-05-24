@@ -1,6 +1,6 @@
 <% main_item = item[:id]%>
 <% start_price = item[:price_a].to_f %>
-<% categorisations = Menu.find(main_item).menu_item_categorisations_menus %>
+<% categorisations = item[:categorisations] %>
 
 <div class="modal fade" id="item-<%=item[:id]%>" tabindex="-1" role="dialog" aria-labelledby="<%=item[:name]%>" aria-hidden="true">
   <div class="modal-dialog override" role="document">

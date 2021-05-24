@@ -46,6 +46,7 @@ class RestaurantsController < ApplicationController
           image: image , 
           description: parent.description,
           custom_lists: parent.custom_lists,
+          categorisations: parent.menu_item_categorisations_menus,
           nutrition: parent.nutrition,
           provenance: parent.provenance, 
           calories: parent.calories,
