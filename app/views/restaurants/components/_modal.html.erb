@@ -1,5 +1,6 @@
 <% main_item = item[:id]%>
 <% start_price = item[:price_a].to_f %>
+<% categorisations = item[:categorisations] %>
 
 <div class="modal fade" id="item-<%=item[:id]%>" tabindex="-1" role="dialog" aria-labelledby="<%=item[:name]%>" aria-hidden="true">
   <div class="modal-dialog override" role="document">
@@ -55,7 +56,32 @@
               </div>
             </div>  
 
-            <div class="row pt-2"></div>
+            <div class="row pt-2">
+              <% if categorisations.allergies.any? %>
+                <i class="text-left col-12 pb-2 ng-scope">
+                  <% if categorisations.contains_allergen.any? %>
+                    <span class="badge badge-pill badge-danger">Contains</span>
+                  <% end %>
+                  <% if categorisations.may_contain_allergen.any? %>
+                    <span class="badge badge-pill badge-warning">May contain</span>
+                  <% end %>
+                  <% if categorisations.dietary.any? %>
+                    <span class="badge badge-pill badge-success">Suitable for</span>
+                  <% end %>
+                </i>
+                <ul class="eicon-list col mb-0 pb-1 eicon-small ng-scope">
+                  <% categorisations.contains_allergen.each do |allergen| %>
+                    <li class="allergen-level-yes mb-0 pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span><%= allergen.menu_item_categorisation.name.humanize %></li>
+                  <% end %>
+                  <% categorisations.may_contain_allergen.each do |allergen| %>
+                    <li class="allergen-level-may mb-0 pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span><%= allergen.menu_item_categorisation.name.humanize %></li>
+                  <% end %>
+                  <% categorisations.dietary.each do |diet| %>
+                    <li class="suitable-level-yes mb-0 pb-1"><span class="<%= diet.menu_item_categorisation.icon %>"></span><%= diet.menu_item_categorisation.name.humanize %></li>
+                  <% end %>
+                </ul>
+              <% end %>
+            </div>
 
             <div class="row border-top mt-2 pt-1">
               <% custom_lists = [] #item[:custom_lists] %>

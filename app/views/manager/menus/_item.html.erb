@@ -76,9 +76,20 @@
         <div class="col-lg-1"> 
           Screen: <%= sub.item_screen_type_name%><%= " & #{sub.secondary_item_screen_type_name}" if sub.secondary_item_screen_type_name %>
         </div>
-        <div class="col-lg-1"> 
-          <% sub.menu_item_categorisation.each do |category| %>
-            <i class="<%= category.icon %>"></i>
+        <ul class="col-lg-1 eicon-list eicon-x-small">
+          <% sub.menu_item_categorisations_menus.contains_allergen.each do |allergen| %>
+            <li class="allergen-level-yes"><span class="<%= allergen&.menu_item_categorisation&.icon %>"></span></li>
+          <% end %>
+          <% sub.menu_item_categorisations_menus.may_contain_allergen.each do |allergen| %>
+            <li class="allergen-level-may"><span class="<%= allergen&.menu_item_categorisation&.icon %>"></span></li>
+          <% end %>
+          <% sub.menu_item_categorisations_menus.dietary.each do |diet| %>
+            <li class="suitable-level-yes"><span class="<%= diet&.menu_item_categorisation&.icon %>"></span></li>
+          <% end %>
+        </ul>
+        <div class="col-lg-1">
+          <% sub.menu_item_categorisations_menus.category.each do |category| %>
+            <i class="<%= category&.menu_item_categorisation&.icon %>"></i>
           <% end %>
         </div>
         <div class="col-lg-1"> 
