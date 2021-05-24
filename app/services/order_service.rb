@@ -2,7 +2,7 @@ class OrderService < ApplicationController
 
   def initialize(order)
     @order = order
-    Stripe.api_key = @order.restaurant.stripe_sk_api_key
+    Stripe.api_key = ENV['STRIPE_API_KEY']
     @checkout_session = Stripe::Checkout::Session.retrieve(@order.stripe_data["id"])
   end
 
@@ -14,7 +14,8 @@ class OrderService < ApplicationController
     begin
       refund = Stripe::Refund.create({
         payment_intent: @order.stripe_data['payment_intent'],
-        reverse_transfer: true
+        reverse_transfer: true,
+        refund_application_fee: true
       })
       @order.refunds.create(stripe_data: refund)
       return true
