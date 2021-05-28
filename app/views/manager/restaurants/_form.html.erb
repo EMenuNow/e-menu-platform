@@ -139,7 +139,7 @@ collection = restaurant.features.where(id: 12).present?
     <div class="row">
       <div class="col">
         <div class="form-group ">
-          <% if @account[:details_submitted] && @account[:charges_enabled] %>
+          <% if @account && @account[:details_submitted] && @account[:charges_enabled] %>
             <strong class="d-inline-block text-gray-dark"><span class="badge badge-pill badge-success" style="font-size: 100%;">Stripe connection complete</span></strong>
           <% else %>
             <%= link_to("Connect stripe", @connect, class: "d-inline-block btn btn-warning") %>
