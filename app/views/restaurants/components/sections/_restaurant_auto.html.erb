@@ -35,7 +35,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
   </div>
 
   <% 
-    menu_id = params[:menu_id].to_i if params[:menu_id]
+    menu_id = params[:menu_id].to_i if params[:menu_id].present?
     menu_id = menu.first[:id] if menu_id.blank? 
   %>
 
