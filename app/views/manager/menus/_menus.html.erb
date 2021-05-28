@@ -25,9 +25,6 @@
 
 <% end %>
 
-
-
-
 <% @sorted_menus.each do |category| %>
 
 <div class="row">
@@ -38,7 +35,22 @@
     <%= link_to "Add Category to #{category.name}", new_manager_restaurant_menu_path(category.restaurant_id,  node_type: 'section',parent: category.id), class: "text-warning  menu-management-links" %> | 
     <%= link_to "New Item in #{category.name}", new_manager_restaurant_menu_path(category.restaurant_id, node_type: 'item', parent: category.id), class: "text-warning menu-management-links" %>  
   </div>
-  <div class="col-lg-5 text-right">  
+  <div class="col-lg-1 switches"> 
+
+  <%= check_box_tag dom_id(category, :available), category.id, category.available, data: {
+                    remote: true,
+                    url: manager_restaurant_toggle_active_path(@restaurant, menu_id: category.id),
+                    method: :post
+                    }, class: "available_menu" %>
+  <label for="<%= dom_id(category, :available) %>">
+    <span id="available_<%= category.id %>" class="management-description pr-2">
+      <%= category.available ? "Available" : "Unavailable" %>
+    </span>
+    <span></span>
+  </label>
+
+  </div>
+  <div class="col-lg-3 ml-auto text-right">  
     <%= link_to edit_manager_restaurant_menu_path(category.restaurant_id, category.id, node_type: category.node_type, parent: category.id), class: "text-warning menu-management-links" do %><i class='fa fa-edit'></i> Edit<% end %> | 
     <%= link_to manager_restaurant_menu_path(category.restaurant_id, category.id), class: "text-warning menu-management-links", method: :delete,  "data-confirm" => 'Are you sure? This will remove all items and categories!' do %><i class='fa fa-trash'></i> Delete<% end %>
   </div>
