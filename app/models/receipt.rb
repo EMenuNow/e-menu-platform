@@ -308,4 +308,9 @@ class Receipt < ApplicationRecord
     return 'error'
   end
 
+  def to_orkestro
+    url = 'http://localhost:3001/receipt/get'
+    response = Faraday.post(url, self.to_json, "Content-Type" => "application/json")
+
+  end
 end
