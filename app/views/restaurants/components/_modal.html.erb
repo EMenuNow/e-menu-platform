@@ -166,7 +166,7 @@
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
             <button type="button" class="placeholder-to-basket btn btn-primary <%= !required_lists.present? ? ' d-none' : '' %>" id="placeholder-to-basket-<%= main_item %>" data-scope="<%= main_item %>">Add to Order - <span class='button-price-<%=main_item%>'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></span></button>
             
-            <%= link_to basket_path(@path, main_item: main_item, menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: params[:dietary_ids], contains_allergen_ids: params[:contains_allergen_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], add_to_basket: true), class: "btn btn-primary#{required_lists.present? ? ' d-none' : ''}", id: "add-to-basket-#{main_item}", method: :PATCH do %>
+            <%= link_to basket_path(@path, main_item: main_item, menu_id: params[:menu_id], section_id: params[:section_id], add_to_basket: true), class: "btn btn-primary#{required_lists.present? ? ' d-none' : ''}", id: "add-to-basket-#{main_item}", method: :PATCH do %>
                 Add to Order - <span class='button-price-<%=main_item%>'><%=number_to_currency(item[:price_a], unit: @restaurant.currency_symbol)%></span>
             <% end %>
             

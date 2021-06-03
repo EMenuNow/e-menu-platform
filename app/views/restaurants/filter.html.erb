@@ -160,7 +160,7 @@
                 <div class="col-md-4 mx-auto">
                   <div class="row">
                     <div class="col-6 mx-auto">
-                      <%= link_to "Clear", restaurant_path(@restaurant.path), class: 'btn btn-secondary btn-block' %>
+                      <%= link_to "Clear", restaurant_path(@restaurant.path, filter: 'clear'), class: 'btn btn-secondary btn-block' %>
                     </div>
                     <div class="col-6 mx-auto">
                       <%= submit_tag "Filter", class: 'btn btn-warning btn-block' %>

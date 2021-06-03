@@ -46,7 +46,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
         <% menu_nav.each do |menu| %>
         <div class="col p-0 m-1 ml-5 mr-5">
           <% button_css = menu[:menu_id] == menu_id ? 'btn-outline-dark' : 'btn-dark'%>
-          <%= link_to menu[:name], restaurant_path(@restaurant.path, menu_id: menu[:menu_id], dietary_ids: params[:dietary_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], contains_allergen_ids: params[:contains_allergen_ids]), class: "btn #{button_css} btn-block" %>
+          <%= link_to menu[:name], restaurant_path(@restaurant.path, menu_id: menu[:menu_id]), class: "btn #{button_css} btn-block" %>
         </div>
         <% end %>
       </div>
@@ -75,7 +75,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
                         <div id="pnProductNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition" style="transform: none;">
                           <% nav_items.each do |nav|%>
                           <% selected = current_section == nav[:id] ? true : false %>
-                          <%= link_to nav[:name], restaurant_path(@restaurant.path, menu_id: m[:id], section_id: nav[:id], dietary_ids: params[:dietary_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], contains_allergen_ids: params[:contains_allergen_ids]), class: 'pn-ProductNav_Link', 'aria-selected'=>"#{selected}" %>
+                          <%= link_to nav[:name], restaurant_path(@restaurant.path, menu_id: m[:id], section_id: nav[:id]), class: 'pn-ProductNav_Link', 'aria-selected'=>"#{selected}" %>
                           <% end %>
 
                           <!--<span id="pnIndicator" class="pn-ProductNav_Indicator" style="transform: translateX(1680.5px) scaleX(1.1829687500000001); background-color: rgb(236, 187, 12);"></span>-->
@@ -89,27 +89,27 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
                   <div class='col bg-dark p-0'>
                     <div class="pn-ProductNav_Wrapper">
                       <nav id="pnFilterNav" class="pn-ProductNav dragscroll" data-overflowing="both">
-                        <ul id="pnFilterNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition eicon-list eicon-small ng-scope m-0" style="transform: none;">
-                          <span class="pn-ProductNav_Link" aria-selected="true">Menu Filters:</span>
+                        <ul id="pnFilterNavContents" class="row pn-ProductNav_Contents pn-ProductNav_Contents-no-transition eicon-list eicon-x-small ng-scope m-0 align-items-center h-100" style="transform: none;">
+                          <span class="pn-ProductNav_Link" aria-selected="true" class="py-0">Menu Filters:</span>
                           <% if params[:dietary_ids].present? or params[:contains_allergen_ids].present? or params[:may_contain_allergen_ids].present? %>
-                            <%= link_to restaurant_filter_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: params[:dietary_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], contains_allergen_ids: params[:contains_allergen_ids]) do %>
+                            <%= link_to restaurant_filter_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id]), class: 'pn-ProductNav_Link p-1',  "aria-selected" => "true" do %>
                               <% @diets.each do |diet| %>
                                 <% if params[:dietary_ids]&.include?(diet.id.to_s) %>
-                                  <li class="suitable-level-yes my-0 pt-1"><span class="<%= diet.icon %>"></span></li>
+                                  <li class="suitable-level-yes my-0 p-0"><span class="<%= diet.icon %>"></span></li>
                                 <% end %>
                               <% end %>
                               <% @allergens.each do |allergen| %>
                                 <% if params[:contains_allergen_ids]&.include?(allergen.id.to_s) %>
-                                  <li class="allergen-level-yes my-0 pt-1"><span class="<%= allergen.icon %>"></li>
+                                  <li class="allergen-level-yes my-0 p-0"><span class="<%= allergen.icon %>"></li>
                                 <% end %>
                               <% end %>
                               <% @allergens.each do |allergen| %>
                                 <% if params[:may_contain_allergen_ids]&.include?(allergen.id.to_s) %>
-                                  <li class="allergen-level-may my-0 pt-1"><span class="<%= allergen.icon %>"></li>
+                                  <li class="allergen-level-may my-0 p-0"><span class="<%= allergen.icon %>"></li>
                                 <% end %>
                               <% end %>
                             <% end %>
-                            <%= link_to "Clear filters", restaurant_path(@restaurant.path, menu_id: params[:menu_id].presence, section_id: params[:section_id].presence), class: 'pn-ProductNav_Link' %>
+                            <%= link_to "Clear filters", restaurant_path(@restaurant.path, menu_id: params[:menu_id].presence, section_id: params[:section_id].presence, filter: 'clear'), class: 'pn-ProductNav_Link' %>
                           <% else %>
                             <%= link_to 'Diet & Allergens', restaurant_filter_path(@restaurant.path, menu_id: params[:menu_id].presence, section_id: params[:section_id].presence), class: 'pn-ProductNav_Link' %>
                           <% end %>

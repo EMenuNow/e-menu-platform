@@ -32,7 +32,7 @@
     <div class='row'>
       <% note = item['note'] %>
       <div class="col-sm-1">
-        <%= link_to basket_path(@path, uuid: item['uuid'], menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: params[:dietary_ids], contains_allergen_ids: params[:contains_allergen_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], remove_from_basket: true), method: :PATCH do %>
+        <%= link_to basket_path(@path, uuid: item['uuid'], menu_id: params[:menu_id], section_id: params[:section_id], remove_from_basket: true), method: :PATCH do %>
         <i class="fas fa-minus-circle text-danger"></i> <span class="d-sm-none">Remove</span>
         <% end %>
       </div>
@@ -126,7 +126,7 @@
         <%= button_to "Apply", nil, { class: 'bg-dark text-white rounded form-control d-inline-block', style: "width:28%" } %>
         <% end %>
         <% else %>
-        <%= button_to basket_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: params[:dietary_ids], contains_allergen_ids: params[:contains_allergen_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids]), :method => :patch, :class => "bg-dark text-light rounded p-1", params: { discount_code: "", path: @path } do %>
+        <%= button_to basket_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id]), :method => :patch, :class => "bg-dark text-light rounded p-1", params: { discount_code: "", path: @path } do %>
         <%#= hidden_field_tag :path, @path %>
         <%#= hidden_field_tag :action, "remove" %>
         Discount applied: <%= @basket_service.get_basket_db.discount_code %> <i class="fa fa-1x fa-times-circle"></i>

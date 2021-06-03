@@ -55,15 +55,15 @@
             </div>
             <div class="col-auto pr-0">
               <% if item[:categorisations].allergies.any? %>
-                <ul class="eicon-list mb-0 pb-1 eicon-x-small ng-scope">
+                <ul class="row eicon-list m-0 pb-1 eicon-x-small ng-scope align-items-center">
                   <% item[:categorisations].contains_allergen.each do |allergen| %>
-                    <li class="allergen-level-yes mb-0 pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
+                    <li class="allergen-level-yes my-0 align-baseline pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
                   <% end %>
                   <% item[:categorisations].may_contain_allergen.each do |allergen| %>
-                    <li class="allergen-level-may mb-0 pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
+                    <li class="allergen-level-may my-0 align-baseline pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
                   <% end %>
                   <% item[:categorisations].dietary.each do |diet| %>
-                    <li class="suitable-level-yes mb-0 pb-1"><span class="<%= diet.menu_item_categorisation.icon %>"></span></li>
+                    <li class="suitable-level-yes my-0 align-baseline pb-1"><span class="<%= diet.menu_item_categorisation.icon %>"></span></li>
                   <% end %>
                 </ul>
               <% end %>

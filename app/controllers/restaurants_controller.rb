@@ -8,9 +8,17 @@ class RestaurantsController < ApplicationController
     @menu = @restaurant.menus_live_menus
     @menu = @restaurant.menus_live_menus.where(:id => params[:menu_id]) if params[:menu_id].present?
     @menu2 = get_serialized_menu(@restaurant)
-  end
 
+    if params[:filter] == 'clear'
+      clear_cookie
+    else
+      update_cookie
+      restore_cookie
+    end
+  end
+  
   def filter
+    restore_cookie
   end
   
   def welcome
@@ -72,4 +80,42 @@ class RestaurantsController < ApplicationController
       end
     end
   end
+
+  def update_cookie
+    update_cookie_with_param(:dietary_ids, params[:dietary_ids])
+    update_cookie_with_param(:contains_allergen_ids, params[:contains_allergen_ids])
+    update_cookie_with_param(:may_contain_allergen_ids, params[:may_contain_allergen_ids])
+  end
+
+  def restore_cookie
+    restore_param_from_cookie(:dietary_ids)
+    restore_param_from_cookie(:contains_allergen_ids)
+    restore_param_from_cookie(:may_contain_allergen_ids)
+  end
+  
+  def clear_cookie
+    clear_param_from_cookie(:dietary_ids)
+    clear_param_from_cookie(:contains_allergen_ids)
+    clear_param_from_cookie(:may_contain_allergen_ids)
+  end
+
+  def update_cookie_with_param(param_name, ids)
+    if params[param_name].present?
+      value = (ids.class == Array) ? ids.join('&') : ids
+      cookies[param_name] = { :value => value, :expires => 2.weeks.from_now }
+    end
+  end
+  
+  def restore_param_from_cookie(param_name)
+    if cookies[param_name].present?
+      params[param_name] = cookies[param_name].split('&')
+    end
+  end
+  
+  def clear_param_from_cookie(param_name)
+    if cookies[param_name].present?
+      cookies.delete(param_name)
+    end
+  end
+
 end

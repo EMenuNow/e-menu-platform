@@ -41,7 +41,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
               <nav id="pnFilterNav" class="pn-ProductNav dragscroll" data-overflowing="both">
                 <ul id="pnFilterNavContents" class="pn-ProductNav_Contents pn-ProductNav_Contents-no-transition eicon-list eicon-small ng-scope m-1" style="transform: none;">
                   <span class="pn-ProductNav_Link" aria-selected="true">Menu Filters:</span>
-                  <%= link_to restaurant_filter_path(@restaurant.path, dietary_ids: params[:dietary_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids], contains_allergen_ids: params[:contains_allergen_ids]) do %>
+                  <%= link_to restaurant_filter_path(@restaurant.path,) do %>
                     <% @diets.each do |diet| %>
                       <% if params[:dietary_ids]&.include?(diet.id.to_s) %>
                         <li class="suitable-level-yes my-0 pt-1"><span class="<%= diet.icon %>"></span></li>
@@ -58,7 +58,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
                       <% end %>
                     <% end %>
                   <% end %>
-                  <%= link_to "Clear filters", restaurant_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id]), class: 'pn-ProductNav_Link' %>
+                  <%= link_to "Clear filters", restaurant_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id], filter: 'clear'), class: 'pn-ProductNav_Link' %>
                 </ul>
               </nav>
             </div>
