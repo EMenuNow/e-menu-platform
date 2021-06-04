@@ -3,8 +3,8 @@ style = "background: url('#{url_for(@restaurant.background_image)}') no-repeat f
 style = "background: url('#{@restaurant.background}') ;" if @restaurant.background.present?
 %>
 
-<div class="container-fluid background-color" style="<%= style %>">
-  <div class='row menu-header'>
+<div class="container-fluid background-color menu-header" style="<%= style %>">
+  <div class='row'>
     <div class="col text-left mt-2 mb-2"> 
       <% if @restaurant.image.attached? %>
         <%= image_tag @restaurant.image.variant(resize_and_pad: [200, 200]), class: "img-fluid"  %>
@@ -32,35 +32,89 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
       </div>
     </div>
   </div>
+</div>
+<div class="container-fluid">
   <div class="row">
     <div class='col-sm-8 menu-body'>
+      <div class='row bg-dark'>
+        <div class='col bg-dark p-0'>
+          <div class="pn-ProductNav_Wrapper">
+            <nav id="pnFilterNav" class="pn-ProductNav dragscroll" data-overflowing="both">
+              <ul id="pnFilterNavContents" class="row pn-ProductNav_Contents pn-ProductNav_Contents-no-transition eicon-list eicon-x-small ng-scope m-0 align-items-center h-100" style="transform: none;">
+                <span class="pn-ProductNav_Link" aria-selected="true" class="py-0">Menu Filters:</span>
+                <% if params[:dietary_ids].present? or params[:contains_allergen_ids].present? or params[:may_contain_allergen_ids].present? %>
+                  <%= link_to restaurant_filter_path(@restaurant.path), class: 'pn-ProductNav_Link p-1',  "aria-selected" => "true" do %>
+                    <% @diets.each do |diet| %>
+                      <% if params[:dietary_ids]&.include?(diet.id.to_s) %>
+                        <li class="suitable-level-yes my-0 pt-1"><span class="<%= diet.icon %>"></span></li>
+                      <% end %>
+                    <% end %>
+                    <% @allergens.each do |allergen| %>
+                      <% if params[:contains_allergen_ids]&.include?(allergen.id.to_s) %>
+                        <li class="allergen-level-yes my-0 pt-1"><span class="<%= allergen.icon %>"></li>
+                      <% end %>
+                    <% end %>
+                    <% @allergens.each do |allergen| %>
+                      <% if params[:may_contain_allergen_ids]&.include?(allergen.id.to_s) %>
+                        <li class="allergen-level-may my-0 pt-1"><span class="<%= allergen.icon %>"></li>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                <%= link_to "Clear filters", restaurant_path(@restaurant.path, filter: 'clear'), class: 'pn-ProductNav_Link' %>
+                <% else %>
+                  <%= link_to 'Diet & Allergens', restaurant_filter_path(@restaurant.path), class: 'pn-ProductNav_Link' %>
+                <% end %>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
       <% menu.each do |m| %>
-      <% if  m[:node_type] == 'menu' %>
-      <div class="row">
-        <div class="col">
-          <div class="">
-            <div class='row'>
-              <div class='col-sm-12 col-md-12 col-lg-12 col-xl-12'>
-                <div class="row pt-4">
-                  <% m[:children].each do |section| %>
-                  <% if section[:node_type] == 'section' %>
-                  <div class="col-sm-12 col-lg-12 pb-5 text-light">
-                    <h2 class="text-left section-title"><%= section[:name] %></h2>
-                    <div class='row'>
-                      <% section[:children].each do |item| %>
-                      <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false if section[:node_type] == 'section'  %>
-                      <% end  %>
+        <% if  m[:node_type] == 'menu' %>
+          <div class="row">
+            <div class="col">
+              <div class="">
+                <div class='row'>
+                  <div class='col-sm-12 col-md-12 col-lg-12 col-xl-12'>
+                    <div class="row pt-4">
+                      <% m[:children].each do |section| %>
+                        <% if section[:node_type] == 'section' %>
+                          <div class="col-sm-12 col-lg-12 pb-5 text-light">
+                            <h2 class="text-left section-title"><%= section[:name] %></h2>
+                            <div class='row'>
+                            <% nodes = [] %>
+                              <% section[:children].each do |item| %>
+                                <% if params[:dietary_ids].present? && item[:node_type] == 'item' %>
+                                  <% veggie_id = MenuItemCategorisation.where("lower(name) = ?", 'vegetarian').first.id.to_s %>
+                                  <% also_veggie = item[:categories].where(name: 'vegan').any? && params[:dietary_ids].include?(veggie_id) %>
+                                  <% next unless (params[:dietary_ids] + (also_veggie ? [veggie_id] : []) - (item[:categorisations].dietary.map{|mic| mic.menu_item_categorisation_id.to_s} + (also_veggie ? [veggie_id] : []))).empty? %>
+                                <% end %>
+                                <% if params[:may_contain_allergen_ids].present? %>
+                                  <% next unless (item[:categorisations].allergies.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:may_contain_allergen_ids]).empty? %>
+                                <% end %>
+                                <% if params[:contains_allergen_ids].present? %>
+                                  <% next unless (item[:categorisations].contains_allergen.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:contains_allergen_ids]).empty? %>
+                                <% end %>
+                                <% nodes << item %>
+                              <% end %>
+                              <% if nodes.blank? %>
+                                <%= render 'restaurants/components/no_item' %>
+                              <% else %>
+                                <% nodes.each do |item| %>
+                                  <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false  %>
+                                <% end %>
+                              <% end  %>
+                            </div>
+                          </div>
+                        <% end %>
+                      <% end %>
                     </div>
                   </div>
-                  <% end %>
-                  <% end %>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <% end %>
+        <% end %>
       <% end %>
     </div>
     <div class='col-sm-4 basket-body'>

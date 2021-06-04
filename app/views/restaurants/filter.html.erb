@@ -1,0 +1,177 @@
+<% content_for :js do %>
+  <script>
+    $(document).ready(function() {
+      $('.allergen-check').on('change', function () {
+        var allergenId = this.value
+        $(`.allergen-check-group :input[type=checkbox][value=${allergenId}]`).not(this).prop("checked", false);
+      })
+    });
+  </script>
+<% end %>
+
+<% pallergens = current_patron.patron_allergens if current_patron %>
+
+<% content_for :hero do %>
+  <div class="jumbotron jumbotron-fluid background-color text-center">
+    <div class="container text-light">
+      <div class="row">
+        <div class="col-lg-12">
+          <h3 class="section-title">Menu Filters</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= form_tag restaurant_path(@restaurant.path), method: :get do %>
+  <%= hidden_field_tag "menu_id", params[:menu_id] %>
+  <%= hidden_field_tag "section_id", params[:section_id] %>
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-md-12">
+        <% if pallergens&.any? %>
+          <div class="row mt-1">
+            <div class="col-md-12">
+              <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapse1">
+                <h5 class="m-0">Saved filters</h5>
+              </a>
+              <div class="collapse show py-4 bg-light text-center" id="collapse1">
+                <div class="row">
+                  <div class="col-auto mx-auto">
+                    <p class="text-center ng-scope">
+                      <% if pallergens.select{|x|x.menu_item_categorisation.type == 'Dietary'}.any? %>
+                        <span class="badge badge-pill badge-success">Suitable for</span>
+                      <% end %>
+                      <% if pallergens.select{|x|x.menu_item_categorisation.type == 'Allergen'}.any? %>
+                        <span class="badge badge-pill badge-danger">Contains</span>
+                      <% end %>
+                    </p>
+                    <ul class="eicon-list eicon-small ng-scope mx-auto text-center">
+                      <% pallergens.select{|x|x.menu_item_categorisation.type == 'Dietary'}.each do |diet| %>
+                        <li class="suitable-level-yes"><span class="<%= diet&.menu_item_categorisation.icon %>"></span><%= diet&.menu_item_categorisation&.name&.humanize %></li>
+                      <% end %>
+                      <% pallergens.select{|x|x.menu_item_categorisation.type == 'Allergen'}.each do |allergen| %>
+                        <li class="allergen-level-yes"><span class="<%= allergen&.menu_item_categorisation.icon %>"></span><%= allergen&.menu_item_categorisation&.name&.humanize %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row pb-2">
+                  <div class="col-md-4 mx-auto">
+                    <div class="row">
+                      <div class="col-6 mx-auto">
+                        <%= link_to "Edit", settings_patrons_path, class: 'btn btn-secondary btn-block' %>
+                      </div>
+                      <div class="col-6 mx-auto">
+                        <% dietary_ids = pallergens.map{|x|x.menu_item_categorisation.id.to_s if x.menu_item_categorisation.type == "Dietary"}.reject(&:nil?) %>
+                        <% contains_allergen_ids = pallergens.map{|x|x.menu_item_categorisation.id.to_s if x.menu_item_categorisation.type == "Allergen"}.reject(&:nil?) %>
+                        <%= link_to "Filter", restaurant_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: dietary_ids, contains_allergen_ids: contains_allergen_ids), class: 'btn btn-warning btn-block' %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% elsif pallergens&.blank? %>
+          <% if patron_signed_in? %>
+            <div>
+              <h5><%= link_to "Edit settings",  settings_patrons_path %> to save diet and allergen preferences</h5>
+            </div>
+          <% end %>
+        <% else %>
+          <% if !patron_signed_in? %>
+            <div>
+              <h5><%= link_to "Log in", new_patron_session_path %> to save diet and allergen preferences</h5>
+            </div>
+          <% end %>
+        <% end %>
+
+        <div class="row mt-1">
+          <div class="col-md-12">
+            <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapse2">
+              <h5 class="m-0">Custom filters</h5>
+            </a>
+            <div class="collapse <%= 'show ' if !pallergens.present? %>py-4 bg-light text-center" id="collapse2">
+              <div class="row">
+                <div class="col-md-6 mx-auto">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h5 class="text-center pb-2">
+                        Only show items suitable for:
+                      </h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <ul class="eicon-list eicon-medium ng-scope collection-check-box mx-auto text-center">
+                      <% @diets.each do |d| %>
+                        <%= label_tag do %>
+                          <%= check_box_tag "dietary_id[#{d.id}]", d.id, params[:dietary_ids]&.include?(d.id.to_s), name: "dietary_ids[]" %>
+                          <li class="suitable-level-yes"><span class="<%= d.icon %>"></span><%= d.name.humanize %></li>
+                        <% end %>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="row allergen-check-group">
+                <div class="col-md-6 mx-auto">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h5 class="text-center pb-2">
+                        Hide items containing:
+                      </h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <ul class="eicon-list eicon-medium ng-scope collection-check-box mx-auto text-center">
+                      <% @allergens.each do |a| %>
+                        <%= label_tag do %>
+                          <%= check_box_tag "contains_allergen_id[#{a.id}]", a.id, params[:contains_allergen_ids]&.include?(a.id.to_s), name: "contains_allergen_ids[]", class: "allergen-check" %>
+                          <li class="allergen-level-yes"><span class="<%= a.icon %>"></span><%= a.name.humanize %></li>
+                        <% end %>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="row allergen-check-group">
+                <div class="col-md-6 mx-auto">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h5 class="text-center pb-2">
+                        Hide items which may contain:
+                      </h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <ul class="eicon-list eicon-medium ng-scope collection-check-box mx-auto text-center">
+                      <% @allergens.each do |a| %>
+                        <%= label_tag do %>
+                          <%= check_box_tag "may_contain_allergen_id[#{a.id}]", a.id, params[:may_contain_allergen_ids]&.include?(a.id.to_s), name: "may_contain_allergen_ids[]", class: "allergen-check" %>
+                          <li class="allergen-level-may"><span class="<%= a.icon %>"></span> <%= a.name.humanize %></li>
+                        <% end %>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="row pb-2">
+                <div class="col-md-4 mx-auto">
+                  <div class="row">
+                    <div class="col-6 mx-auto">
+                      <%= link_to "Clear", restaurant_path(@restaurant.path, filter: 'clear'), class: 'btn btn-secondary btn-block' %>
+                    </div>
+                    <div class="col-6 mx-auto">
+                      <%= submit_tag "Filter", class: 'btn btn-warning btn-block' %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -11,6 +11,9 @@ module Patrons
 
     def show
       @patron = current_patron
+      @allergens = Allergen.all.sort_by &:id
+      @diets = Dietary.all.sort_by &:id
+      @categories = Category.all.sort_by &:id
     end
   end
 end

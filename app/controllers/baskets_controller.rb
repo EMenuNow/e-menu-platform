@@ -22,12 +22,11 @@ class BasketsController < ApplicationController
       notice = "Removed item from basket"
       alert = "Invalid item"
     end
-
     respond_to do |format|
       if action
-        format.html { redirect_to restaurant_path(@path), notice: notice || "Success" } 
+        format.html { redirect_to restaurant_path(@path, menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: params[:dietary_ids], contains_allergen_ids: params[:contains_allergen_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids]), notice: notice || "Success" } 
       else
-        format.html { redirect_to restaurant_path(@path), alert: alert || "Error" }
+        format.html { redirect_to restaurant_path(@path, menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: params[:dietary_ids], contains_allergen_ids: params[:contains_allergen_ids], may_contain_allergen_ids: params[:may_contain_allergen_ids]), alert: alert || "Error" }
       end
     end   
   end
@@ -38,6 +37,5 @@ class BasketsController < ApplicationController
     @menu_id = params[:menu_id]
     @path = params[:path]
     @restaurant = Restaurant.find_by(path: @path)
-
   end
 end

@@ -23,7 +23,7 @@ Restaurant Configuration - <%= @restaurant&.name ? @restaurant.name : "Welcome" 
         Currency: <%= @restaurant.currency_name %> |
         Stripe Account: <%= @restaurant.stripe_connected_account_id %> |
         EMenu Commission: <%= @restaurant.commision_percentage %>% |
-        Chargeback Protection: <%= @restaurant.stripe_chargeback_enabled ? "0.04% of sale" : "No" %>
+        Chargeback Protection: <%= @restaurant.stripe_chargeback_enabled ? "0.4% of sale" : "No" %>
       </p>
       <div class="row py-5">
         <div class="col-md mt-3">

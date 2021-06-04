@@ -50,6 +50,10 @@ $erudus-default : #d3d3d3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  &.eicon-medium {
+    font-size: 48px;
+  }
+
   &.eicon-small {
     font-size: 32px;
   }
@@ -60,6 +64,12 @@ $erudus-default : #d3d3d3;
 
 }
 
+.eicon-medium{
+  .eicon{
+    font-size: 48px;
+  }
+}
+
 .eicon-small{
   .eicon{
     font-size: 32px;
@@ -68,7 +78,7 @@ $erudus-default : #d3d3d3;
 
 .eicon-x-small{
   .eicon{
-    font-size: 18px;
+    font-size: 20px;
   }
 }
 
@@ -125,6 +135,13 @@ $erudus-default : #d3d3d3;
     }
   }
 
+  &.eicon-medium{
+    li{
+      width: 48px;
+      margin-right: 8px;
+    }
+  }
+
   &.eicon-small{
     li{
       width: 32px;
@@ -135,8 +152,8 @@ $erudus-default : #d3d3d3;
 
   &.eicon-x-small{
     li{
-      width: 18px;
-      margin-right: 2px;
+      width: 20px;
+      margin-right: 4px;
       font-size: 6px;
     }
   }

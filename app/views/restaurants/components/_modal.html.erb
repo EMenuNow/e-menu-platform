@@ -1,6 +1,5 @@
 <% main_item = item[:id]%>
 <% start_price = item[:price_a].to_f %>
-<% categorisations = item[:categorisations] %>
 
 <div class="modal fade" id="item-<%=item[:id]%>" tabindex="-1" role="dialog" aria-labelledby="<%=item[:name]%>" aria-hidden="true">
   <div class="modal-dialog override" role="document">
@@ -57,26 +56,26 @@
             </div>  
 
             <div class="row pt-2">
-              <% if categorisations.allergies.any? %>
+              <% if item[:categorisations].allergies.any? %>
                 <i class="text-left col-12 pb-2 ng-scope">
-                  <% if categorisations.contains_allergen.any? %>
+                  <% if item[:categorisations].contains_allergen.any? %>
                     <span class="badge badge-pill badge-danger">Contains</span>
                   <% end %>
-                  <% if categorisations.may_contain_allergen.any? %>
+                  <% if item[:categorisations].may_contain_allergen.any? %>
                     <span class="badge badge-pill badge-warning">May contain</span>
                   <% end %>
-                  <% if categorisations.dietary.any? %>
+                  <% if item[:categorisations].dietary.any? %>
                     <span class="badge badge-pill badge-success">Suitable for</span>
                   <% end %>
                 </i>
                 <ul class="eicon-list col mb-0 pb-1 eicon-small ng-scope">
-                  <% categorisations.contains_allergen.each do |allergen| %>
+                  <% item[:categorisations].contains_allergen.each do |allergen| %>
                     <li class="allergen-level-yes mb-0 pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span><%= allergen.menu_item_categorisation.name.humanize %></li>
                   <% end %>
-                  <% categorisations.may_contain_allergen.each do |allergen| %>
+                  <% item[:categorisations].may_contain_allergen.each do |allergen| %>
                     <li class="allergen-level-may mb-0 pb-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span><%= allergen.menu_item_categorisation.name.humanize %></li>
                   <% end %>
-                  <% categorisations.dietary.each do |diet| %>
+                  <% item[:categorisations].dietary.each do |diet| %>
                     <li class="suitable-level-yes mb-0 pb-1"><span class="<%= diet.menu_item_categorisation.icon %>"></span><%= diet.menu_item_categorisation.name.humanize %></li>
                   <% end %>
                 </ul>
@@ -136,7 +135,9 @@
 
                     <div class="row m-2 p-1 border<%= " alert alert-danger" if !cli.available %>">
                       <div class='col'>
-                        <%= check_box_tag "item-#{cli.id}", "item-#{cli.id}-#{main_item}", nil, id:"custom-item-#{cli.id}", class: "selection-item selection-item-#{main_item}", 'data-price' => ("%.2f" % cli.price).to_f, 'data-start_price' => start_price, 'data-scope' => main_item,'data-constraint' => custom_list.constraint, 'data-id' => cli.id, disabled: !cli.available %> <small><strong><%=cli.name%><%= " (Unavailable)" if !cli.available %></strong> <% if cli.description.present?%>  <i>- <%=cli.description%></i><% end %></small>
+                        <label>
+                          <%= check_box_tag "item-#{cli.id}", "item-#{cli.id}-#{main_item}", nil, id:"custom-item-#{cli.id}", class: "selection-item selection-item-#{main_item}", 'data-price' => ("%.2f" % cli.price).to_f, 'data-start_price' => start_price, 'data-scope' => main_item,'data-constraint' => custom_list.constraint, 'data-id' => cli.id, disabled: !cli.available %> <small><strong><%=cli.name%><%= " (Unavailable)" if !cli.available %></strong> <% if cli.description.present?%>  <i>- <%=cli.description%></i><% end %></small>
+                        </label>
                       </div>
                       <div class='col-3 text-right'>
                         <small><%=number_to_currency(cli.price, unit: "+#{@restaurant.currency_symbol}") if cli.price.to_f > 0.0 %></small>
