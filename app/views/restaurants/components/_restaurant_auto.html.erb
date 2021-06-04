@@ -3,8 +3,8 @@ style = "background: url('#{url_for(@restaurant.background_image)}') no-repeat f
 style = "background: url('#{@restaurant.background}') ;" if @restaurant.background.present?
 %>
 
-<div class="container-fluid background-color" style="<%= style %>">
-  <div class='row menu-header'>
+<div class="container-fluid background-color menu-header" style="<%= style %>">
+  <div class='row'>
     <div class="col text-left mt-2 mb-2"> 
       <% if @restaurant.image.attached? %>
         <%= image_tag @restaurant.image.variant(resize_and_pad: [200, 200]), class: "img-fluid"  %>
@@ -32,6 +32,8 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
       </div>
     </div>
   </div>
+</div>
+<div class="container-fluid">
   <div class="row">
     <div class='col-sm-8 menu-body'>
       <div class='row bg-dark'>
