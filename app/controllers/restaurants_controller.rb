@@ -100,20 +100,22 @@ class RestaurantsController < ApplicationController
   end
 
   def update_cookie_with_param(param_name, ids)
-    if params[param_name].present?
+    if params[param_name]
       value = (ids.class == Array) ? ids.join('&') : ids
       cookies[param_name] = { :value => value, :expires => 2.weeks.from_now }
+    else
+      cookies.delete(param_name)
     end
   end
   
   def restore_param_from_cookie(param_name)
-    if cookies[param_name].present?
+    if cookies[param_name]
       params[param_name] = cookies[param_name].split('&')
     end
   end
   
   def clear_param_from_cookie(param_name)
-    if cookies[param_name].present?
+    if cookies[param_name]
       cookies.delete(param_name)
     end
   end
