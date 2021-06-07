@@ -47,12 +47,16 @@ module Manager
   
       respond_to do |format|
         if @menu.save
-
+          
           if @menu.node_type == 'menu'
             @menu.root_node_id = @menu.id
             @menu.save
           end
-
+          
+          @allergens.each{|a| ([params[:contains_allergen_ids], params[:may_contain_allergen_ids]].compact.reduce([], :|)).include?(a.id.to_s) ? MenuItemCategorisationsMenu.where(menu_id: @menu.id, menu_item_categorisation_id: a.id).first_or_create.update(contains: params[:contains_allergen_ids]&.include?(a.id.to_s), may_contain: params[:may_contain_allergen_ids]&.include?(a.id.to_s), dietary: nil, category: nil) : MenuItemCategorisationsMenu.find_by(menu_id: @menu.id, menu_item_categorisation_id: a.id)&.destroy}
+          @diets.each{|d| params[:dietary_ids]&.include?(d.id.to_s) ? MenuItemCategorisationsMenu.where(menu_id: @menu.id, menu_item_categorisation_id: d.id).first_or_create.update(dietary: true, contains: nil, may_contain: nil, category: nil) : MenuItemCategorisationsMenu.find_by(menu_id: @menu.id, menu_item_categorisation_id: d.id)&.destroy}
+          @categories.each{|c| params[:menu_item_categorisation_ids]&.include?(c.id.to_s) ? MenuItemCategorisationsMenu.where(menu_id: @menu.id, menu_item_categorisation_id: c.id).first_or_create.update(dietary: nil, contains: nil, may_contain: nil, category: true) : MenuItemCategorisationsMenu.find_by(menu_id: @menu.id, menu_item_categorisation_id: c.id)&.destroy}
+    
           @menu.translate
           redirect_location = @menu.node_type == 'item' ? manager_restaurant_menu_path(@restaurant, @menu, updated_menu: @menu.id) : manager_restaurant_menus_path(@restaurant, updated_menu: @menu.id)
           format.html { redirect_to redirect_location, notice: 'Menu was successfully created.' }
