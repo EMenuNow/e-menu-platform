@@ -7,14 +7,20 @@
         menu_id = $(this).val();
         menu_checked = $(this).is(':checked');
         menu_available = $(`#available_${menu_id}`);
+        menu_active = $(`#active_${menu_id}`);
+        menu_sections = $(`#menu-${menu_id}-sections`);
         menu_item = $(`#item-${menu_id}`);
 
         if (menu_checked) {
           menu_available.text('Available');
+          menu_active.text('Active');
+          menu_sections.css("opacity", "");
           menu_item.removeClass('alert');
           menu_item.removeClass('alert-danger');
         } else {
           menu_available.text('Unavailable');
+          menu_active.text('Inactive');
+          menu_sections.css("opacity", "0.5");
           menu_item.addClass('alert');
           menu_item.addClass('alert-danger');
         }
@@ -37,14 +43,14 @@
   </div>
   <div class="col-lg-1 switches"> 
 
-  <%= check_box_tag dom_id(category, :available), category.id, category.available, data: {
+  <%= check_box_tag dom_id(category, :available), category.id, @restaurant.active_menu_ids.include?(category.id), data: {
                     remote: true,
                     url: manager_restaurant_toggle_active_path(@restaurant, menu_id: category.id),
                     method: :post
                     }, class: "available_menu" %>
   <label for="<%= dom_id(category, :available) %>">
-    <span id="available_<%= category.id %>" class="management-description pr-2">
-      <%= category.available ? "Available" : "Unavailable" %>
+    <span id="active_<%= category.id %>" class="management-description pr-2">
+      <%= @restaurant.active_menu_ids.include?(category.id) ? "Active" : "Inactive" %>
     </span>
     <span></span>
   </label>
@@ -55,7 +61,7 @@
     <%= link_to manager_restaurant_menu_path(category.restaurant_id, category.id), class: "text-warning menu-management-links", method: :delete,  "data-confirm" => 'Are you sure? This will remove all items and categories!' do %><i class='fa fa-trash'></i> Delete<% end %>
   </div>
 </div>
-<div class="row ">
+<div class="row" id="menu-<%= category.id %>-sections">
   <div class="col">
     <% if category.children.present? %>
       <div id="submenu">
