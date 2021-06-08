@@ -30,7 +30,7 @@
               <td><%= receipt.delivery_or_collection %></td>
               <td><%= receipt.table_number %></td>
               <td><%= receipt.telephone %></td>
-              <td><%= receipt.address if receipt.delivery_or_collection == 'delivery' %></td>
+              <td><%= receipt.full_address if receipt.delivery_or_collection == 'delivery' %></td>
               <td><%= receipt.collection_time %></td>
               <td><%= number_to_currency(receipt.basket_total/100.to_f, unit: receipt.restaurant.currency_symbol) %></td>
               <td><%= number_to_currency(receipt.delivery_fee.to_f, unit: receipt.restaurant.currency_symbol) %></td>

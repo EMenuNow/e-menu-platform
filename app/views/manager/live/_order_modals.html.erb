@@ -10,7 +10,7 @@
           <h6 class="card-title">Type: <%=receipt.delivery_or_collection%></h6>
           <% if receipt.delivery_or_collection == 'tableservice' %><h6 class="card-title">Table Number: <%=receipt.table_number%></h6><% end %>
           <% if receipt.telephone.present? %>  <h6 class="card-title">Telephone: <%=receipt.telephone%></h6><% end %>
-          <% if receipt.delivery_or_collection == 'delivery' %> <h6 class="card-title">Address: <%=receipt.address%></h6><% end %>
+          <% if receipt.delivery_or_collection == 'delivery' %> <h6 class="card-title">Address: <%=receipt.full_address%></h6><% end %>
         </div>
         <div class=" col-sm-5 text-right">
           <strong>Received: <%=receipt.created_at.in_time_zone(@restaurant.time_zone).strftime('%H:%M') %> </strong>

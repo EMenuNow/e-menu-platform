@@ -22,7 +22,9 @@ class Restaurant < ApplicationRecord
   validates_presence_of :name, on: %i[create update], message: "can't be blank"
   validates_format_of :name, :with => /\A[;-} -9]*\z/i, on: %i[create update], message: "has invalid characters"
   validates_presence_of :address, on: %i[create update], message: "can't be blank"
+  validates_presence_of :city, on: %i[create update], message: "can't be blank"
   validates_presence_of :postcode, on: %i[create update], message: "can't be blank"
+  validates_presence_of :country_code, on: %i[create update], message: "can't be blank"
   validates_presence_of :telephone, on: %i[create update], message: "can't be blank"
   validates_presence_of :email, on: %i[create update], message: "can't be blank"
   validates_uniqueness_of :path, on: %i[create update], message: "must be unique"
@@ -297,6 +299,25 @@ class Restaurant < ApplicationRecord
 
   def clear_close_early
     self.opening_time.update(close_early: false)
+  end
+
+  def full_address
+    address_array = [address_2, city, postcode, country_name]
+    full_address = address
+    address_array.each{|a| full_address += ", " + a unless a.blank?}
+    return full_address
+  end
+
+  def country_name
+    country = ISO3166::Country[country_code]
+    return nil if !country
+    country.translations[I18n.locale.to_s] || country.name
+  end
+
+  def stripe_countries
+    Stripe.api_key = self.stripe_sk_api_key
+    country_spec = Stripe::CountrySpec.retrieve('GB')
+    country_spec.supported_transfer_countries
   end
 
   private

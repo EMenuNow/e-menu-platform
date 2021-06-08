@@ -8,7 +8,7 @@
     <% if @receipt.delivery_or_collection != 'tableservice'  %><div><strong>Time: </strong><%=@receipt.collection_time%></div><% end %>
     <% if @receipt.email.present? %><div><strong>Email: </strong><%=@receipt.email%></div><% end %>
     <% if @receipt.telephone.present? %><div><strong>Telephone: </strong><%=@receipt.telephone%></div><% end %>
-    <% if @receipt.delivery_or_collection == 'delivery'  %><div><strong>Address: </strong><%=@receipt.address%></div><% end %>
+    <% if @receipt.delivery_or_collection == 'delivery'  %><div><strong>Address: </strong><%=@receipt.full_address%></div><% end %>
     <% if @receipt.table_number.present? %><div><strong>Table Number: </strong><%=@receipt.table_number%></div><% end %>
   </div>
 </div>

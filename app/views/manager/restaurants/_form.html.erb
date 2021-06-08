@@ -76,49 +76,70 @@ collection = restaurant.features.where(id: 12).present?
     </div>
     <div class="row pt-5">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label "Restaurant name" %>
-          <%= form.text_field :name, class: 'form-control  form-control-sm text-center' %>
+          <%= form.text_field :name, class: 'form-control form-control-sm text-center' %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label :address %>
-          <%= form.text_field :address, class: 'form-control  form-control-sm text-center' %>
+          <%= form.text_field :address, class: 'form-control form-control-sm text-center', placeholder: "Line 1 (required)" %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
+          <%= form.text_field :address_2, class: 'form-control form-control-sm text-center', placeholder: "Line 2 (optional)" %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-md">
+        <div class="form-group">
+          <%= form.label :city %>
+          <%= form.text_field :city, class: 'form-control form-control-sm text-center' %>
+        </div>
+      </div>
+      <div class="col-12 col-md">
+        <div class="form-group">
           <%= form.label :postcode %>
-          <%= form.text_field :postcode, class: 'form-control  form-control-sm text-center' %>
+          <%= form.text_field :postcode, class: 'form-control form-control-sm text-center' %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
+          <%= form.label :country_code %>
+          <%= form.country_select(:country_code, { priority_countries: ["GB"], priority_countries_divider: "~~~~~~", only: @restaurant.stripe_countries }, { class: 'form-control form-control-sm' }, { required: true }) %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
           <%= form.label :telephone %>
-          <%= form.text_field :telephone, class: 'form-control  form-control-sm text-center' %>
+          <%= form.text_field :telephone, class: 'form-control form-control-sm text-center' %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label :email %>
-          <%= form.text_field :email, class: 'form-control  form-control-sm text-center' %>
+          <%= form.text_field :email, class: 'form-control form-control-sm text-center' %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label :cuisine_id %>
-          <%= form.select :cuisine_id,  options_for_select(@cuisines.map{|a| [a.name, a.id]}, restaurant.cuisine_id ), {prompt: "Choose cuisine"}, {class: 'form-control  form-control-sm text-center'} %>
+          <%= form.select :cuisine_id,  options_for_select(@cuisines.map{|a| [a.name, a.id]}, restaurant.cuisine_id ), {prompt: "Choose cuisine"}, {class: 'form-control form-control-sm text-center'} %>
         </div>
       </div>
     </div>
@@ -138,7 +159,7 @@ collection = restaurant.features.where(id: 12).present?
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <% if @account && @account[:details_submitted] && @account[:charges_enabled] %>
             <strong class="d-inline-block text-gray-dark"><span class="badge badge-pill badge-success" style="font-size: 100%;">Stripe connection complete</span></strong>
           <% else %>
@@ -149,39 +170,39 @@ collection = restaurant.features.where(id: 12).present?
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label "Stripe Connected Account ID" %>
-          <%= form.text_field :stripe_connected_account_id, class: 'form-control  form-control-sm text-center', rows: 10, :disabled=>!admin  %>
+          <%= form.text_field :stripe_connected_account_id, class: 'form-control form-control-sm text-center', rows: 10, :disabled=>!admin  %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <label>Commission percentage e.g. 1.5</label>
-          <%= form.text_field :commision_percentage, class: 'form-control  form-control-sm text-center', rows: 10, :disabled=>!admin  %>
+          <%= form.text_field :commision_percentage, class: 'form-control form-control-sm text-center', rows: 10, :disabled=>!admin  %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label "URL Path" %>
-          <%= form.text_field :path, id: "restaurant_path", class: 'form-control  form-control-sm text-center', :disabled=>!admin %>
+          <%= form.text_field :path, id: "restaurant_path", class: 'form-control form-control-sm text-center', :disabled=>!admin %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label :currency_id %>
-          <%= form.select :currency_id, options_for_select(Currency.all.map{|s| [s.name, s.id]}, restaurant.currency_id), {prompt: "Choose Currency"}, {class: 'form-control  form-control-sm text-center', :disabled=>!admin} %>
+          <%= form.select :currency_id, options_for_select(Currency.all.map{|s| [s.name, s.id]}, restaurant.currency_id), {prompt: "Choose Currency"}, {class: 'form-control form-control-sm text-center', :disabled=>!admin} %>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <label>Stripe chargeback protection enabled (0.04% extra charge)
             <br />
             <%= form.check_box :stripe_chargeback_enabled, class: 'text-center', :disabled=>!admin %>
@@ -191,7 +212,7 @@ collection = restaurant.features.where(id: 12).present?
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <label>Enable SEO indexing (show restaurant on EMenu listings)
             <br />
             <%= form.check_box :show_on_homepage, class: 'text-center', :disabled=>!admin %>
@@ -202,7 +223,7 @@ collection = restaurant.features.where(id: 12).present?
     <% if params[:admin] == "true" %>
       <div class="row">
         <div class="col">
-          <div class="form-group ">
+          <div class="form-group">
             <label>Demo Restaurant (Uses stripe test keys)
               <br />
               <%= form.check_box :demo, class: 'text-center', :disabled=>!admin %>
@@ -246,7 +267,7 @@ collection = restaurant.features.where(id: 12).present?
 
   <div class="row">
     <div class="col">
-      <div class="form-group ">
+      <div class="form-group">
         <label for="restaurant_ssubscription_enabled">Subscription Enabled</label>
 
         <%= form.check_box :subscription_enabled, class: 'form-control  form-control-sm' %>
@@ -320,7 +341,7 @@ collection = restaurant.features.where(id: 12).present?
 
   <div class="row">
     <div class="col">
-      <div class="form-group ">
+      <div class="form-group">
         <label for="restaurant_show_on_homepage">Show on eat.emenunow.com homepage</label>
 
         <%= form.check_box :show_on_homepage, class: 'form-control  form-control-sm' %>
@@ -335,7 +356,7 @@ collection = restaurant.features.where(id: 12).present?
     <!-- tracking -->
     <div class="row mt-2">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label :facebook_pixel %>
           <%= form.text_field :facebook_pixel, class: 'form-control  form-control-sm' %>
         </div>
@@ -343,13 +364,13 @@ collection = restaurant.features.where(id: 12).present?
     </div>
     <div class="row">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label :facebook %>
           <%= form.text_field :facebook, class: 'form-control  form-control-sm' %>
         </div>
       </div>
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <%= form.label :twitter %>
           <%= form.text_field :twitter, class: 'form-control  form-control-sm' %>
         </div>
@@ -380,7 +401,7 @@ collection = restaurant.features.where(id: 12).present?
       <div class="col">
         <div class="row">
           <div class="col">
-            <div class="form-group ">
+            <div class="form-group">
               <h5 class="pb-5">Solid background colour</h5>
               <p class='text-gray text-warning'><i> Choosing a solid background will override a custom background image</i></p>
               <%= form.select :subtle_background,  options_for_select(subtle_background_list.map{|s| [s[:name], s[:file]]}, restaurant.subtle_background ), {prompt: "Choose solid background"}, {class: 'form-control  form-control-sm'} %>
@@ -396,7 +417,7 @@ collection = restaurant.features.where(id: 12).present?
         </div>
         <div class="row">
           <div class="col">
-            <div class="form-group ">
+            <div class="form-group">
               <div class="row">
                 <% subtle_background_list.each do |subtle| %>
                 <div class="subtle-color card col-md-3 col-4 p-0" style="cursor: pointer;" data-id="<%= subtle[:file] %>" id="subtle-color-<%=subtle[:name]%>">
@@ -414,13 +435,13 @@ collection = restaurant.features.where(id: 12).present?
     </div>
     <div class="row mt-5 border-bottom border-gray card p-5">
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <h5 class="pb-5">Custom Background Image</h5>
           <%= form.file_field :background_image %>
         </div>
       </div>
       <div class="col">
-        <div class="form-group ">
+        <div class="form-group">
           <% if restaurant.background_image.attached? %>
           <%= image_tag restaurant.background_image.variant(resize: "200x200"), class: "img-fluid"  %>
           <% end %>

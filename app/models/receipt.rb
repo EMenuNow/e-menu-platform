@@ -129,7 +129,7 @@ class Receipt < ApplicationRecord
     header << "Receipt Type: Full receipt\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
-    header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
+    header << "Address: #{full_address}\n" if delivery_or_collection == 'delivery'
     header << "\n\n"
     data = {receipt_id: id, print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
 
@@ -180,7 +180,7 @@ class Receipt < ApplicationRecord
     header << "Receipt Type: #{item_screen_type_key}\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
-    header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
+    header << "Address: #{full_address}\n" if delivery_or_collection == 'delivery'
     header << "\n\n"
     data = {receipt_id: id, print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
     # mylogger.debug("PRINTING PRIMARY: #{printer.inspect}")
@@ -224,7 +224,7 @@ class Receipt < ApplicationRecord
     header << "Receipt Type: #{secondary_item_screen_type_key}\n"
     header << "Table Number: #{table_number}\n" if delivery_or_collection == 'tableservice' 
     header << "Tel: #{telephone}\n" if telephone.present? 
-    header << "Address: #{address}\n" if delivery_or_collection == 'delivery'
+    header << "Address: #{full_address}\n" if delivery_or_collection == 'delivery'
     header << "\n\n"
     data = {receipt_id: id, print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
   #  mylogger.debug("PRINTING SECONDARY: #{printer.inspect}")
@@ -306,6 +306,19 @@ class Receipt < ApplicationRecord
     return statuses[0] if statuses.uniq.length == 1
     return 'preparing' if statuses.uniq.length > 1
     return 'error'
+  end
+
+  def full_address
+    address_array = [address_2, city, post_code, country_name]
+    full_address = address
+    address_array.each{|a| full_address += ", " + a unless a.blank?}
+    return full_address
+  end
+
+  def country_name
+    country = ISO3166::Country[country_code]
+    return nil if !country
+    country.translations[I18n.locale.to_s] || country.name
   end
 
   def to_orkestro

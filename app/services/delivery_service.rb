@@ -11,7 +11,8 @@ class DeliveryService < ApplicationController
         name: @receipt.restaurant.name, # Required
         # companyName: @receipt.restaurant.name, #  Optional
         addressLine1: @receipt.restaurant.address, # Required - needs splitting out to line 1 and city
-        # city: @receipt.restaurant.city, # Required - needs city creating
+        addressLine2: @receipt.restaurant.address_2, # Required - needs splitting out to line 1 and city
+        city: @receipt.restaurant.city, # Required - needs city creating
         postCode: @receipt.restaurant.postcode, # Required
         country: @receipt.restaurant.country, # Required - needs country creating
         phone: @receipt.restaurant.telephone, # Required
@@ -26,9 +27,10 @@ class DeliveryService < ApplicationController
         name: @receipt.name, # Required
         # companyName: @receipt.name, # Optional
         addressLine1: @receipt.address, # Required
-        # city: @receipt.city, # Required - needs city creating
-        # postCode: @receipt.postcode, # Required - needs postcode creating
-        # country: @receipt.country, # Required - needs country creating
+        addressLine2: @receipt.address_2, # Required
+        city: @receipt.city, # Required - needs city creating
+        postCode: @receipt.post_code, # Required - needs postcode creating
+        country: @receipt.country_code, # Required - needs country creating
         phone: @receipt.telephone, # Required
         # instructions: @receipt.delivery_note,  # Optional
         email: @receipt.email, # Required

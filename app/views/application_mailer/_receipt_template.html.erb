@@ -50,7 +50,7 @@
 
     <% if @receipt.delivery_or_collection == 'delivery'  %> <tr>
       <td style='text-align: right;'>Address:</td>
-      <td><%=@receipt.address%></td>
+      <td><%=@receipt.full_address%></td>
     </tr><% end %>
   </tbody>
 </table>
@@ -126,7 +126,7 @@
       <td colspan=2><strong>Restaurant Address</strong></td>
     </tr>
     <tr>
-      <td colspan=2><%=@restaurant.address%></td>
+      <td colspan=2><%=@restaurant.full_address%></td>
     </tr>
   </tbody>
 </table>

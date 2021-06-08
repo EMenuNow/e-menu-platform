@@ -1,6 +1,6 @@
 class CheckoutService < ApplicationController
 
-  attr_accessor :name, :total_payment, :service_type, :collection_time, :due_date, :telephone, :address,
+  attr_accessor :name, :total_payment, :service_type, :collection_time, :due_date, :telephone, :address, :address_2, :city
                 :table_number, :email, :house_number, :street, :postcode, :basket, :delivery_fee, :discount_code, :payment_in_pence, :basket_service
 
   def initialize(restaurant, parameters, basket_service)
@@ -12,7 +12,7 @@ class CheckoutService < ApplicationController
 
     @total_payment = @total.to_f 
     @payment_in_pence = (@total_payment*100).to_i
-    @address = "#{@house_number}, #{@street}, #{@postcode}"
+    # @address = "#{@house_number}, #{@street}, #{@postcode}"
     @application_fee_amount = application_fee_amount(to_stripe_amount(@total_payment))
   end
 
@@ -70,6 +70,10 @@ class CheckoutService < ApplicationController
       is_ready: false,
       telephone: @telephone,
       address: @address,
+      address_2: @address_2,
+      city: @city,
+      postcode: @post_code,
+      country_code: @restaurant.country_code,
       delivery_or_collection: @service_type,
       delivery_fee: @delivery_fee, 
       table_number: @table_number,

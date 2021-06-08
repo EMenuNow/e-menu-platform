@@ -49,16 +49,33 @@
       </div>
       <div class="row my-5">
         <h4 class="w-100 text-center mb-3">Where is your business located?</h4>
-        <div class="col-md-6">
+        <div class="col-md-12">
           <div class="form-group">
             <%= form.label :address %>
-            <%= form.text_field :address, class: 'form-control form-control-sm', placeholder: 'Address...' %>
+            <%= form.text_field :address, class: 'form-control form-control-sm', placeholder: 'Line 1 (required)...' %>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group">
+            <%= form.text_field :address_2, class: 'form-control form-control-sm', placeholder: 'Line 2 (optional)...'  %>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= form.label :city %>
+            <%= form.text_field :city, class: 'form-control form-control-sm', placeholder: 'City...' %>
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <%= form.label :postcode %>
             <%= form.text_field :postcode, class: 'form-control form-control-sm', placeholder: 'Postcode...' %>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group">
+            <%= form.label 'Country' %>
+            <%= form.country_select(:country_code, { priority_countries: ["GB"], priority_countries_divider: "~~~~~~", only: @restaurant.stripe_countries }, { class: 'form-control form-control-sm' }, { required: true }) %>
           </div>
         </div>
         <div class="col-md-6">

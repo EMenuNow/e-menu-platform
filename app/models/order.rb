@@ -24,6 +24,9 @@ class Order < ApplicationRecord
         receipt.source = :takeaway 
         receipt.telephone = self.telephone
         receipt.address = self.address
+        receipt.address_2 = self.address_2
+        receipt.post_code = self.post_code
+        receipt.country_code = self.restaurant.country_code
         receipt.delivery_or_collection = self.delivery_or_collection
         receipt.delivery_fee = self.delivery_fee 
         receipt.table_number = self.table_number

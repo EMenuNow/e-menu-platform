@@ -36,7 +36,7 @@ class ScreenItem < ApplicationRecord
     header << "Type: #{receipt.delivery_or_collection}\n" 
     header << "Table Number: #{receipt.table_number}\n" if receipt.delivery_or_collection == 'tableservice' 
     header << "Tel: #{receipt.telephone}\n" if receipt.telephone.present? 
-    header << "Address: #{receipt.address}\n" if receipt.delivery_or_collection == 'delivery'
+    header << "Address: #{receipt.full_address}\n" if receipt.delivery_or_collection == 'delivery'
     header << "\n\n"
     data = {print_type: printer.print_type, action: action, header: header, print_receipt: print_receipt, printer_vendor: printer.vendor, printer_product: printer.product}
 
