@@ -1,0 +1,26 @@
+<h3>Delivery Postcodes</h3>
+
+<table class='table'>
+  <thead>
+    <tr>
+      <th>Prefix</th>
+      <th>Delivery fee</th>
+      <th colspan="2"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @delivery_postcodes.each do |delivery_postcode| %>
+      <tr>
+        <td><%= delivery_postcode.prefix %></td>
+        <td><%= delivery_postcode.delivery_fee %></td>
+        <td><%= link_to 'Edit', edit_manager_restaurant_delivery_postcode_path(@restaurant.id, delivery_postcode) %></td>
+        <td><%= link_to 'Destroy', manager_restaurant_delivery_postcode_path(@restaurant.id, delivery_postcode), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Delivery Postcode', new_manager_restaurant_delivery_postcode_path(@restaurant) %>

@@ -5,7 +5,7 @@ module Manager
     before_action :authenticate_manager_restaurant_user!
 
     before_action :set_restaurant_new, only: %i[show edit update]
-    before_action :set_restaurant, only: %i[active toggle_active set_delay open_early close_early]
+    before_action :set_restaurant, only: %i[active toggle_active set_delay open_early close_early delivery_settings]
     before_action :set_cuisine, only: %i[new create show edit update]
     # before_action :get_stripe_account, only: :edit
 
@@ -184,6 +184,11 @@ module Manager
         format.html { redirect_to path, notice: 'Stopped accepting orders for today' }
       end
    
+    end
+
+    def delivery_settings
+      @services = Feature.where(key: 'orkestro_delivery')
+      @delivery_postcodes = DeliveryPostcode.where(restaurant_id: @restaurant.id)
     end
 
 

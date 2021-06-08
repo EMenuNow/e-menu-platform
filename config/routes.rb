@@ -162,6 +162,7 @@ Rails.application.routes.draw do
       resources :opening_times
       resources :busy_times, except: [:update]
       resources :delivery_postcodes
+      get 'delivery', action: :delivery_settings, as: :delivery_settings
       
       resources :themes
       

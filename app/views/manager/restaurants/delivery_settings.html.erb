@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col m-3">
+
+    <h1>Delivery Settings</h1>
+
+    <ul class="switches">
+      
+      <% @services.each do |feature|%>
+
+        <li class="my-3">
+          <%= check_box_tag dom_id(feature), feature.id, @restaurant.features.include?(feature), data: {
+                            remote: true,
+                            url: manager_restaurant_toggle_feature_path(@restaurant.id, feature.id),
+                            method: :post
+                            } %>
+          <label for="feature_<%= feature.id %>">
+            <span><%=feature.name%></span>
+            <span></span>
+          </label>
+        </li>
+
+      <% end %>
+
+    </ul>
+
+    <%= render 'manager/delivery_postcodes/index' %>
+
+  </div>
+</div>
