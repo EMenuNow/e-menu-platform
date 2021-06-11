@@ -117,7 +117,7 @@
 
         <%
           menu_id = params[:menu_id].to_i if params[:menu_id].present?
-          menu_id = @menu2.first[:id] if params[:menu_id].blank?
+          menu_id = @menu2.select{|m| m[:is_available] == true}.first[:id] if params[:menu_id].blank?
           current_section = params[:section_id].to_i 
           if params[:section_id].blank?
             menu = @menu2.select { |w| w[:id] == menu_id}.first
