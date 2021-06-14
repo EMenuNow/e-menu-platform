@@ -6,6 +6,7 @@ class RestaurantsController < ApplicationController
 
   def show
     @menu = @restaurant.menus_live_menus
+    @menu_availability = @menu.select{|m| m.node_type == "menu"}.select{|m| m.is_available?}.map{|m| m.id}
     @menu = @restaurant.menus_live_menus.where(:id => params[:menu_id]) if params[:menu_id].present?
     @menu2 = get_serialized_menu(@restaurant)
 

@@ -51,7 +51,7 @@ module Manager
           end
           
           @menu_time.menu_id = @menu.id
-          @menu_time.save if params[:menu_time][:timed_menu] == "1"
+          @menu_time.save if params[:node_type] == "menu" && params[:menu_time][:timed_menu] == "1"
           
           @allergens.each{|a| ([params[:contains_allergen_ids], params[:may_contain_allergen_ids]].compact.reduce([], :|)).include?(a.id.to_s) ? MenuItemCategorisationsMenu.where(menu_id: @menu.id, menu_item_categorisation_id: a.id).first_or_create.update(contains: params[:contains_allergen_ids]&.include?(a.id.to_s), may_contain: params[:may_contain_allergen_ids]&.include?(a.id.to_s), dietary: nil, category: nil) : MenuItemCategorisationsMenu.find_by(menu_id: @menu.id, menu_item_categorisation_id: a.id)&.destroy}
           @diets.each{|d| params[:dietary_ids]&.include?(d.id.to_s) ? MenuItemCategorisationsMenu.where(menu_id: @menu.id, menu_item_categorisation_id: d.id).first_or_create.update(dietary: true, contains: nil, may_contain: nil, category: nil) : MenuItemCategorisationsMenu.find_by(menu_id: @menu.id, menu_item_categorisation_id: d.id)&.destroy}

@@ -69,7 +69,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
           </div>
         </div>
       </div>
-      <% menu.select{|m| m[:is_available] == true}.each do |m| %>
+      <% menu.select{|m| menu_availability.include?(m[:id])}.each do |m| %>
         <% if  m[:node_type] == 'menu' %>
           <div class="row">
             <div class="col">
