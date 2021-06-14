@@ -1,39 +1,192 @@
-    <h3 class=" pb-2 mb-0">Menu</h3>
+<% content_for :js do %>
+  <script>
+    var availableTimes = <%= @menu_time.times.empty? ? @menu_time.blank_times.to_json.html_safe : @menu_time.times.to_json.html_safe %>;
+
+    var unavailableDays = [];
+
+    for (const [key, value] of Object.entries(availableTimes)) {
+      var start = parseInt(value.start.replace(/\D/g,''));
+      var end = parseInt(value.end.replace(/\D/g,''));
+      if (start >= end) {
+        unavailableDays.push(key);
+      };
+    };
+
+    $(document).ready(function () {
+
+      function validate() {
+        if ($('#menu_time_timed_menu').is(":checked")) {
+          var count = 0;
+  
+          $('select').each(function(){
+            if($(this).val() == ""){
+              count ++;
+            };
+          });
+          if (count == 0) {
+            $('#validation-warning').hide();
+            $(':input[type="submit"]').prop('disabled', false);
+          } else {
+            $('#validation-warning').show();
+            $(':input[type="submit"]').prop('disabled', true);
+          }
+        } else {
+          $('#validation-warning').hide();
+          $(':input[type="submit"]').prop('disabled', false);
+        }
+      };
+
+      function unavailableDay(day, status) {
+        var $startDay = $(`#menu_times\\[${day}\\]\\[start\\]`)
+        var $endDay = $(`#menu_times\\[${day}\\]\\[end\\]`)
+
+        if (status) {
+          $startDay.val("00:00");
+          $endDay.val("00:00");
+
+          $startDay.prop("disabled", true);
+          $endDay.prop("disabled", true);
+        } else {
+          $startDay.val(availableTimes[`${day}`]['start']);
+          $endDay.val(availableTimes[`${day}`]['end']);
+
+          $startDay.prop("disabled", false);
+          $endDay.prop("disabled", false);
+        }
+      };
+
+      unavailableDays.forEach(function(day) {
+        $(`#${day}-unavailable`).prop('checked', true);
+        unavailableDay(`${day}`, 'checked');
+      });
+
+      $('.unavailable-day').on( "click", function() {unavailableDay($(this).val(), $(this).is(":checked"))} )
+
+      $('.validate-item').on("change", validate);
+
+      validate();
+
+      $('form').bind('submit', function () {
+        $(this).find(':input').prop('disabled', false);
+      });
+
+    });
+
+  </script>
+<% end %>
+
+<h3 class=" pb-2 mb-0">Menu</h3>
+
 <%= form_with(model: [:manager, @restaurant, menu], local: true) do |form| %>
   <% if menu.errors.any? %>
     <div id="error_explanation" class="alert alert-danger">
       <h2><%= pluralize(menu.errors.count, "error") %> prohibited this menu from being saved:</h2>
-
       <ul>
-      <% menu.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
+        <% menu.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
       </ul>
     </div>
   <% end %>
 
-    <%= form.hidden_field :restaurant_id, value: @restaurant.id %>
-        <%= form.hidden_field :node_type, value: menu.node_type %>
-    <%= hidden_field_tag :parent, params[:parent] %>
+  <%= form.hidden_field :restaurant_id, value: @restaurant.id %>
+  <%= form.hidden_field :node_type, value: menu.node_type %>
+  <%= hidden_field_tag :parent, params[:parent] %>
 
-    <div class="row">
-      <div class="col">
-        <div class="form-group ">
-          <%= form.label :name %>
-          <%= form.text_field :name, class: 'form-control  form-control-sm' %>
+  <div class="row">
+    <div class="col">
+      <div class="form-group ">
+        <%= form.label :name %>
+        <%= form.text_field :name, class: 'form-control  form-control-sm' %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="form-group ">
+        <%= form.label :position %>
+        <%= form.number_field :position, class: 'form-control  form-control-sm' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header p-1">
+          <h2 class="mb-0">
+            <label class="btn btn-link btn-block my-0 text-left text-dark text-decoration-none" type="button" data-toggle="collapse" data-target="#timedMenu" aria-expanded="true" aria-controls="timedMenu" id="heading-timedMenu">
+              <%= check_box :menu_time, :timed_menu, checked: params[:timed_menu], class: "validate-item" %> Timed Menu?
+            </label>
+          </h2>
+        </div>
+        <div id="timedMenu" class="collapse<%= params[:timed_menu] ? ' show' : '' %>">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-3 text-right pb-1">
+                <div class="form-group ">
+                  <h5><strong>Day</strong></h5>
+                </div>
+              </div>
+              <div class="col-sm-3 pb-1">
+                <div class="form-group ">
+                    <h5><strong>Start</strong></h5>
+                </div>
+              </div>
+              <div class="col-sm-3 pb-1">
+                <div class="form-group ">
+                    <h5><strong>End</strong></h5>
+                </div>
+              </div>
+              <div class="col-sm-3 pb-1">
+                <div class="form-group ">
+                    <h5><strong>Unavailable?</strong></h5>
+                </div>
+              </div>
+            </div>
+
+            <% MenuTime.days_of_week.each do |dow| %>
+              <div class="row">
+                <div class="col-sm-3 text-right pb-1">
+                  <div class="form-group ">
+                    <h5><%= dow.camelcase %>: </h5>
+                  </div>
+                </div>
+                <div class="col-sm-3 pb-1">
+                  <div class="form-group ">
+                    <% set_time = @menu_time.times[dow]['start'] if @menu_time.times.present? %>
+                    <%= form.select "times[#{dow}][start]", options_for_select(MenuTime.available_times(30).map{|a| a.strftime("%H:%M")}, set_time), {prompt: 'Choose Time'}, {class: 'select-start form-control validate-item'} %>
+                  </div>
+                </div>
+                <div class="col-sm-3 pb-1">
+                  <div class="form-group ">
+                    <% set_time_end = @menu_time.times[dow]['end'] if @menu_time.times.present? %>
+                    <%= form.select "times[#{dow}][end]", options_for_select(MenuTime.available_times(30).map{|a| a.strftime("%H:%M")}, set_time_end), {prompt: 'Choose Time'}, {class: 'select-end form-control validate-item'} %>
+                  </div>
+                </div>
+                <div class="col-sm-3 pb-1">
+                  <div class="form-group ">
+                    <input type="checkbox" id="<%= dow %>-unavailable" name="<%= dow %>-unavailable" value="<%= dow %>" class="unavailable-day validate-item">
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <div class="form-group ">
-          <%= form.label :position %>
-          <%= form.number_field :position, class: 'form-control  form-control-sm' %>
-        </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-sm-8">
+      <div id="validation-warning">
+        Please ensure every day either has valid start and end time, or is selected unavailable
       </div>
     </div>
+  </div>
 
   <div class="actions">
     <%= form.submit nil, class: "btn btn-primary" %>
   </div>
+
 <% end %>

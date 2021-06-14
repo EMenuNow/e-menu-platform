@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_07_114826) do
+ActiveRecord::Schema.define(version: 2021_06_09_095101) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -213,6 +213,14 @@ ActiveRecord::Schema.define(version: 2021_06_07_114826) do
     t.boolean "category"
   end
 
+  create_table "menu_times", force: :cascade do |t|
+    t.bigint "menu_id", null: false
+    t.jsonb "times"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["menu_id"], name: "index_menu_times_on_menu_id"
+  end
+
   create_table "menu_translations", force: :cascade do |t|
     t.integer "menu_id", null: false
     t.string "locale", null: false
@@ -315,6 +323,10 @@ ActiveRecord::Schema.define(version: 2021_06_07_114826) do
     t.datetime "due_date"
     t.bigint "discount_code_id"
     t.jsonb "tax_rates"
+    t.string "address_2"
+    t.string "city"
+    t.string "post_code"
+    t.string "country_code"
     t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
     t.index ["restaurant_id"], name: "index_orders_on_restaurant_id"
   end
@@ -468,6 +480,10 @@ ActiveRecord::Schema.define(version: 2021_06_07_114826) do
     t.string "first_print_status"
     t.string "print_status"
     t.jsonb "tax_rates"
+    t.string "address_2"
+    t.string "city"
+    t.string "post_code"
+    t.string "country_code"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"
     t.index ["restaurant_id"], name: "index_receipts_on_restaurant_id"
@@ -545,6 +561,9 @@ ActiveRecord::Schema.define(version: 2021_06_07_114826) do
     t.boolean "stripe_chargeback_enabled", default: false
     t.boolean "subscription_enabled", default: true
     t.boolean "demo", default: false
+    t.string "address_2"
+    t.string "city"
+    t.string "country_code"
     t.index ["cuisine_id"], name: "index_restaurants_on_cuisine_id"
     t.index ["currency_id"], name: "index_restaurants_on_currency_id"
     t.index ["restaurant_user_id"], name: "index_restaurants_on_restaurant_user_id"
@@ -637,6 +656,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_114826) do
   add_foreign_key "item_screens", "item_screen_types"
   add_foreign_key "item_screens", "printers"
   add_foreign_key "item_screens", "restaurants"
+  add_foreign_key "menu_times", "menus"
   add_foreign_key "menus", "item_screen_types"
   add_foreign_key "menus", "menu_item_categorisations"
   add_foreign_key "menus", "restaurants"

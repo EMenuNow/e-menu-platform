@@ -6,6 +6,7 @@ class RestaurantsController < ApplicationController
 
   def show
     @menu = @restaurant.menus_live_menus
+    @menu_availability = @menu.select{|m| m.node_type == "menu"}.select{|m| m.is_available?}.map{|m| m.id}
     @menu = @restaurant.menus_live_menus.where(:id => params[:menu_id]) if params[:menu_id].present?
     @menu2 = get_serialized_menu(@restaurant)
 
@@ -68,7 +69,8 @@ class RestaurantsController < ApplicationController
           nutrition: parent.nutrition,
           provenance: parent.provenance, 
           calories: parent.calories,
-          is_deleted: parent.is_deleted, 
+          is_deleted: parent.is_deleted,
+          is_available: parent.is_available?,
           item_screen_type_id: parent.item_screen_type_id,
           item_screen_type_name: parent.item_screen_type_name,
           item_screen_type_key: parent.item_screen_type_key,

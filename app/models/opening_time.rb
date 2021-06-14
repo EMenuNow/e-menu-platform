@@ -27,7 +27,7 @@ class OpeningTime < ApplicationRecord
       start = '00:00:00'
       time_end = '23:59:59'
       times = []
-      (Time.parse('2020-08-01 00:00:00').to_i..Time.parse('2020-08-01 23:59:59').to_i).to_a.in_groups_of(step.minutes).collect(&:first).collect { |t| Time.at(t) } 
+      (Time.parse('2020-08-01 00:00:00').to_i..Time.parse('2020-08-01 23:59:59').to_i).to_a.in_groups_of(step.minutes).collect(&:first).collect { |t| Time.at(t) } << Time.parse('2020-08-01 23:59:59')
   end
 
 

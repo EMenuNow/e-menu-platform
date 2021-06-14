@@ -112,8 +112,8 @@ class Restaurant < ApplicationRecord
     today_closing_time = opening_time_times[today_day]['close']
     today_opening_time = "00:00" if today_opening_time.empty?
     today_closing_time = "00:00" if today_closing_time.empty?
-    time_today_opening = Time.parse("#{t.year}-#{t.month}-#{t.day} #{today_opening_time}:00") - t.utc_offset
-    time_today_closing = Time.parse("#{t.year}-#{t.month}-#{t.day} #{today_closing_time}:00") - t.utc_offset - opening_time_kitchen_delay_minutes.minutes
+    time_today_opening = Time.zone.parse("#{t.year}-#{t.month}-#{t.day} #{today_opening_time}:00") - t.utc_offset
+    time_today_closing = Time.zone.parse("#{t.year}-#{t.month}-#{t.day} #{today_closing_time}:00") - t.utc_offset - opening_time_kitchen_delay_minutes.minutes
     time_today_opening = time_today_opening.in_time_zone(time_zone)
     time_today_closing = time_today_closing.in_time_zone(time_zone)
     time_today_opening < t and t < time_today_closing
@@ -125,8 +125,8 @@ class Restaurant < ApplicationRecord
     today_closing_time = opening_time_times[today_day]['close']
     today_opening_time = "00:00" if today_opening_time.empty?
     today_closing_time = "00:00" if today_closing_time.empty?
-    time_today_opening = Time.parse("#{t.year}-#{t.month}-#{t.day} #{today_opening_time}:00") - t.utc_offset
-    time_today_closing = Time.parse("#{t.year}-#{t.month}-#{t.day} #{today_closing_time}:00") - t.utc_offset - opening_time_kitchen_delay_minutes.minutes
+    time_today_opening = Time.zone.parse("#{t.year}-#{t.month}-#{t.day} #{today_opening_time}:00") - t.utc_offset
+    time_today_closing = Time.zone.parse("#{t.year}-#{t.month}-#{t.day} #{today_closing_time}:00") - t.utc_offset - opening_time_kitchen_delay_minutes.minutes
     time_today_opening = time_today_opening.in_time_zone(time_zone)
     time_today_closing = time_today_closing.in_time_zone(time_zone)
     

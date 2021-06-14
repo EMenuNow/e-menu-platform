@@ -33,9 +33,6 @@
               </li>
               <% if @restaurant.present? && @restaurant.id %> 
                 <li>
-                  <%= link_to("Active Menus", manager_restaurant_active_path(@restaurant)) %>
-                </li>
-                <li>
                   <%= link_to("Menus", manager_restaurant_menus_path(@restaurant)) %>
                 </li>
                 <li>
@@ -52,9 +49,6 @@
                 </li>
                 <li>
                   <%= link_to("Discount Codes", manager_discount_codes_path(@restaurant)) %>
-                </li>
-                <li>
-                  <%= link_to("View Menus", menu_manager_home_index_path(@restaurant)) %>
                 </li>
                 <li>
                   <%= link_to("Printer Interfaces", manager_restaurant_pi_interfaces_path(@restaurant)) %>
