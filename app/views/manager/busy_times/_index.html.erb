@@ -6,7 +6,6 @@
 
   <% bts = manager_busy_times.group_by{|x| x.busy_time.strftime("%A, #{x.busy_time.day.ordinalize} %B")}.map{|k,v| {k => v}} %>
   <% bts.each do |bt| %>
-  <%# debugger %>
     <div class="row pt-2">
       <div class="col-lg-3">
         <% date = bt.keys[0] %>

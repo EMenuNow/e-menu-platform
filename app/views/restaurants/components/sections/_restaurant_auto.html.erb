@@ -36,13 +36,13 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
 
   <% 
     menu_id = params[:menu_id].to_i if params[:menu_id].present?
-    menu_id = menu.select{|m| m[:is_available] == true}.first[:id] if menu_id.blank? 
+    menu_id = menu.select{|m| menu_availability.include?(m[:id])}.first[:id] if menu_id.blank?
   %>
 
   <div class='row'>
     <div class='col-sm-12 col-md-12 col-lg-12 col-xl-8 pb-1'>
       <div class="row">
-        <% menu_nav = menu.select{|m| m[:is_available] == true}.map{|a| {name: a[:name], menu_id: a[:id]}}%>
+        <% menu_nav = menu.select{|m| menu_availability.include?(m[:id])}.map{|a| {name: a[:name], menu_id: a[:id]}}%>
         <% menu_nav.each do |menu| %>
         <% next if menu.nil? %>
         <div class="col p-0 m-1 ml-5 mr-5">
