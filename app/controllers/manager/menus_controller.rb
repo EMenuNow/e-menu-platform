@@ -114,7 +114,7 @@ module Manager
             @menu.save
           end
 
-          params[:menu_time][:timed_menu] == "1" ? @menu_time.update(menu_time_params) : @menu_time.destroy
+          params[:node_type] == "menu" && params[:menu_time][:timed_menu] == "1" ? @menu_time.update(menu_time_params) : @menu_time.destroy
 
           @menu.translate
 
