@@ -1,4 +1,27 @@
+<% content_for :js do %>
+  <script>
+    $(document).ready(function() {
+      $('.select-all').click(function () {
+        var set = $(this).parent();
+        var group = set.find('input:checkbox');
+        var checked = set.find('input:checkbox:checked');
 
+        if (checked.length == group.length) {
+          $(this).removeClass('selected');
+          group.prop('checked', $(this).hasClass('selected'));
+        } else {
+          $(this).addClass('selected');
+          group.prop('checked', $(this).hasClass('selected'));
+        };
+      });
+
+      $('.allergen-check').on('change', function () {
+        var allergenId = this.value
+        $(`.allergen-check-group :input[type=checkbox][value=${allergenId}]`).not(this).prop("checked", false);
+      })
+    });
+  </script>
+<% end %>
 
 <%= form_with(model: [:manager, @restaurant, @custom_list, custom_list_item], local: true) do |form| %>
   <% if custom_list_item.errors.any? %>
@@ -13,39 +36,144 @@
     </div>
   <% end %>
 
+  <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true"><%= t('menu.details')%></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="allergens-tab" data-toggle="tab" href="#allergens" role="tab" aria-controls="allergens" aria-selected="false"><%= t('menu.allergens')%></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="categories-tab" data-toggle="tab" href="#categories" role="tab" aria-controls="categories" aria-selected="false"><%= t('menu.categories')%></a>
+    </li>
+  </ul>
 
-
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :name %>
-        <%= form.text_field :name, class: 'form-control  form-control-sm' %>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade pt-3  pb-3 show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+      <div class="row">
+        <div class="col">
+          <div class="form-group ">
+            <%= form.label :name %>
+            <%= form.text_field :name, class: 'form-control  form-control-sm' %>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="form-group ">
+            <%= form.label :price %>
+            <%= form.number_field :price, class: 'form-control  form-control-sm', step: :any  %>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="form-group ">
+            <%= form.label :description %>
+            <%= form.text_area :description, class: 'form-control  form-control-sm' %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade pt-3  pb-3" id="allergens" role="tabpanel" aria-labelledby="allergens-tab">
+      <div class="row allergen-check-group">
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-12">
+              <h5 class="text-center pb-2">
+                Contains:
+              </h5>
+            </div>
+          </div>
+          <div class="row">
+            <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
+              <% @allergens.each do |a| %>
+                <%= label_tag do %>
+                  <%= check_box_tag "contains_allergen_id[#{a.id}]", a.id, custom_list_item.categorisations_clis.contains_allergen.where(menu_item_categorisation_id: a.id).any?, name: "contains_allergen_ids[]", class: "allergen-check" %>
+                  <li class="allergen-level-yes"><span class="<%= a.icon %>"></span><%= a.name.humanize %></li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-12">
+              <h5 class="text-center pb-2">
+                May contain:
+              </h5>
+            </div>
+          </div>
+          <div class="row">
+            <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
+              <% @allergens.each do |a| %>
+                <%= label_tag do %>
+                  <%= check_box_tag "may_contain_allergen_id[#{a.id}]", a.id, custom_list_item.categorisations_clis.may_contain_allergen.where(menu_item_categorisation_id: a.id).any?, name: "may_contain_allergen_ids[]", class: "allergen-check" %>
+                  <li class="allergen-level-may"><span class="<%= a.icon %>"></span> <%= a.name.humanize %></li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-12">
+              <h5 class="text-center pb-2">
+                Suitable for:
+              </h5>
+            </div>
+          </div>
+          <div class="row">
+            <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
+              <% @diets.each do |d| %>
+                <%= label_tag do %>
+                  <%= check_box_tag "dietary_id[#{d.id}]", d.id, custom_list_item.categorisations_clis.dietary.where(menu_item_categorisation_id: d.id).any?, name: "dietary_ids[]" %>
+                  <li class="suitable-level-yes"><span class="<%= d.icon %>"></span><%= d.name.humanize %></li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade pt-3  pb-3" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+      <div class="row">
+        <div class="col">
+          <div class="row ml-1">
+            <div lass="col ">
+              <h6>Categories</h6>
+              <% @categories.each do |c| %>
+                <div class="collection-check-box">
+                  <%= label_tag do %>
+                    <%= check_box_tag "menu_item_categorisation_id[#{c.id}]", c.id, custom_list_item.categorisations_clis.category.where(menu_item_categorisation_id: c.id).any?, name: "menu_item_categorisation_ids[]" %>
+                    <i class="<%= c.icon %>"> <%= c.name.humanize %></i>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row">
+            <div class="col">
+              <h6>Spice Level</h6>
+              <% @spice_levels.each do |spice| %>
+              <div class="form-check">
+                <%= form.radio_button :spice_level_id, spice.id%>
+                <%= form.label spice.name %>
+              </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :price %>
-        <%= form.number_field :price, class: 'form-control  form-control-sm', step: :any  %>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col">
-      <div class="form-group ">
-        <%= form.label :description %>
-        <%= form.text_area :description, class: 'form-control  form-control-sm' %>
-      </div>
-    </div>
-  </div>
-
-
-    <%= form.hidden_field :custom_list_id, value: @custom_list.id %>
-
+  <%= form.hidden_field :custom_list_id, value: @custom_list.id %>
   <div class="actions">
     <%= form.submit (action_name == "edit" ? "Update Option Set Item" : "Create Option Set Item"), class: "btn btn-warning mt-2" %>
   </div>
+
 <% end %>

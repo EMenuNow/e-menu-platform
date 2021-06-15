@@ -83,6 +83,43 @@
             </div>
 
             <div class="row border-top mt-2 pt-1">
+            
+            <% if params[:dietary_ids].present? or params[:contains_allergen_ids].present? or params[:may_contain_allergen_ids].present? %>
+                <div class='col bg-dark mb-2 p-0'>
+                  <div class="pn-ProductNav_Wrapper">
+                    <nav id="pnFilterNav" class="pn-ProductNav dragscroll" data-overflowing="both">
+                      <ul id="pnFilterNavContents" class="row pn-ProductNav_Contents pn-ProductNav_Contents-no-transition eicon-list eicon-x-small ng-scope m-0 align-items-center h-100" style="transform: none;">
+                        <span class="pn-ProductNav_Link" aria-selected="true" class="py-0">Menu Filters:</span>
+
+                        <% if params[:dietary_ids].present? or params[:contains_allergen_ids].present? or params[:may_contain_allergen_ids].present? %>
+                          <%= link_to restaurant_filter_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id]), class: 'pn-ProductNav_Link p-1',  "aria-selected" => "true" do %>
+                            <% @diets.each do |diet| %>
+                              <% if params[:dietary_ids]&.include?(diet.id.to_s) %>
+                                <li class="suitable-level-yes my-0 p-0"><span class="<%= diet.icon %>"></span></li>
+                              <% end %>
+                            <% end %>
+                            <% @allergens.each do |allergen| %>
+                              <% if params[:contains_allergen_ids]&.include?(allergen.id.to_s) %>
+                                <li class="allergen-level-yes my-0 p-0"><span class="<%= allergen.icon %>"></li>
+                              <% end %>
+                            <% end %>
+                            <% @allergens.each do |allergen| %>
+                              <% if params[:may_contain_allergen_ids]&.include?(allergen.id.to_s) %>
+                                <li class="allergen-level-may my-0 p-0"><span class="<%= allergen.icon %>"></li>
+                              <% end %>
+                            <% end %>
+                          <% end %>
+                          <%= link_to "Clear filters", restaurant_path(@restaurant.path, menu_id: params[:menu_id].presence, section_id: params[:section_id].presence, filter: 'clear'), class: 'pn-ProductNav_Link' %>
+                        <% else %>
+                          <%= link_to 'Diet & Allergens', restaurant_filter_path(@restaurant.path, menu_id: params[:menu_id].presence, section_id: params[:section_id].presence), class: 'pn-ProductNav_Link' %>
+                        <% end %>
+
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+            <% end %>
+
               <% custom_lists = [] #item[:custom_lists] %>
 
               <% item[:custom_lists].each do |l| %>
@@ -128,22 +165,60 @@
                     </div>
                   </div>
   
+                  <% clis = [] %>
                   <% list[1].each_with_index do |item_id, index| %>
                     <% cli = custom_list_item(item_id)%>
 
                     <% required_lists << custom_list.id if custom_list.required_items? %>
-
-                    <div class="row m-2 p-1 border<%= " alert alert-danger" if !cli.available %>">
-                      <div class='col'>
-                        <label>
-                          <%= check_box_tag "item-#{cli.id}", "item-#{cli.id}-#{main_item}", nil, id:"custom-item-#{cli.id}", class: "selection-item selection-item-#{main_item}", 'data-price' => ("%.2f" % cli.price).to_f, 'data-start_price' => start_price, 'data-scope' => main_item,'data-constraint' => custom_list.constraint, 'data-id' => cli.id, disabled: !cli.available %> <small><strong><%=cli.name%><%= " (Unavailable)" if !cli.available %></strong> <% if cli.description.present?%>  <i>- <%=cli.description%></i><% end %></small>
-                        </label>
+                    <% if params[:dietary_ids].present? %>
+                      <% veggie_id = MenuItemCategorisation.where("lower(name) = ?", 'vegetarian').first.id.to_s %>
+                      <% also_veggie = cli.menu_item_categorisations.where(name: 'vegan').any? && params[:dietary_ids].include?(veggie_id) %>
+                      <% next unless (params[:dietary_ids] + (also_veggie ? [veggie_id] : []) - (cli.categorisations_clis.dietary.map{|mic| mic.menu_item_categorisation_id.to_s} + (also_veggie ? [veggie_id] : []))).empty? %>
+                    <% end %>
+                    <% if params[:may_contain_allergen_ids].present? %>
+                      <% next unless (cli.categorisations_clis.allergies.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:may_contain_allergen_ids]).empty? %>
+                    <% end %>
+                    <% if params[:contains_allergen_ids].present? %>
+                      <% next unless (cli.categorisations_clis.contains_allergen.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:contains_allergen_ids]).empty? %>
+                    <% end %>
+                    <% clis << cli %>
+                  <% end %>
+                  <% if clis.blank? %>
+                    <%= render 'restaurants/components/no_option' %>
+                  <% else %>
+                    <% clis.each do |cli| %>
+                      <div class="row m-2 p-1 border<%= " alert alert-danger" if !cli.available %>">
+                        <div class='col px-1'>
+                          <label class="m-0">
+                            <%= check_box_tag "item-#{cli.id}", "item-#{cli.id}-#{main_item}", nil, id:"custom-item-#{cli.id}", class: "selection-item selection-item-#{main_item}", 'data-price' => ("%.2f" % cli.price).to_f, 'data-start_price' => start_price, 'data-scope' => main_item,'data-constraint' => custom_list.constraint, 'data-id' => cli.id, disabled: !cli.available %>
+                            <small>
+                              <strong><%=cli.name%><%= " (Unavailable)" if !cli.available %></strong>
+                              <% if cli.description.present?%>
+                                <i>- <%=cli.description%></i>
+                              <% end %>
+                              <% if cli.categorisations_clis.allergies.any? %>
+                                <ul class="d-inline eicon-list col mb-0 p-1 eicon-x-small ng-scope">
+                                  <% cli.categorisations_clis.contains_allergen.each do |allergen| %>
+                                    <li class="allergen-level-yes mb-0 p-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
+                                  <% end %>
+                                  <% cli.categorisations_clis.may_contain_allergen.each do |allergen| %>
+                                    <li class="allergen-level-may mb-0 p-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
+                                  <% end %>
+                                  <% cli.categorisations_clis.dietary.each do |diet| %>
+                                    <li class="suitable-level-yes mb-0 p-1"><span class="<%= diet.menu_item_categorisation.icon %>"></span></li>
+                                  <% end %>
+                                </ul>
+                              <% end %>
+                            </small>
+                          </label>
+                        </div>
+                        <%  if cli.price.to_f > 0.0 %>
+                          <div class='col-auto px-1 text-right'>
+                            <small><%=number_to_currency(cli.price, unit: "+#{@restaurant.currency_symbol}") %></small>
+                          </div>
+                        <% end %>
                       </div>
-                      <div class='col-3 text-right'>
-                        <small><%=number_to_currency(cli.price, unit: "+#{@restaurant.currency_symbol}") if cli.price.to_f > 0.0 %></small>
-                      </div>
-                    </div>
-
+                    <% end %>
                   <% end %>
                 </div>
               <% end %>
