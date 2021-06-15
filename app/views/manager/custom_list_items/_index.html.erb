@@ -35,8 +35,10 @@
     <tr>
       <th>Name</th>
       <th>Description</th>
+      <th>Diet & Allergens</th>
+      <th>Categories</th>
       <th>Price</th>
-      <th colspan="2"></th>
+      <th colspan="3"></th>
     </tr>
   </thead>
 
@@ -45,6 +47,24 @@
       <tr id='item-<%= custom_list_item.id %>' class="<%= "alert alert-danger" if !custom_list_item.available %>">
         <td><%= custom_list_item.name %></td>
         <td><%= custom_list_item.description %></td>
+        <td>
+          <ul class="d-inline col-lg-1 eicon-list eicon-x-small">
+            <% custom_list_item.categorisations_clis.contains_allergen.each do |allergen| %>
+              <li class="allergen-level-yes"><span class="<%= allergen&.menu_item_categorisation&.icon %>"></span></li>
+            <% end %>
+            <% custom_list_item.categorisations_clis.may_contain_allergen.each do |allergen| %>
+              <li class="allergen-level-may"><span class="<%= allergen&.menu_item_categorisation&.icon %>"></span></li>
+            <% end %>
+            <% custom_list_item.categorisations_clis.dietary.each do |diet| %>
+              <li class="suitable-level-yes"><span class="<%= diet&.menu_item_categorisation&.icon %>"></span></li>
+            <% end %>
+          </ul>
+        </td>
+        <td>
+          <% custom_list_item.categorisations_clis.category.each do |category| %>
+            <i class="<%= category&.menu_item_categorisation&.icon %>"></i>
+          <% end %>
+        </td>
         <td><%= number_to_currency(custom_list_item.price, unit: restaurant.currency_symbol) %></td>
 
         <td class="switches w-25"> 

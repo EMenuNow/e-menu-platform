@@ -210,8 +210,23 @@
         <% custom_list.custom_list_items.each do |item| %>
 
           <div class="collection-check-box my-2">
-            <input type="checkbox" value="<%=item.id%>" name="menu[custom_lists][<%=custom_list.id%>][]" id="menu_custom_lists_<%=custom_list.id%>-<%=item.id%>" <%=checked?(menu.custom_lists, custom_list.id, item.id)%>>
-            <i class=""><%= item.name%> <small>(<%= number_to_currency item.price, unit: @restaurant.currency_symbol%>)</small></i>
+            <label class="my-1">
+              <input type="checkbox" value="<%=item.id%>" name="menu[custom_lists][<%=custom_list.id%>][]" id="menu_custom_lists_<%=custom_list.id%>-<%=item.id%>" <%=checked?(menu.custom_lists, custom_list.id, item.id)%>>
+              <i class=""><%= item.name%> <small>(<%= number_to_currency item.price, unit: @restaurant.currency_symbol%>)</small></i>
+            </label>
+            <% if item.categorisations_clis.allergies.any? %>
+              <ul class="d-inline eicon-list col mb-0 p-1 eicon-x-small ng-scope">
+                <% item.categorisations_clis.contains_allergen.each do |allergen| %>
+                  <li class="allergen-level-yes mb-0 p-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
+                <% end %>
+                <% item.categorisations_clis.may_contain_allergen.each do |allergen| %>
+                  <li class="allergen-level-may mb-0 p-1"><span class="<%= allergen.menu_item_categorisation.icon %>"></span></li>
+                <% end %>
+                <% item.categorisations_clis.dietary.each do |diet| %>
+                  <li class="suitable-level-yes mb-0 p-1"><span class="<%= diet.menu_item_categorisation.icon %>"></span></li>
+                <% end %>
+              </ul>
+            <% end %>
             <i><%= link_to '[edit]', edit_manager_restaurant_custom_list_custom_list_item_path(@restaurant, custom_list, item), class: "text-muted" %></i>
           </div>
 

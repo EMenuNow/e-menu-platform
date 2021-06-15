@@ -13,7 +13,7 @@ class RestaurantsController < ApplicationController
     if params[:filter] == 'clear'
       clear_cookie
     else
-      update_cookie
+      update_cookie if params[:filter] == 'update'
       restore_cookie
     end
   end
