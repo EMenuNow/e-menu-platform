@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_09_095101) do
+ActiveRecord::Schema.define(version: 2021_06_15_074051) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,6 +52,17 @@ ActiveRecord::Schema.define(version: 2021_06_09_095101) do
     t.index ["restaurant_id"], name: "index_busy_times_on_restaurant_id"
   end
 
+  create_table "categorisations_clis", force: :cascade do |t|
+    t.bigint "custom_list_item_id"
+    t.bigint "menu_item_categorisation_id"
+    t.boolean "contains"
+    t.boolean "may_contain"
+    t.boolean "dietary"
+    t.boolean "category"
+    t.index ["custom_list_item_id"], name: "index_categorisations_clis_on_custom_list_item_id"
+    t.index ["menu_item_categorisation_id"], name: "index_categorisations_clis_on_menu_item_categorisation_id"
+  end
+
   create_table "cook_levels", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -89,6 +100,7 @@ ActiveRecord::Schema.define(version: 2021_06_09_095101) do
     t.datetime "updated_at", null: false
     t.integer "cloned_from"
     t.boolean "available", default: true
+    t.bigint "spice_level_id"
     t.index ["custom_list_id"], name: "index_custom_list_items_on_custom_list_id"
   end
 

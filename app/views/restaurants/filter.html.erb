@@ -26,6 +26,7 @@
 <%= form_tag restaurant_path(@restaurant.path), method: :get do %>
   <%= hidden_field_tag "menu_id", params[:menu_id] %>
   <%= hidden_field_tag "section_id", params[:section_id] %>
+  <%= hidden_field_tag "filter", "update" %>
   <div class="container">
     <div class="row text-center mb-5">
       <div class="col-md-12">
@@ -65,7 +66,7 @@
                       <div class="col-6 mx-auto">
                         <% dietary_ids = pallergens.map{|x|x.menu_item_categorisation.id.to_s if x.menu_item_categorisation.type == "Dietary"}.reject(&:nil?) %>
                         <% contains_allergen_ids = pallergens.map{|x|x.menu_item_categorisation.id.to_s if x.menu_item_categorisation.type == "Allergen"}.reject(&:nil?) %>
-                        <%= link_to "Filter", restaurant_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: dietary_ids, contains_allergen_ids: contains_allergen_ids), class: 'btn btn-warning btn-block' %>
+                        <%= link_to "Filter", restaurant_path(@restaurant.path, menu_id: params[:menu_id], section_id: params[:section_id], dietary_ids: dietary_ids, contains_allergen_ids: contains_allergen_ids, filter: 'update'), class: 'btn btn-warning btn-block' %>
                       </div>
                     </div>
                   </div>
