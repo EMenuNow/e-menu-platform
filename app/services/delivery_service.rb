@@ -14,7 +14,7 @@ class DeliveryService < ApplicationController
         addressLine2: @receipt.restaurant.address_2, # Required - needs splitting out to line 1 and city
         city: @receipt.restaurant.city, # Required - needs city creating
         postCode: @receipt.restaurant.postcode, # Required
-        country: @receipt.restaurant.country, # Required - needs country creating
+        country: @receipt.restaurant.country_name, # Required - needs country creating
         phone: @receipt.restaurant.telephone, # Required
         # instructions: @receipt.restuarant.pickup_note, # Optional
         email: @receipt.restaurant.email, # Required
@@ -30,7 +30,7 @@ class DeliveryService < ApplicationController
         addressLine2: @receipt.address_2, # Required
         city: @receipt.city, # Required - needs city creating
         postCode: @receipt.post_code, # Required - needs postcode creating
-        country: @receipt.country_code, # Required - needs country creating
+        country: @receipt.country_name, # Required - needs country creating
         phone: @receipt.telephone, # Required
         # instructions: @receipt.delivery_note,  # Optional
         email: @receipt.email, # Required
@@ -70,12 +70,12 @@ class DeliveryService < ApplicationController
   def establish_order
     # Call delivery service API with receipt at checkout stage
     # Returns the delivery distance & estimated time
-    responose = Faraday.post(@url, @obj, "Content-Type" => "application/json")
+    responose = Faraday.post(@url, @receipt, "Content-Type" => "application/json")
   end
 
   def create_order
     # Send data to delivery service API to create Orkestro order
-    responose = Faraday.post(@url, @obj, "Content-Type" => "application/json")
+    responose = Faraday.post(@url, @receipt, "Content-Type" => "application/json")
   end
 
 end
