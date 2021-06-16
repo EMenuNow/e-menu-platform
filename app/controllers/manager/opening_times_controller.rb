@@ -87,6 +87,6 @@ class Manager::OpeningTimesController < Manager::BaseController
 
   # Only allow a list of trusted parameters through.
   def manager_opening_time_params
-    params.require(:opening_time).permit(:restaurant_id, :delay_time_minutes, :kitchen_delay_minutes, :cut_off_days, :advanced_order_days, times: {})
+    params.require(:opening_time).permit(:restaurant_id, :delay_time_minutes, :kitchen_delay_minutes, :cut_off_days, :advanced_order_days, :max_orders, times: {})
   end
 end

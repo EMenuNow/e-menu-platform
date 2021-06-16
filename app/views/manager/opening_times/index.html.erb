@@ -72,6 +72,15 @@
           </div>
         </div>
 
+        <div class="row">
+          <div class="col-sm-4 text-right pb-1">
+            Maximum orders per time-slot
+          </div>
+          <div class="col-sm-6 pb-1">
+            <%= @manager_opening_time.max_orders == 0 ? 'No limit' : pluralize(@manager_opening_time.max_orders, 'order') %>
+          </div>
+        </div>
+
         <div class="row mb-4 border-bottom">
           <div class="col-sm-4">
             <%= link_to 'Edit', edit_manager_restaurant_opening_time_path(@restaurant, @manager_opening_time) %>

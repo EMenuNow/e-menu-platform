@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_15_074051) do
+ActiveRecord::Schema.define(version: 2021_06_16_131346) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 2021_06_15_074051) do
     t.bigint "restaurant_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "unavailable", default: true
     t.index ["restaurant_id"], name: "index_busy_times_on_restaurant_id"
   end
 
@@ -300,6 +301,7 @@ ActiveRecord::Schema.define(version: 2021_06_15_074051) do
     t.boolean "close_early", default: false
     t.integer "cut_off_days", default: 0
     t.integer "advanced_order_days", default: 2
+    t.integer "max_orders", default: 0
     t.index ["restaurant_id"], name: "index_opening_times_on_restaurant_id"
   end
 

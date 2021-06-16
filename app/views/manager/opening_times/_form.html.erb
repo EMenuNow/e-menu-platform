@@ -201,6 +201,18 @@
 
     <div class="row">
       <div class="col-sm-4 pb-1">
+        <div class="form-group ">
+          <%= form.label 'Maximum number of orders per time-slot (0 for no limit)' %>
+        <%= form.number_field :max_orders, {min: 0, class: 'form-control validate-item'} %>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="row">
+      <div class="col-sm-4 pb-1">
         <div id="validation-warning" class="form-group">
           <%= form.label 'Please ensure every weekday either has valid opening and closing times, or is selected closed' %>
         </div>

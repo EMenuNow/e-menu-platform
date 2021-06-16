@@ -1,3 +1,25 @@
+<% content_for :js do %>
+
+  <script>
+  
+    $(function(){
+      $('.busy-time-toggle').on('change', function() {
+        busy_time_id = $(this).val();
+        busy_time_checked = $(this).is(':checked');
+        busy_time_available = $(`#available_${busy_time_id}`);
+
+        if (busy_time_checked) {
+            busy_time_available.text('Available');
+          } else {
+            busy_time_available.text('Unavailable');
+        }
+      })
+    })
+  
+  </script>
+
+<% end %>
+
 <h1>Busy Times</h1>
 
 <p>Allocated busy times will be unavailable for customers to place orders for</p>
@@ -12,18 +34,50 @@
         <h5><%= date %></h5>
       </div>
     </div>
-    <% times = bt[date] %>
-    <% times.each do |t| %>
-      <div class="row justify-content-start">
-        <div class="col-6 col-sm-4 col-md-2 text-right">
-          <% dt = t.busy_time.in_time_zone(@restaurant.time_zone) %>
-          <small><i class="far fa-clock"></i></small><%= dt.strftime(" %H:%M") %>
-        </div>
-        <div class="col-6 col-sm-8 col-md-10">
-          <%= link_to "Delete", manager_restaurant_busy_time_path(t.restaurant, t), method: :delete, data: { confirm: "Are you sure?" } %>
-        </div>
+
+    <div class="row">
+      <div class="col-xl-4 col-lg-6 col-md-8 col-sm-12">
+        <table class="text-center" style="width:100%">
+          <tr>
+            <th>Time</th>
+            <th>Order Count</th>
+            <th>Override</th>
+            <th>Actions</th>
+          </tr>
+          <% times = bt[date] %>
+          <% times.each do |t| %>
+            <tr>
+              <td>
+                <% dt = t.busy_time.in_time_zone(@restaurant.time_zone) %>
+                <small><i class="far fa-clock"></i></small><%= dt.strftime(" %H:%M") %>
+              </td>
+              <td>
+                <%= pluralize(@restaurant.receipts.where(due_date: dt).count, 'order') %>
+              </td>
+              <td class="switches" style="width:120px;"> 
+
+                <%= check_box_tag dom_id(t, :unavailable), t.id, !t.unavailable, data: {
+                                  remote: true,
+                                  url: manager_restaurant_busy_time_toggle_busy_time_path(@restaurant, t),
+                                  method: :post
+                                  }, class: "busy-time-toggle" %>
+                <label for="<%= dom_id(t, :unavailable) %>">
+                  <span id="available_<%= t.id %>" class="management-description pr-2">
+                    <%= !t.unavailable ? "Available" : "Unavailable" %>
+                  </span>
+                  <span></span>
+                </label>
+                
+              </td>
+              <td>
+                <%= link_to "Delete", manager_restaurant_busy_time_path(t.restaurant, t), method: :delete, data: { confirm: "Are you sure?" } %>
+              </td>
+            </tr>
+          <% end %>
+
+        </table>
       </div>
-    <% end %>
+    </div>
   <% end %>
 
 <% else %>
