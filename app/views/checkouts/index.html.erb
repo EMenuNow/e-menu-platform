@@ -135,7 +135,7 @@ function validate(){
   service_type = $('#service_type').val();
   // console.log(service_type);
   if (service_type == 'tableservice'){
-    if (valid_table_number & valid_email){
+    if (valid_table_number & valid_email & valid_telephone & valid_name){
         $('#pay-now-button').show();
     } else {
         $('#pay-now-button').hide();
@@ -209,8 +209,8 @@ function selectService(service_type) {
       $('#group_order').prop('checked', false);
       $('#group-order-boolean').show();
     <% end %>
-    $('#name-field').hide();
-    $('#telephone-field').hide();
+    $('#name-field').show();
+    $('#telephone-field').show();
     $('#email-field').show();
     $('#address-field').hide();
     $('#payment-info').show();

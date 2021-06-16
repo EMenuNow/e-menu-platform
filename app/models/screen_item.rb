@@ -31,7 +31,7 @@ class ScreenItem < ApplicationRecord
     print_receipt = ApplicationController.render(partial: "manager/live/order_item_screen_specific_print", locals: { grouped: false, screen_item: self, restaurant: restaurant_id })
     print_receipt = print_receipt.gsub("&amp;","&").gsub(restaurant.currency_symbol,"")
     header = ""
-    header << "Name: #{receipt.name}\n" if receipt.delivery_or_collection != 'tableservice' 
+    header << "Name: #{receipt.name.titleize}\n" if receipt.name.present? 
     header << "Time: #{receipt.collection_time}\n" if receipt.delivery_or_collection != 'tableservice' 
     header << "Type: #{receipt.delivery_or_collection}\n" 
     header << "Table Number: #{receipt.table_number}\n" if receipt.delivery_or_collection == 'tableservice' 

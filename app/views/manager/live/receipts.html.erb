@@ -1,6 +1,6 @@
-<div class="container">
+<div class="container-fluid">
   <div class="row my-5">
-    <div class="col-10 mx-auto">
+    <div class="col mx-auto">
       <h1 class="py-5">Receipts</h1>
       <%= paginate @receipts %>
       <table class='table'>
@@ -17,8 +17,9 @@
             <th>Basket total</th>
             <th>Delivery Fee</th>
             <th>Item</th>
-            
             <th>Email</th>
+            <th colspan="2">Actions</th>
+
           </tr>
         </thead>
 
@@ -26,7 +27,7 @@
           <% @receipts.order(created_at: :desc).each do |receipt| %>
             <tr>
               <td><%= receipt.created_at.in_time_zone(receipt.restaurant.time_zone).strftime('%Y-%m-%d %H:%M') %></td>
-              <td><%= receipt.name %></td>
+              <td><%= receipt.name.titleize %></td>
               <td><%= receipt.delivery_or_collection %></td>
               <td><%= receipt.table_number %></td>
               <td><%= receipt.telephone %></td>
