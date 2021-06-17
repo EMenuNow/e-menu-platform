@@ -76,67 +76,89 @@
       </div>
     </div>
     <div class="tab-pane fade pt-3  pb-3" id="allergens" role="tabpanel" aria-labelledby="allergens-tab">
-      <div class="row allergen-check-group">
-        <div class="col-md-6">
-          <div class="row">
-            <div class="col-md-12">
-              <h5 class="text-center pb-2">
-                Contains:
-              </h5>
-            </div>
-          </div>
-          <div class="row">
-            <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
-              <% @allergens.each do |a| %>
-                <%= label_tag do %>
-                  <%= check_box_tag "contains_allergen_id[#{a.id}]", a.id, custom_list_item.categorisations_clis.contains_allergen.where(menu_item_categorisation_id: a.id).any?, name: "contains_allergen_ids[]", class: "allergen-check" %>
-                  <li class="allergen-level-yes"><span class="<%= a.icon %>"></span><%= a.name.humanize %></li>
-                <% end %>
-              <% end %>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="row">
-            <div class="col-md-12">
-              <h5 class="text-center pb-2">
-                May contain:
-              </h5>
-            </div>
-          </div>
-          <div class="row">
-            <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
-              <% @allergens.each do |a| %>
-                <%= label_tag do %>
-                  <%= check_box_tag "may_contain_allergen_id[#{a.id}]", a.id, custom_list_item.categorisations_clis.may_contain_allergen.where(menu_item_categorisation_id: a.id).any?, name: "may_contain_allergen_ids[]", class: "allergen-check" %>
-                  <li class="allergen-level-may"><span class="<%= a.icon %>"></span> <%= a.name.humanize %></li>
-                <% end %>
-              <% end %>
-            </ul>
-          </div>
-        </div>
-      </div>
+
       <div class="row">
-        <div class="col-md-6">
-          <div class="row">
-            <div class="col-md-12">
-              <h5 class="text-center pb-2">
-                Suitable for:
-              </h5>
+        <div class="col">
+          <div class="card">
+            <div class="card-header p-1">
+              <h2 class="mb-0">
+                <label class="btn btn-link btn-block my-0 text-left text-dark text-decoration-none" type="button" data-toggle="collapse" data-target="#categoryFiltered" aria-expanded="true" aria-controls="categoryFiltered" id="heading-categoryFiltered">
+                  <%= form.check_box :category_filtered, class: "validate-item" %> Item can be filtered by diet & allergen?
+                </label>
+              </h2>
             </div>
-          </div>
-          <div class="row">
-            <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
-              <% @diets.each do |d| %>
-                <%= label_tag do %>
-                  <%= check_box_tag "dietary_id[#{d.id}]", d.id, custom_list_item.categorisations_clis.dietary.where(menu_item_categorisation_id: d.id).any?, name: "dietary_ids[]" %>
-                  <li class="suitable-level-yes"><span class="<%= d.icon %>"></span><%= d.name.humanize %></li>
-                <% end %>
-              <% end %>
-            </ul>
+            <div id="categoryFiltered" class="collapse<%= custom_list_item.category_filtered ? ' show' : '' %>">
+              <div class="card-body">
+
+                <div class="row allergen-check-group">
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <h5 class="text-center pb-2">
+                          Contains:
+                        </h5>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
+                        <% @allergens.each do |a| %>
+                          <%= label_tag do %>
+                            <%= check_box_tag "contains_allergen_id[#{a.id}]", a.id, custom_list_item.categorisations_clis.contains_allergen.where(menu_item_categorisation_id: a.id).any?, name: "contains_allergen_ids[]", class: "allergen-check" %>
+                            <li class="allergen-level-yes"><span class="<%= a.icon %>"></span><%= a.name.humanize %></li>
+                          <% end %>
+                        <% end %>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <h5 class="text-center pb-2">
+                          May contain:
+                        </h5>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
+                        <% @allergens.each do |a| %>
+                          <%= label_tag do %>
+                            <%= check_box_tag "may_contain_allergen_id[#{a.id}]", a.id, custom_list_item.categorisations_clis.may_contain_allergen.where(menu_item_categorisation_id: a.id).any?, name: "may_contain_allergen_ids[]", class: "allergen-check" %>
+                            <li class="allergen-level-may"><span class="<%= a.icon %>"></span> <%= a.name.humanize %></li>
+                          <% end %>
+                        <% end %>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <h5 class="text-center pb-2">
+                          Suitable for:
+                        </h5>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <ul class="eicon-list ng-scope collection-check-box mx-auto text-center">
+                        <% @diets.each do |d| %>
+                          <%= label_tag do %>
+                            <%= check_box_tag "dietary_id[#{d.id}]", d.id, custom_list_item.categorisations_clis.dietary.where(menu_item_categorisation_id: d.id).any?, name: "dietary_ids[]" %>
+                            <li class="suitable-level-yes"><span class="<%= d.icon %>"></span><%= d.name.humanize %></li>
+                          <% end %>
+                        <% end %>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+
     </div>
     <div class="tab-pane fade pt-3  pb-3" id="categories" role="tabpanel" aria-labelledby="categories-tab">
       <div class="row">
