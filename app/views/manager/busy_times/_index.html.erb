@@ -52,7 +52,7 @@
                 <small><i class="far fa-clock"></i></small><%= dt.strftime(" %H:%M") %>
               </td>
               <td>
-                <%= pluralize(@restaurant.receipts.where(due_date: dt).count, 'order') %>
+                <%= pluralize(@restaurant.receipts.where("due_date >= ? AND due_date < ?", dt, dt+15.minutes).count, 'order') %>
               </td>
               <td class="switches" style="width:120px;"> 
 
