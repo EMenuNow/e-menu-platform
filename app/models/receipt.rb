@@ -241,7 +241,7 @@ class Receipt < ApplicationRecord
     return if restaurant.opening_time.max_orders == 0
     
     t = Time.zone.parse("#{due_date.year}-#{due_date.month}-#{due_date.day} #{due_date.hour}:#{due_date.min/15*15}:00") # due_date rounded down to 15 minute
-    count = restaurant.receipts.where(due_date: t).count
+    count = restaurant.receipts.where("due_date >= ? AND due_date < ?", t, t+15.minutes).count
     bt = restaurant.busy_time.find_by(busy_time: t)
     if count >= restaurant.opening_time.max_orders
       restaurant.busy_time.where(busy_time: t).first_or_create(restaurant_id: restaurant.id, unavailable: true) unless bt&.unavailable == false
