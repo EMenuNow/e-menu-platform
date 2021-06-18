@@ -161,7 +161,9 @@ Rails.application.routes.draw do
       get 'reporting/zreport_show/:daily_reporting_id', to: 'reporting#zreport_show', as: :zreport
       
       resources :opening_times
-      resources :busy_times, except: [:update]
+      resources :busy_times, except: [:update] do
+        post 'toggle_busy_time/:busy_time_id', action: :toggle_busy_time, as: :toggle_busy_time
+      end
       resources :delivery_postcodes
       
       resources :themes

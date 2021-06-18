@@ -55,6 +55,12 @@ class Manager::BusyTimesController < Manager::BaseController
     end
   end
 
+  def toggle_busy_time
+    @busy_time = BusyTime.find(params[:busy_time_id])
+    @busy_time.unavailable = !@busy_time.unavailable
+    @busy_time.save
+  end
+
   private
 
   def set_manager_busy_time

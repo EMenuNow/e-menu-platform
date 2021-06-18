@@ -198,14 +198,14 @@ class Restaurant < ApplicationRecord
       until rounded_t > time_closing - btm
         if rounded_t >= next_time
           is_busy = rounded_t + rounded_t.utc_offset - t.utc_offset
-          delivery_time_options << {value: rounded_t.strftime("%H:%M"), text: "#{rounded_t.strftime("%H:%M")}", busy: busy_times.where(busy_time: is_busy).any?} unless closed
+          delivery_time_options << {value: rounded_t.strftime("%H:%M"), text: "#{rounded_t.strftime("%H:%M")}", busy: busy_times.where(busy_time: is_busy, unavailable: true).any?} unless closed
         end
         rounded_t = rounded_t + 15.minutes
       end
     elsif offset > 0
       until next_time > time_closing
         is_busy = next_time + rounded_t.utc_offset - t.utc_offset
-        delivery_time_options << {value: next_time.strftime("%H:%M"), text: "#{next_time.strftime("%H:%M")}", busy: busy_times.where(busy_time: is_busy).any?} unless closed
+        delivery_time_options << {value: next_time.strftime("%H:%M"), text: "#{next_time.strftime("%H:%M")}", busy: busy_times.where(busy_time: is_busy, unavailable: true).any?} unless closed
         next_time = next_time + 15.minutes
       end
 

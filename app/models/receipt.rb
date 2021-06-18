@@ -6,6 +6,7 @@ class Receipt < ApplicationRecord
   after_create :creation_print
   after_create :item_breakdown
   after_create :group_order_task
+  after_create :check_busy_times
   has_many :screen_items
   belongs_to :discount_code, optional: true
   delegate :id, to: :restaurant, prefix: true
@@ -234,6 +235,19 @@ class Receipt < ApplicationRecord
 
   def group_order_task
     GroupOrderTaskWorker.perform_in(5.minutes, self.id) if self.group_order
+  end
+
+  def check_busy_times
+    return if restaurant.opening_time.max_orders == 0
+    
+    t = Time.zone.parse("#{due_date.year}-#{due_date.month}-#{due_date.day} #{due_date.hour}:#{due_date.min/15*15}:00") # due_date rounded down to 15 minute
+    count = restaurant.receipts.where(due_date: t).count
+    bt = restaurant.busy_time.find_by(busy_time: t)
+    if count >= restaurant.opening_time.max_orders
+      restaurant.busy_time.where(busy_time: t).first_or_create(restaurant_id: restaurant.id, unavailable: true) unless bt&.unavailable == false
+    else
+      return false
+    end
   end
 
   def zreport
