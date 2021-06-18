@@ -185,7 +185,7 @@ class Restaurant < ApplicationRecord
     busy_times = self.busy_time.in_future
     
     busy_now = round_down_t + dtm + round_down_t.utc_offset - t.utc_offset
-    delivery_time_options << {value: "ASAP", text: "ASAP"} if is_open and (round_down_t + dtm < closing_time) and !opening_time_close_early and busy_times.where(busy_time: busy_now).empty? and !closed
+    delivery_time_options << {value: "ASAP", text: "ASAP"} if is_open and (round_down_t + dtm < closing_time) and !opening_time_close_early and busy_times.where(busy_time: busy_now, unavailable: true).empty? and !closed
 
     # Set first available time
     if offset == 0 and (rounded_t > time_opening or opening_time_open_early)
