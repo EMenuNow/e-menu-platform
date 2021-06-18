@@ -173,13 +173,13 @@
                     <% if params[:dietary_ids].present? %>
                       <% veggie_id = MenuItemCategorisation.where("lower(name) = ?", 'vegetarian').first.id.to_s %>
                       <% also_veggie = cli.menu_item_categorisations.where(name: 'vegan').any? && params[:dietary_ids].include?(veggie_id) %>
-                      <% next unless (params[:dietary_ids] + (also_veggie ? [veggie_id] : []) - (cli.categorisations_clis.dietary.map{|mic| mic.menu_item_categorisation_id.to_s} + (also_veggie ? [veggie_id] : []))).empty? %>
+                      <% next unless (params[:dietary_ids] + (also_veggie ? [veggie_id] : []) - (cli.categorisations_clis.dietary.map{|mic| mic.menu_item_categorisation_id.to_s} + (also_veggie ? [veggie_id] : []))).empty? or !cli.category_filtered %>
                     <% end %>
                     <% if params[:may_contain_allergen_ids].present? %>
-                      <% next unless (cli.categorisations_clis.allergies.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:may_contain_allergen_ids]).empty? %>
+                      <% next unless (cli.categorisations_clis.allergies.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:may_contain_allergen_ids]).empty? or !cli.category_filtered %>
                     <% end %>
                     <% if params[:contains_allergen_ids].present? %>
-                      <% next unless (cli.categorisations_clis.contains_allergen.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:contains_allergen_ids]).empty? %>
+                      <% next unless (cli.categorisations_clis.contains_allergen.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:contains_allergen_ids]).empty? or !cli.category_filtered %>
                     <% end %>
                     <% clis << cli %>
                   <% end %>

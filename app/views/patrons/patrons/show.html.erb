@@ -88,8 +88,7 @@
                           <div class="col mb-3">
                             <h1><%=order.restaurant.name%></h1>
                             <div><strong>Payment Date: </strong><%= receipt.created_at.in_time_zone(order.restaurant.time_zone).strftime("%d %B %Y - %H:%M") %></div>
-                            <div><strong>Receipt Number: </strong><%=receipt.uuid%></div>
-                            <% if receipt.delivery_or_collection != 'tableservice'  %><div><strong>Name: </strong><%=receipt.name%></div><% end %>
+                            <% if receipt.name.present?  %><div><strong>Name: </strong><%= receipt.name.titleize %></div><% end %>
                             <div><strong>Type: </strong><%=receipt.delivery_or_collection.camelcase%></div>
                             <% if receipt.delivery_or_collection != 'tableservice'  %><div><strong>Time: </strong><%=receipt.collection_time%></div><% end %>
                             <% if receipt.email.present? %><div><strong>Email: </strong><%=receipt.email%></div><% end %>

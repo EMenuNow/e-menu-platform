@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_16_131346) do
+ActiveRecord::Schema.define(version: 2021_06_17_114124) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -102,6 +102,7 @@ ActiveRecord::Schema.define(version: 2021_06_16_131346) do
     t.integer "cloned_from"
     t.boolean "available", default: true
     t.bigint "spice_level_id"
+    t.boolean "category_filtered", default: false
     t.index ["custom_list_id"], name: "index_custom_list_items_on_custom_list_id"
   end
 

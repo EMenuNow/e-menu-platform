@@ -38,9 +38,12 @@ class CustomListItemsController < Manager::BaseController
     respond_to do |format|
       if @custom_list_item.save
 
-        @allergens.each{|a| ([params[:contains_allergen_ids], params[:may_contain_allergen_ids]].compact.reduce([], :|)).include?(a.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: a.id).first_or_create.update(contains: params[:contains_allergen_ids]&.include?(a.id.to_s), may_contain: params[:may_contain_allergen_ids]&.include?(a.id.to_s), dietary: nil, category: nil) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: a.id)&.destroy}
-        @diets.each{|d| params[:dietary_ids]&.include?(d.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: d.id).first_or_create.update(dietary: true, contains: nil, may_contain: nil, category: nil) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: d.id)&.destroy}
-        @categories.each{|c| params[:menu_item_categorisation_ids]&.include?(c.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: c.id).first_or_create.update(dietary: nil, contains: nil, may_contain: nil, category: true) : CategorisationsCli.find_by(custom_list_item_id: @menu.id, menu_item_categorisation_id: c.id)&.destroy}
+        if @custom_list_item.category_filtered
+          @allergens.each{|a| ([params[:contains_allergen_ids], params[:may_contain_allergen_ids]].compact.reduce([], :|)).include?(a.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: a.id).first_or_create.update(contains: params[:contains_allergen_ids]&.include?(a.id.to_s), may_contain: params[:may_contain_allergen_ids]&.include?(a.id.to_s), dietary: nil, category: nil) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: a.id)&.destroy}
+          @diets.each{|d| params[:dietary_ids]&.include?(d.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: d.id).first_or_create.update(dietary: true, contains: nil, may_contain: nil, category: nil) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: d.id)&.destroy}
+        end
+        
+        @categories.each{|c| params[:menu_item_categorisation_ids]&.include?(c.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: c.id).first_or_create.update(dietary: nil, contains: nil, may_contain: nil, category: true) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: c.id)&.destroy}
 
         format.html { redirect_to manager_restaurant_custom_list_path(@restaurant, @custom_list), notice: 'Option Set item was successfully created.' }
         format.json { render :show, status: :created, location: @custom_list_item }
@@ -65,8 +68,13 @@ class CustomListItemsController < Manager::BaseController
     respond_to do |format|
       if @custom_list_item.update(custom_list_item_params)
 
-        @allergens.each{|a| ([params[:contains_allergen_ids], params[:may_contain_allergen_ids]].compact.reduce([], :|)).include?(a.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: a.id).first_or_create.update(contains: params[:contains_allergen_ids]&.include?(a.id.to_s), may_contain: params[:may_contain_allergen_ids]&.include?(a.id.to_s), dietary: nil, category: nil) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: a.id)&.destroy}
-        @diets.each{|d| params[:dietary_ids]&.include?(d.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: d.id).first_or_create.update(dietary: true, contains: nil, may_contain: nil, category: nil) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: d.id)&.destroy}
+        if @custom_list_item.category_filtered
+          @allergens.each{|a| ([params[:contains_allergen_ids], params[:may_contain_allergen_ids]].compact.reduce([], :|)).include?(a.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: a.id).first_or_create.update(contains: params[:contains_allergen_ids]&.include?(a.id.to_s), may_contain: params[:may_contain_allergen_ids]&.include?(a.id.to_s), dietary: nil, category: nil) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: a.id)&.destroy}
+          @diets.each{|d| params[:dietary_ids]&.include?(d.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: d.id).first_or_create.update(dietary: true, contains: nil, may_contain: nil, category: nil) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: d.id)&.destroy}
+        else
+          @custom_list_item.categorisations_clis.where('contains=? OR may_contain=? OR dietary=?', true, true, true).destroy_all
+        end
+
         @categories.each{|c| params[:menu_item_categorisation_ids]&.include?(c.id.to_s) ? CategorisationsCli.where(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: c.id).first_or_create.update(dietary: nil, contains: nil, may_contain: nil, category: true) : CategorisationsCli.find_by(custom_list_item_id: @custom_list_item.id, menu_item_categorisation_id: c.id)&.destroy}
 
         format.html { redirect_to manager_restaurant_custom_list_path(@restaurant, @custom_list), notice: 'Option Set item was successfully updated.' }
@@ -133,7 +141,7 @@ class CustomListItemsController < Manager::BaseController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def custom_list_item_params
-      params.require(:custom_list_item).permit(:name, :custom_list_id, :custom_list_item_id, :price, :description, :available, :spice_level_id, menu_item_categorisation_ids: [], contains_allergen_ids: [], may_contain_allergen_ids: [])
+      params.require(:custom_list_item).permit(:name, :custom_list_id, :custom_list_item_id, :price, :description, :available, :spice_level_id, :category_filtered, menu_item_categorisation_ids: [], contains_allergen_ids: [], may_contain_allergen_ids: [])
     end
 
     def clear_list_item(list_id, list_item_id)
