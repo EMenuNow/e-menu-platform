@@ -10,8 +10,8 @@
       </svg>
 
     </button>
-    <%= link_to current_manager_restaurant_user ? manager_home_index_path : new_manager_restaurant_user_session_path, class: "navbar-brand" do %>
-    <%= image_tag("logo/Logo__icon_v1.0.0-dark-bkg.svg", height: '20', width: 'auto') %> <i class="fa fa-home fa-1x mt-1 text-white" style="top: 2px;position: relative;"></i>
+    <%= link_to current_manager_restaurant_user ? manager_home_index_path : new_manager_restaurant_user_session_path, class: "navbar-brand my-auto py-0" do %>
+    <%= image_tag("logo/Logo__icon_v2.0.0-dark-bkg.svg", height: '30', width: 'auto') %> <i class="fa fa-home fa-1x mt-1 text-white" style="top: 2px;position: relative;"></i>
     <% end %>
 
     <% if current_manager_restaurant_user %>
