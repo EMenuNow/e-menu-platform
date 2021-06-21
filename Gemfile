@@ -48,7 +48,6 @@ gem 'rubyzip', '= 1.0.0'
 gem 'axlsx', '= 2.0.1'
 gem 'axlsx_rails'
 gem 'wicked_pdf'
-gem 'wkhtmltopdf-binary'
 
 gem 'aasm'
 gem 'rqrcode'
@@ -101,6 +100,7 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'railroady'
+  gem 'wkhtmltopdf-binary'
 end
 
 group :test do
