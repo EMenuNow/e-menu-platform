@@ -35,8 +35,8 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
   </div>
 
   <% 
-    menu_id = params[:menu_id].to_i if params[:menu_id].present?
-    menu_id = menu.select{|m| menu_availability.include?(m[:id])}.first[:id] if menu_id.blank?
+    menu_id = params[:menu_id].to_i if params[:menu_id].present? && menu_availability.include?(params[:menu_id].to_i)
+    menu_id = menu.select{|m| menu_availability.include?(m[:id])}.first[:id] if menu_id.nil?
   %>
 
   <div class='row'>
@@ -67,7 +67,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
               <div class="container-fluid p-0">
                 <% nav_items = m[:children].map{|a| {name: a[:name], id: a[:id]}} %>
                 <% 
-                  current_section = (params[:section_id].presence || nav_items.first[:id]).to_i
+                  current_section = menu_availability.include?(params[:menu_id]) ? (params[:section_id].presence || nav_items.first[:id]).to_i : nav_items.first[:id].to_i
                 %>
                 <div class='row bg-dark'>
                   <div class='col bg-dark p-0'>

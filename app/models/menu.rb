@@ -58,7 +58,7 @@ class Menu < ApplicationRecord
   end
 
   def is_available?
-    return true if !self.menu_time
+    return restaurant.active_menu_ids.include?(self.id) if !self.menu_time
 
     t = Time.new.in_time_zone(self.restaurant.time_zone)
     today_day = t.strftime("%A").downcase
