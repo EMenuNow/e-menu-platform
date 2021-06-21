@@ -13,8 +13,8 @@
     <% if @restaurant && @restaurant.image.attached? %>
       <%#= link_to (image_tag @restaurant.image, height: 23, width: 'auto'), restaurant_path(@restaurant.path), class:"navbar-brand" %>
     <% else %>
-      <%= link_to root_path, :class=>"navbar-brand" do %>
-        <%= image_tag("logo/Logo__icon_v1.0.0-dark-bkg.svg", height: '20', width: 'auto') %>
+      <%= link_to root_path, :class=>"navbar-brand my-auto py-0" do %>
+        <%= image_tag("logo/Logo__icon_v2.0.0-dark-bkg.svg", height: '30', width: 'auto') %>
       <% end %>
     <% end %>
     <button class="navbar-toggler invisible" type="button">
