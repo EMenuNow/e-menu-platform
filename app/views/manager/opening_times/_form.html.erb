@@ -1,3 +1,76 @@
+<% content_for :js do %>
+  <script>
+    var openingTimes = <%= manager_opening_time.times.to_json.html_safe %>;
+
+    var closedDays = [];
+
+    for (const [key, value] of Object.entries(openingTimes)) {
+      var open = parseInt(value.open.replace(/\D/g,''));
+      var close = parseInt(value.close.replace(/\D/g,''));
+      if (open >= close) {
+        closedDays.push(key);
+      };
+    };
+
+    $(document).ready(function () {
+
+      function validate() {
+        var count = 0;
+
+        $('select').each(function(){
+          if($(this).val() == ""){
+            count ++;
+          };
+        });
+        if (count == 0) {
+          $('#validation-warning').hide();
+          $(':input[type="submit"]').prop('disabled', false);
+        } else {
+          $('#validation-warning').show();
+          $(':input[type="submit"]').prop('disabled', true);
+        }
+      };
+
+      function closedDay(day, status) {
+        var $openDay = $(`#opening_time_times\\[${day}\\]\\[open\\]`)
+        var $closeDay = $(`#opening_time_times\\[${day}\\]\\[close\\]`)
+
+        if (status) {
+          $openDay.val("00:00");
+          $closeDay.val("00:00");
+
+          $openDay.prop("disabled", true);
+          $closeDay.prop("disabled", true);
+        } else {
+          $openDay.val(openingTimes[`${day}`]['open']);
+          $closeDay.val(openingTimes[`${day}`]['close']);
+
+          $openDay.prop("disabled", false);
+          $closeDay.prop("disabled", false);
+        }
+      };
+
+      closedDays.forEach(function(day) {
+        $(`#${day}-closed`).prop('checked', true);
+        closedDay(`${day}`, 'checked');
+      });
+
+      $('.closed-day').on( "click", function() {closedDay($(this).val(), $(this).prop('checked'))} )
+
+      $('.validate-item').on("change", validate);
+
+      validate();
+
+      $('form').bind('submit', function () {
+        $(this).find(':input').prop('disabled', false);
+      });
+
+    });
+
+  </script>
+<% end %>
+
+
 <%= form_with(model: ['manager', @restaurant, manager_opening_time], local: true) do |form| %>
   <% if manager_opening_time.errors.any? %>
     <div id="error_explanation">
@@ -28,6 +101,11 @@
            <h5><strong>Closing</strong></h5>
         </div>
       </div>
+      <div class="col-sm-2 pb-1">
+        <div class="form-group ">
+           <h5><strong>Closed?</strong></h5>
+        </div>
+      </div>
     </div>
 
 
@@ -43,13 +121,18 @@
       <div class="col-sm-2 pb-1">
         <div class="form-group ">
           <% set_time = manager_opening_time.times[dow]['open'] if manager_opening_time.times.present? %>
-          <%= form.select "times[#{dow}][open]", options_for_select(OpeningTime.available_times(30).map{|a| a.strftime("%H:%M")}, set_time), {prompt: 'Choose Time'}, {class: 'form-control'} %>
+          <%= form.select "times[#{dow}][open]", options_for_select(OpeningTime.available_times(30).map{|a| a.strftime("%H:%M")}, set_time), {prompt: 'Choose Time'}, {class: 'select-opening form-control validate-item'} %>
         </div>
       </div>
       <div class="col-sm-2 pb-1">
         <div class="form-group ">
           <% set_time_close = manager_opening_time.times[dow]['close'] if manager_opening_time.times.present? %>
-          <%= form.select "times[#{dow}][close]", options_for_select(OpeningTime.available_times(30).map{|a| a.strftime("%H:%M")}, set_time_close), {prompt: 'Choose Time'}, {class: 'form-control'} %>
+          <%= form.select "times[#{dow}][close]", options_for_select(OpeningTime.available_times(30).map{|a| a.strftime("%H:%M")}, set_time_close), {prompt: 'Choose Time'}, {class: 'select-closing form-control validate-item'} %>
+        </div>
+      </div>
+      <div class="col-sm-2 pb-1">
+        <div class="form-group ">
+          <input type="checkbox" id="<%= dow %>-closed" name="<%= dow %>-closed" value="<%= dow %>" class="closed-day validate-item">
         </div>
       </div>
     </div>
@@ -72,7 +155,7 @@
       <div class="col-sm-4 pb-1">
         <div class="form-group ">
           <%= form.label 'Time BEFORE earliest collection / delivery (minutes)' %>
-          <%= form.select :delay_time_minutes, options_for_select(@time_settings, manager_opening_time.delay_time_minutes), {prompt: 'Choose Delay'}, {class: 'form-control'} %>
+          <%= form.select :delay_time_minutes, options_for_select(@time_settings, manager_opening_time.delay_time_minutes), {prompt: 'Choose Delay'}, {class: 'form-control validate-item'} %>
         </div>
       </div>
     </div>
@@ -84,7 +167,7 @@
       <div class="col-sm-4 pb-1">
         <div class="form-group ">
           <%= form.label 'Current Kitchen Delay (minutes)' %>
-        <%= form.select :kitchen_delay_minutes, options_for_select(@time_settings, manager_opening_time.kitchen_delay_minutes), {prompt: 'Choose Delay'}, {class: 'form-control'} %>
+        <%= form.select :kitchen_delay_minutes, options_for_select(@time_settings, manager_opening_time.kitchen_delay_minutes), {prompt: 'Choose Delay'}, {class: 'form-control validate-item'} %>
         </div>
       </div>
     </div>
@@ -92,8 +175,50 @@
 
 
 
+    <div class="row">
+      <div class="col-sm-4 pb-1">
+        <div class="form-group ">
+          <%= form.label 'Advanced order cut-off days' %>
+        <%= form.select :cut_off_days, options_for_select(@cut_off_settings, manager_opening_time.cut_off_days), {prompt: 'Choose days'}, {class: 'form-control validate-item'} %>
+        </div>
+      </div>
+    </div>
 
-  <div class="form-group ">
-    <%= form.submit nil, class: 'btn btn-primary' %>
-  </div>
+
+
+
+    <div class="row">
+      <div class="col-sm-4 pb-1">
+        <div class="form-group ">
+          <%= form.label 'Advanced order maximum days' %>
+        <%= form.select :advanced_order_days, options_for_select(@advanced_order_settings, manager_opening_time.advanced_order_days), {prompt: 'Choose days'}, {class: 'form-control validate-item'} %>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="row">
+      <div class="col-sm-4 pb-1">
+        <div class="form-group ">
+          <%= form.label 'Maximum number of orders per time-slot (0 for no limit)' %>
+        <%= form.number_field :max_orders, {min: 0, class: 'form-control validate-item'} %>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="row">
+      <div class="col-sm-4 pb-1">
+        <div id="validation-warning" class="form-group">
+          <%= form.label 'Please ensure every weekday either has valid opening and closing times, or is selected closed' %>
+        </div>
+        <div class="form-group">
+          <%= form.submit nil, class: 'btn btn-primary', disabled: true %>
+        </div>
+      </div>
+    </div>
 <% end %>

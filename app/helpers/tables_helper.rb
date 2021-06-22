@@ -87,15 +87,15 @@ module TablesHelper
     restaurant_features.map{|s| s.key.to_sym}.include?(feature.to_sym)
   end
 
-  def is_delivery?(restaurant)
+  def is_delivery?(restaurant) # Delivery service enabled
     feature_match('delivery_service', restaurant.features)
   end
 
-  def is_takeaway?(restaurant)
+  def is_takeaway?(restaurant) # Collection service enabled
     feature_match('takeaway_service_enabled', restaurant.features)
   end
 
-  def is_tableservice?(restaurant)
+  def is_tableservice?(restaurant) # Pre-pay table service enabled
     feature_match('takeaway_to_table', restaurant.features)
   end
   
@@ -119,3 +119,7 @@ module TablesHelper
     ret
   end
 end
+
+  def group_orders?(restaurant) # Pre-pay table service enabled
+    feature_match('group_orders', restaurant.features)
+  end

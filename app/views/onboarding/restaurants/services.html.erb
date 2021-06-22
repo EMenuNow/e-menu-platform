@@ -50,5 +50,6 @@ Choose your services
 <div class="row my-5">
   <div class="col-md-8 mx-auto text-center">
     <%= link_to("Save", onboarding_restaurant_connect_path, class: "btn btn-warning", role: "button", id: "connect-button") %>
+    <div class="text-left pt-3"><small><%= link_to "Log Off", destroy_onboarding_restaurant_user_session_path, method: :delete %></small></div>
   </div>
 </div>

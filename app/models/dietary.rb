@@ -1,0 +1,4 @@
+class Dietary < MenuItemCategorisation
+
+  
+end

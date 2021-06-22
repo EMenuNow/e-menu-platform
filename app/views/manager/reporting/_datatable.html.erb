@@ -40,6 +40,7 @@ $(document).ready(function() {
           <th>Item</th>
           <th class='text-right'>Count</th>
           <th class='text-right'>Total</th>
+          <th class='text-right'>Total VAT</th>
           <th class='text-right'>Percentage Items</th>
           <th class='text-right'>Percentage Sales</th>
         </tr>
@@ -50,6 +51,7 @@ $(document).ready(function() {
             totals = daily_reporting.data.select{|a| a['id'] == menu_id } 
             total_sales = totals.map{|x| x['total']}.inject(:+)
             menu_name = totals.map{|x| x['menu_name']}.uniq.join(',')
+            total_tax = totals.map{|x| x['total'] * (x['tax_rate'].to_f/100.0)}.sum
             menu_parent_name = totals.map{|x| x['menu_parent_name']}.uniq.join(',')
             percent_count =  daily_reporting.items_count == 0 ? 0 : (totals.count.to_f / daily_reporting.items_count.to_f )*100
             percent_total =  daily_reporting.total == 0 ? 0 : (total_sales.to_f / daily_reporting.total.to_f )*100
@@ -59,6 +61,7 @@ $(document).ready(function() {
           <td><%= menu_name%><%#= get_menu_item_name(menu_id)%></td>
           <td class='text-right'><%= totals.count%></td>
           <td class='text-right'><%= number_to_currency(total_sales.to_f / 100.to_f, unit: @restaurant.currency_symbol )%></td>
+          <td class='text-right'><%= number_to_currency(total_tax / 100.0, unit: @restaurant.currency_symbol ) %></td>
           <td class='text-right'><%= number_to_percentage(percent_count, precision: 2) %></td>
           <td class='text-right'><%= number_to_percentage(percent_total, precision: 2) %></td>
         </tr>
@@ -71,6 +74,7 @@ $(document).ready(function() {
           <td></td>
           <td class='text-right'><%= @daily_reporting.items_count%></td>
           <td class='text-right'><%= number_to_currency(@daily_reporting.total.to_f / 100.to_f, unit: @restaurant.currency_symbol )%></td>
+          <td class='text-right'><%= number_to_currency(daily_reporting.get_vat_total / 100.0, unit: @restaurant.currency_symbol ) %></td>
           <td class='text-right'><%= number_to_percentage(100, precision: 0) %></td>
           <td class='text-right'><%= number_to_percentage(100, precision: 0) %></td>
         </tr>

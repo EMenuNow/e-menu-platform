@@ -1,0 +1,25 @@
+<% content_for :channels do %>
+  <%#= javascript_include_tag 'channels/receipts'%>
+  <%= javascript_include_tag 'cable_kitchen'%>
+<% end %>
+
+<% content_for :js do%>
+  <script>
+    var order_bell;
+    document.getElementById("dismiss-loader").addEventListener("click", function() {
+      order_bell = new Audio("<%= asset_path("order-bell.wav") %>");
+      order_bell.muted = false;
+      order_bell.play().then(() => { order_bell.pause()} )
+    });
+  </script>
+<% end %>
+
+<%= hidden_field_tag :restaurant_id, @restaurant.id%>
+
+  <%= render 'manager/live/kitchen_delay' %>
+
+  <div class="mt-2" id='current-orders'>
+    <%= render 'manager/live/order_items_kitchen', printers: @printers %>
+  </div>
+
+  <%= render 'manager/live/status_bar' %>

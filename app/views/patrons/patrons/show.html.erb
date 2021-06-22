@@ -24,7 +24,7 @@
           <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapse1">
             <h5 class="m-0">Account details</h5>
           </a>
-          <div class="collapse p-5 bg-light text-center" id="collapse1">
+          <div class="collapse py-4 bg-light text-center" id="collapse1">
             <h5><%= current_patron.full_name %></h5>
             <h5><%= current_patron.email.truncate(6) %></h5>
             <h5><%= current_patron.phone %></h5>
@@ -38,7 +38,7 @@
           <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse4" role="button" aria-expanded="false" aria-controls="collapse4">
             <h5 class="m-0">Order history</h5>
           </a>
-          <div class="collapse p-4 bg-light" id="collapse4">
+          <div class="collapse py-4 bg-light" id="collapse4">
             <% if orders.present? %>
               <% orders.each.with_index(1) do |order, i| %>
 
@@ -75,7 +75,7 @@
 
                 <!-- Modal -->
                 <div class="modal fade w-auto h-auto" id="receipt-<%= i %>" tabindex="-1" aria-labelledby="receipt-<%= i %>-label" aria-hidden="true">
-                  <div class="modal-dialog">
+                  <div class="modal-dialog override">
                     <div class="modal-content">
                       <div class="modal-header">
                         <h5 class="card-text float-left">Order #<%= order.id %></h5>
@@ -88,8 +88,7 @@
                           <div class="col mb-3">
                             <h1><%=order.restaurant.name%></h1>
                             <div><strong>Payment Date: </strong><%= receipt.created_at.in_time_zone(order.restaurant.time_zone).strftime("%d %B %Y - %H:%M") %></div>
-                            <div><strong>Receipt Number: </strong><%=receipt.uuid%></div>
-                            <% if receipt.delivery_or_collection != 'tableservice'  %><div><strong>Name: </strong><%=receipt.name%></div><% end %>
+                            <% if receipt.name.present?  %><div><strong>Name: </strong><%= receipt.name.titleize %></div><% end %>
                             <div><strong>Type: </strong><%=receipt.delivery_or_collection.camelcase%></div>
                             <% if receipt.delivery_or_collection != 'tableservice'  %><div><strong>Time: </strong><%=receipt.collection_time%></div><% end %>
                             <% if receipt.email.present? %><div><strong>Email: </strong><%=receipt.email%></div><% end %>
@@ -181,21 +180,28 @@
       <div class="row mt-1 ">
         <div class="col-md-12 p-0 m-0">
           <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapse2">
-            <h5 class="m-0">Allergens and Diet</h5>
+            <h5 class="m-0">Diet and Allergens</h5>
           </a>
-          <div class="collapse p-5 bg-light" id="collapse2">
-            <% MenuItemCategorisation.all.group_by(&:type).each do |group, mics| %>
-              <div class="row py-3">
-                <% mics.each do |mic| %>
-                  <div class="col-md-2">
-                    <label>
-                      <h5><i class="<%= mic.icon %>" %></i> <%= mic.name.titleize %>: 
-                      <%= check_box_tag :active, "active", pallergens.select{|x|x.menu_item_categorisation_id == mic.id}.first&.active, data: { :method => :patch, :url => patron_allergen_path(mic.id), remote: true, :authenticity_token => true } %></h5>
-                    </label>
-                  </div>
+          <div class="collapse py-4 bg-light" id="collapse2">
+            <div class="row py-3">
+              <ul class="eicon-list eicon-medium ng-scope collection-check-box mx-auto text-center">
+                <% @diets.each do |diet| %>
+                  <label>
+                    <%= check_box_tag :active, "active", pallergens.select{|x|x.menu_item_categorisation_id == diet.id}.first&.active, data: { :method => :patch, :url => patron_allergen_path(diet.id), remote: true, :authenticity_token => true } %>
+                    <li class="suitable-level-yes"><span class="<%= diet.icon %>"></span><%= diet.name.humanize %></li>
+                  </label>
                 <% end %>
-              </div>
-            <% end %>
+              </ul>
+            </div>
+            <div class="row py-3">
+              <ul class="eicon-list eicon-medium ng-scope collection-check-box mx-auto text-center">
+                <% @allergens.each do |allergen| %>
+                  <label>
+                    <%= check_box_tag :active, "active", pallergens.select{|x|x.menu_item_categorisation_id == allergen.id}.first&.active, data: { :method => :patch, :url => patron_allergen_path(allergen.id), remote: true, :authenticity_token => true } %>
+                    <li class="allergen-level-yes"><span class="<%= allergen.icon %>"></span><%= allergen.name.humanize %></li>
+                  </label>
+                <% end %>
+            </div>
           </div>
         </div>
       </div>
@@ -204,7 +210,7 @@
           <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapse3">
             <h5 class="m-0">Marketing</h5>
           </a>
-          <div class="collapse p-5 bg-light" id="collapse3">
+          <div class="collapse py-4 bg-light" id="collapse3">
             <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
               <label>
                 <h5><i class=""></i> <%= "Emenu news" %>: 

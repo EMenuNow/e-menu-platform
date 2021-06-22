@@ -29,3 +29,4 @@ Pull the latest database from heroku production using e.g. pg_dump
 127.0.0.1       gbk.dev-emenunow.com
 
 
+Upgradinig Stack

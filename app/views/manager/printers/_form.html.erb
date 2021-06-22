@@ -41,7 +41,7 @@
 
   <div class="form-group">
     <%= form.label :print_type %>
-    <%= form.select :print_type, options_for_select(['Generic', 'esc/pos'], printer.print_type), {prompt: 'Choose Printer Protocol'}, {class: "form-control"}%>
+    <%= form.select :print_type, options_for_select(['Generic', 'esc/pos', 'esc/pos/2'], printer.print_type), {prompt: 'Choose Printer Protocol'}, {class: "form-control"}%>
 
   </div>
 

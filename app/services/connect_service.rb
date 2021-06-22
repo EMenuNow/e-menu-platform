@@ -2,7 +2,7 @@ class ConnectService < ApplicationController
 
   def initialize(restaurant)
     @restaurant = restaurant
-    Stripe.api_key = Rails.env == 'production' ? ENV['STRIPE_API_KEY'] : 'sk_test_hOj5WqYB26UV1v5uuqXsADSG'
+    Stripe.api_key = @restaurant.stripe_sk_api_key
   end
 
   def create_account

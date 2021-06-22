@@ -1,8 +1,12 @@
-<div class="container mt-5 mb-5 ">
+<div class="bg-dark py-5">
+  <div class="container text-light mt-5 mb-2">
+    <div class="container mt-5 mb-5 ">
 
-<h1>New Restaurant restaurant_Table</h1>
+      <h1>New Restaurant table</h1>
 
-<%= render 'form', restaurant_table: @restaurant_table %>
+      <%= render 'form', restaurant_table: @restaurant_table %>
 
-<%= link_to 'Back', manager_restaurant_restaurant_tables_path(@restaurant) %>
+      <%= link_to 'Back', manager_restaurant_restaurant_tables_path(@restaurant) %>
+    </div>
+  </div>
 </div>

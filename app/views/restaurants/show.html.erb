@@ -68,6 +68,14 @@
       calculate_price(start_price, scope)
     });
 
+    $('.note-field').on("change keyup change keydowb", function() {
+      item = $(this) // custom list item clicked
+      scope = item.data('scope') // menu item id of item clicked
+
+      start_price = item.data('start_price') * 1
+      calculate_price(start_price, scope)
+    });
+
     $('.placeholder-to-basket').click(function(e) {
       e.preventDefault()
 
@@ -108,11 +116,11 @@
       note = $("#notes-" + scope).val()
 
         <%
-          menu_id = params[:menu_id].to_i if params[:menu_id].present?
-          menu_id = @menu2.first[:id] if params[:menu_id].blank?
+          menu_id = params[:menu_id].to_i if params[:menu_id].present? && @menu_availability.include?(params[:menu_id].to_i)
+          menu_id = @menu2.select{|m| @menu_availability.include?(m[:id])}.first[:id] if menu_id.nil?
           current_section = params[:section_id].to_i 
           if params[:section_id].blank?
-            menu = @menu2.select { |w| w[:id] == menu_id}.first
+            menu = @menu2.select{|m| @menu_availability.include?(m[:id])}.select { |w| w[:id] == menu_id}.first
             nav_items = menu[:children].map {|a| {
               name: a[:name],
               id: a[:id]
@@ -145,11 +153,11 @@
 </script>
 <% end %>
 <div class="container-fluid">
-  <% if !@restaurant.is_open and enable_checkout?(@restaurant) %>
+  <% if (!@restaurant.is_open or @restaurant.opening_time_close_early) and !@restaurant.opening_time_open_early and enable_checkout?(@restaurant) %>
     <% if is_takeaway?(@restaurant) or is_delivery?(@restaurant) %>
       <div class="row">
         <div class="col text-warning text-center border border-warning">
-          The Kitchen is currently closed, but you can still order takeaway for next available open time
+          The Kitchen is currently closed<% if @restaurant.availability.any? %>, but you can still order takeaway for next available open time<% end %>
         </div>
       </div>
     <% else %>
@@ -159,6 +167,12 @@
         </div>
       </div>
     <% end %>
+  <% elsif !enable_checkout?(@restaurant) %>
+    <div class="row">
+      <div class="col text-warning text-center border border-warning">
+          The Kitchen is not accepting orders at this time, please contact them directly to order
+      </div>
+    </div>
   <% end %>
 
   <% if @restaurant.is_open and (@restaurant.is_closing < @restaurant.opening_time.delay_time_minutes) %>
@@ -180,7 +194,7 @@
 
 <%= render 'all' if @restaurant.blank? %>
 <% if feature_match('menu_in_sections', @restaurant.features) %>
-  <%= render 'restaurants/components/sections/restaurant_auto', menu: @menu2 if @restaurant.present? %>
+  <%= render 'restaurants/components/sections/restaurant_auto', menu: @menu2, menu_availability: @menu_availability if @restaurant.present? %>
 <% else %>
-  <%= render 'restaurants/components/restaurant_auto', menu: @menu2 if @restaurant.present? %>
+  <%= render 'restaurants/components/restaurant_auto', menu: @menu2, menu_availability: @menu_availability if @restaurant.present? %>
 <% end %>

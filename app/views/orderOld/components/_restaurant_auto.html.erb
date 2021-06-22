@@ -18,7 +18,7 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
               <div class="col text-left mt-1">
 
                 <% if @restaurant.image.attached? %>
-                <%= image_tag @restaurant.image.variant(resize_and_pad: [200, 200]), class: "img-fluid"  %>
+                <%= image_tag @restaurant.image.variant(gravity:"Center", resize: '200x200^', crop: '200x200+0+0'), class: "img-fluid"  %>
                 <% end %>
 
 

@@ -63,7 +63,7 @@ gem 'trix-rails', require: 'trix'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'sidekiq'
 gem 'yandex-translator'
-gem 'mini_racer'
+#gem 'mini_racer'
 # gem 'rb-readline'
 gem 'image_processing', '~> 1.0'
 gem 'active_storage_validations'
@@ -100,6 +100,7 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'railroady'
+  gem 'wkhtmltopdf-binary'
 end
 
 group :test do

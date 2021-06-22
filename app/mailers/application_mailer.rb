@@ -9,7 +9,7 @@ class ApplicationMailer < ActionMailer::Base
     @receipt = Receipt.find(receipt_id)
     @restaurant = @receipt.restaurant
 
-    from = "#{@restaurant.name} <noreply@emenunow.com>"
+    from = "#{@restaurant.name.gsub(':',' -')} <noreply@emenunow.com>"
 
     mail(to: @receipt.email, from: from , subject: @restaurant.name)
   end

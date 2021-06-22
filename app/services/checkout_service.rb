@@ -1,6 +1,6 @@
 class CheckoutService < ApplicationController
 
-  attr_accessor :name, :total_payment, :service_type, :collection_time, :telephone, :address,
+  attr_accessor :name, :total_payment, :service_type, :collection_time, :due_date, :telephone, :address,
                 :table_number, :email, :house_number, :street, :postcode, :basket, :delivery_fee, :discount_code, :payment_in_pence, :basket_service
 
   def initialize(restaurant, parameters, basket_service)
@@ -66,6 +66,7 @@ class CheckoutService < ApplicationController
       email: @email,
       name: @name,
       collection_time: @collection_time,
+      due_date: @due_date,
       is_ready: false,
       telephone: @telephone,
       address: @address,
@@ -78,9 +79,11 @@ class CheckoutService < ApplicationController
       application_fee_amount: @application_fee_amount,
       stripe_processing_fee: @stripe_processing_fee,
       emenu_commission: @emenu_commission,
+      tax_rates: calculate_vat_amounts(@basket_service.get_basket_db.contents['ids']),
       chargeback_fee: @chargeback_fee,
       chargeback_enabled: @chargeback_enabled,
-      emenu_vat_charge: @emenu_vat_charge
+      emenu_vat_charge: @emenu_vat_charge,
+      group_order: @group_order
     )
     @order.patrons << @patron if @patron and !@order.patrons.include?(@patron)
     @order
@@ -115,4 +118,12 @@ class CheckoutService < ApplicationController
     ['GB'].include?(@restaurant.currency_code)
   end
 
+  def calculate_vat_amounts(all_items)
+    ai = all_items.group_by{|x|x['tax_rate'].to_f}
+    tax_rates = {}
+    ai.each do |g, items|
+      is = items.map{|x|x['tax_rate']}
+      tax_rates[g] = (is.sum / is.size) * 100.0
+    end
+  end
 end

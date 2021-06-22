@@ -1,3 +1,7 @@
+<% content_for :title do %>
+Restaurant Configuration - <%= @restaurant&.name ? @restaurant.name : "Welcome" %>
+<% end %> 
+
 <main role="main">
   <div class="jumbotron jumbotron-fluid">
     <div class="container text-center">
@@ -5,6 +9,9 @@
       <%= image_tag @restaurant.image.variant(resize_and_pad: [200, 200]), class: "img-fluid"  %>
       <% end %>
       <h1 class=" text-dark">Restaurant configuration</h1>
+      <% if @restaurant.demo %>
+        <h5 class="text-muted">(Demo restaurant)</h5>
+      <% end %>
       <p class="pt-3">
         <%= @restaurant.cuisine_name %> |
         <%= @restaurant.address %>, <%= @restaurant.postcode %> |
@@ -16,7 +23,7 @@
         Currency: <%= @restaurant.currency_name %> |
         Stripe Account: <%= @restaurant.stripe_connected_account_id %> |
         EMenu Commission: <%= @restaurant.commision_percentage %>% |
-        Chargeback Protection: <%= @restaurant.stripe_chargeback_enabled ? "0.04% of sale" : "No" %>
+        Chargeback Protection: <%= @restaurant.stripe_chargeback_enabled ? "0.4% of sale" : "No" %>
       </p>
       <div class="row py-5">
         <div class="col-md mt-3">
@@ -56,85 +63,7 @@
       <div class="p-3 bg-white rounded">
         <div class="col-12 text-center">
 
-          <% if params[:admin] == "true" %>
-
-          <div class="row">
-            <div class="col-sm">
-              <h5>Services - Admin</h5>
-              <ul class="switches d-inline-block">
-              
-              <% @features.each do |feature|%>
-
-                <li class="my-3">
-                  <%= check_box_tag dom_id(feature), feature.id, @restaurant.features.include?(feature), data: {
-                                    remote: true,
-                                    url: manager_restaurant_toggle_feature_path(@restaurant.id, feature.id),
-                                    method: :post
-                                    } %>
-                  <label for="feature_<%= feature.id %>">
-                    <span><%=feature.name%></span>
-                    <span></span>
-                  </label>
-                </li>
-
-              <% end %>
-
-              </ul>
-
-            </div>
-          </div>
-
-          <% else %>
-
-          <div class="row">
-            <div class="col-sm">
-              <h5>Services</h5>
-              <ul class="switches d-inline-block">
-              
-              <% @services.each do |feature|%>
-
-                <li class="my-3">
-                  <%= check_box_tag dom_id(feature), feature.id, @restaurant.features.include?(feature), data: {
-                                    remote: true,
-                                    url: manager_restaurant_toggle_feature_path(@restaurant.id, feature.id),
-                                    method: :post
-                                    } %>
-                  <label for="feature_<%= feature.id %>">
-                    <span><%=feature.name%></span>
-                    <span></span>
-                  </label>
-                </li>
-
-              <% end %>
-
-              </ul>
-
-            </div>
-          </div>
-
-          <% checkout_toggle = @features.where(key: 'checkout').first %>
-
-          <div class="row">
-            <div class="col-sm">
-              <hr>
-              <ul class="switches d-inline-block">
-                <li class="my-3">
-                  <%= check_box_tag dom_id(checkout_toggle), checkout_toggle.id, @restaurant.features.include?(checkout_toggle), data: {
-                                    remote: true,
-                                    url: manager_restaurant_toggle_feature_path(@restaurant.id, checkout_toggle.id),
-                                    method: :post
-                                    }, disabled: !@restaurant.subscription_enabled %>
-                  <label for="feature_<%= checkout_toggle.id %>">
-                    <span><%= checkout_toggle.name %> <small class="text-muted">(Accept orders & payments)</small></span>
-                    <span></span>
-                  </label>
-                </li>
-              </ul>
-
-            </div>
-          </div>
-          
-          <% end %>
+          <%= render partial: "settings" %>
 
           <!--<div class="row">
             <div class="col-sm">

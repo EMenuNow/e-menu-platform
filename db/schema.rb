@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_03_165415) do
+ActiveRecord::Schema.define(version: 2021_06_17_114124) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,6 +42,26 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "discount_code"
+  end
+
+  create_table "busy_times", force: :cascade do |t|
+    t.datetime "busy_time"
+    t.bigint "restaurant_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.boolean "unavailable", default: true
+    t.index ["restaurant_id"], name: "index_busy_times_on_restaurant_id"
+  end
+
+  create_table "categorisations_clis", force: :cascade do |t|
+    t.bigint "custom_list_item_id"
+    t.bigint "menu_item_categorisation_id"
+    t.boolean "contains"
+    t.boolean "may_contain"
+    t.boolean "dietary"
+    t.boolean "category"
+    t.index ["custom_list_item_id"], name: "index_categorisations_clis_on_custom_list_item_id"
+    t.index ["menu_item_categorisation_id"], name: "index_categorisations_clis_on_menu_item_categorisation_id"
   end
 
   create_table "cook_levels", force: :cascade do |t|
@@ -81,6 +101,8 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.datetime "updated_at", null: false
     t.integer "cloned_from"
     t.boolean "available", default: true
+    t.bigint "spice_level_id"
+    t.boolean "category_filtered", default: false
     t.index ["custom_list_id"], name: "index_custom_list_items_on_custom_list_id"
   end
 
@@ -193,12 +215,24 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.text "icon"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type", default: "allergen"
+    t.string "type", default: "Allergen"
   end
 
-  create_table "menu_item_categorisations_menus", id: false, force: :cascade do |t|
+  create_table "menu_item_categorisations_menus", force: :cascade do |t|
     t.bigint "menu_id", null: false
     t.bigint "menu_item_categorisation_id", null: false
+    t.boolean "contains"
+    t.boolean "may_contain"
+    t.boolean "dietary"
+    t.boolean "category"
+  end
+
+  create_table "menu_times", force: :cascade do |t|
+    t.bigint "menu_id", null: false
+    t.jsonb "times"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["menu_id"], name: "index_menu_times_on_menu_id"
   end
 
   create_table "menu_translations", force: :cascade do |t|
@@ -235,6 +269,7 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.jsonb "old_custom_lists"
     t.bigint "item_screen_type_id"
     t.integer "secondary_item_screen_type_id"
+    t.float "tax_rate", default: 0.0
     t.index ["ancestry"], name: "index_menus_on_ancestry"
     t.index ["item_screen_type_id"], name: "index_menus_on_item_screen_type_id"
     t.index ["menu_item_categorisation_id"], name: "index_menus_on_menu_item_categorisation_id"
@@ -263,6 +298,11 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.datetime "updated_at", null: false
     t.integer "delay_time_minutes", default: 30
     t.integer "kitchen_delay_minutes", default: 0
+    t.boolean "open_early", default: false
+    t.boolean "close_early", default: false
+    t.integer "cut_off_days", default: 0
+    t.integer "advanced_order_days", default: 2
+    t.integer "max_orders", default: 0
     t.index ["restaurant_id"], name: "index_opening_times_on_restaurant_id"
   end
 
@@ -288,13 +328,21 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.string "delivery_or_collection"
     t.string "delivery_fee", default: "0"
     t.string "table_number"
-    t.string "discount_code"
     t.integer "application_fee_amount", default: 0
     t.integer "emenu_commission", default: 0
     t.integer "chargeback_fee", default: 0
     t.boolean "chargeback_enabled", default: false
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
+    t.boolean "group_order"
+    t.datetime "due_date"
+    t.bigint "discount_code_id"
+    t.jsonb "tax_rates"
+    t.string "address_2"
+    t.string "city"
+    t.string "post_code"
+    t.string "country_code"
+    t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
     t.index ["restaurant_id"], name: "index_orders_on_restaurant_id"
   end
 
@@ -384,6 +432,7 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.boolean "online"
     t.text "lsusb"
     t.text "lsusb_compare"
+    t.string "version"
     t.index ["restaurant_id"], name: "index_pi_interfaces_on_restaurant_id"
   end
 
@@ -440,6 +489,16 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.boolean "chargeback_enabled", default: false
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
+    t.boolean "group_order"
+    t.datetime "due_date"
+    t.string "processing_status", default: "pending"
+    t.string "first_print_status"
+    t.string "print_status"
+    t.jsonb "tax_rates"
+    t.string "address_2"
+    t.string "city"
+    t.string "post_code"
+    t.string "country_code"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"
     t.index ["restaurant_id"], name: "index_receipts_on_restaurant_id"
@@ -516,6 +575,10 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.float "commision_percentage", default: 0.0
     t.boolean "stripe_chargeback_enabled", default: false
     t.boolean "subscription_enabled", default: true
+    t.boolean "demo", default: false
+    t.string "address_2"
+    t.string "city"
+    t.string "country_code"
     t.index ["cuisine_id"], name: "index_restaurants_on_cuisine_id"
     t.index ["currency_id"], name: "index_restaurants_on_currency_id"
     t.index ["restaurant_user_id"], name: "index_restaurants_on_restaurant_user_id"
@@ -536,6 +599,7 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.datetime "updated_at", null: false
     t.string "uuid"
     t.boolean "secondary", default: false
+    t.string "processing_status", default: "pending"
     t.index ["menu_id"], name: "index_screen_items_on_menu_id"
     t.index ["receipt_id"], name: "index_screen_items_on_receipt_id"
     t.index ["restaurant_id"], name: "index_screen_items_on_restaurant_id"
@@ -594,15 +658,11 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
     t.text "custom_css"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "basket_colour", default: "#000"
-    t.string "item_colour", default: "#000"
-    t.string "basket_text_colour", default: "#fff"
-    t.string "item_text_colour", default: "#fff"
-    t.string "item_header_colour", default: "#000"
     t.index ["restaurant_id"], name: "index_themes_on_restaurant_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "busy_times", "restaurants"
   add_foreign_key "custom_list_items", "custom_lists"
   add_foreign_key "custom_lists", "restaurants"
   add_foreign_key "daily_reportings", "restaurants"
@@ -611,6 +671,7 @@ ActiveRecord::Schema.define(version: 2021_03_03_165415) do
   add_foreign_key "item_screens", "item_screen_types"
   add_foreign_key "item_screens", "printers"
   add_foreign_key "item_screens", "restaurants"
+  add_foreign_key "menu_times", "menus"
   add_foreign_key "menus", "item_screen_types"
   add_foreign_key "menus", "menu_item_categorisations"
   add_foreign_key "menus", "restaurants"

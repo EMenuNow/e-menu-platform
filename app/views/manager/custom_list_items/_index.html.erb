@@ -1,4 +1,29 @@
+<% content_for :js do %>
 
+  <script>
+  
+    $(function(){
+      $('.available_cli').on('change', function() {
+        cli_id = $(this).val();
+        cli_checked = $(this).is(':checked');
+        cli_available = $(`#available_${cli_id}`);
+        cli_item = $(`#item-${cli_id}`);
+
+        if (cli_checked) {
+          cli_available.text('Available');
+          cli_item.removeClass('alert');
+          cli_item.removeClass('alert-danger');
+        } else {
+          cli_available.text('Unavailable');
+          cli_item.addClass('alert');
+          cli_item.addClass('alert-danger');
+        }
+      })
+    })
+  
+  </script>
+
+<% end %>
 
 
 <div class="container my-3 p-3 bg-white rounded shadow-sm">
@@ -10,24 +35,54 @@
     <tr>
       <th>Name</th>
       <th>Description</th>
+      <th>Diet & Allergens</th>
+      <th>Categories</th>
       <th>Price</th>
-      <th colspan="2"></th>
+      <th colspan="3"></th>
     </tr>
   </thead>
 
   <tbody>
     <% custom_list_items.each do |custom_list_item| %>
-      <tr class="<%= "alert alert-danger" if !custom_list_item.available %>">
+      <tr id='item-<%= custom_list_item.id %>' class="<%= "alert alert-danger" if !custom_list_item.available %>">
         <td><%= custom_list_item.name %></td>
         <td><%= custom_list_item.description %></td>
-        <td><%= number_to_currency(custom_list_item.price, unit: restaurant.currency_symbol) %></td>
-        <td><%= link_to 'toggle', manager_restaurant_custom_list_custom_list_item_path(restaurant, custom_list, custom_list_item, custom_list_item: {available: !custom_list_item.available}, index: true), method: :put %>
-          <% if custom_list_item.available %>
-            <i class="fa fa-check available"> Available</i>
-          <% else %>
-            <i class="fa fa-times available"> Unavailable</i>
+        <td>
+          <ul class="d-inline col-lg-1 eicon-list eicon-x-small">
+            <% custom_list_item.categorisations_clis.contains_allergen.each do |allergen| %>
+              <li class="allergen-level-yes"><span class="<%= allergen&.menu_item_categorisation&.icon %>"></span></li>
+            <% end %>
+            <% custom_list_item.categorisations_clis.may_contain_allergen.each do |allergen| %>
+              <li class="allergen-level-may"><span class="<%= allergen&.menu_item_categorisation&.icon %>"></span></li>
+            <% end %>
+            <% custom_list_item.categorisations_clis.dietary.each do |diet| %>
+              <li class="suitable-level-yes"><span class="<%= diet&.menu_item_categorisation&.icon %>"></span></li>
+            <% end %>
+          </ul>
+        </td>
+        <td>
+          <% custom_list_item.categorisations_clis.category.each do |category| %>
+            <i class="<%= category&.menu_item_categorisation&.icon %>"></i>
           <% end %>
         </td>
+        <td><%= number_to_currency(custom_list_item.price, unit: restaurant.currency_symbol) %></td>
+
+        <td class="switches w-25"> 
+
+          <%= check_box_tag dom_id(custom_list_item, :available), custom_list_item.id, custom_list_item.available, data: {
+                            remote: true,
+                            url: manager_restaurant_custom_list_custom_list_item_toggle_active_path(@restaurant, @custom_list, custom_list_item),
+                            method: :post
+                            }, class: "available_cli" %>
+          <label for="<%= dom_id(custom_list_item, :available) %>">
+            <span id="available_<%= custom_list_item.id %>" class="management-description pr-2">
+              <%= custom_list_item.available ? "Available" : "Unavailable" %>
+            </span>
+            <span></span>
+          </label>
+          
+        </td>
+
         <td><%= link_to 'Edit', edit_manager_restaurant_custom_list_custom_list_item_path(restaurant, custom_list, custom_list_item) %></td>
         <td><%= link_to 'Destroy', manager_restaurant_custom_list_custom_list_item_path(restaurant, custom_list, custom_list_item), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>

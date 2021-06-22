@@ -6,33 +6,25 @@ Partner with EMenu Now
   
   <div class="row my-5">
     <div class="col-md-6 mx-auto text-center">
-      <h3>Get started with a free trial</h3>
-    </div>
-  </div>
-  
-  <div class="row mb-5">
-    <div class="col-10 col-sm-8 col-md-6 col-lg-4 mx-auto text-center">
-      <p>Are you currently closed?</p>
-      <p>Sign up now, even if you are closed, to make sure you are set-up and ready for re-opening day and we will extend your free trial to 30 days after you re-open.</p>
-      <p>We will call you to arrange this.</p>
+      <h3>Get started with your free EMENU</h3>
     </div>
   </div>
   
   <div class="row">
     <div class="col-10 col-sm-8 col-md-6 col-lg-4 mx-auto text-center">
       <p>In just a few steps you'll have your business set up, and connected to our payment provider.</p>
-      <p>We'll be in contact soon after to guide you through the rest of the process, so you'll be able to create your menu and start accepting orders.</p>
+      <p>We will contact you after you have completed the application to finish the setup process. You will have a link sent to your email to access your dashboard.</p>
     </div>
   </div>
 
   <div class="row my-5">
     <div class="col-8 col-md-3 mx-auto my-3 text-center">
-      <p>If you have previosuly started your onboarding journey, you can resume with the link below:</p>
-      <%= link_to("Resume", new_onboarding_restaurant_user_session_path, class: 'next-link') %>
+      <p>If you have previously started your onboarding journey, you can resume with the link below:</p>
+      <%= link_to("Resume", new_onboarding_restaurant_user_session_path, class: 'btn btn-warning') %>
     </div>
     <div class="col-8 col-md-3 mx-auto my-3 text-center">
       <p>If it's your first time here, you can start your onboarding journey with the link below:</p>
-      <%= link_to("Start", new_onboarding_restaurant_user_registration_path, class: 'next-link') %>
+      <%= link_to("Start", new_onboarding_restaurant_user_registration_path, class: 'btn btn-warning') %>
     </div>
   </div>
     
@@ -47,14 +39,15 @@ Partner with EMenu Now
   <div class="row my-5">
     <div class="col-10 col-sm-8 col-md-6 col-lg-4 mx-auto text-center">
       <p>In just a few steps you'll have your business set up, and connected to our payment provider.</p>
-      <p>We'll be in contact soon after to guide you through the rest of the process, so you'll be able to create your menu and start accepting orders.</p>
+      <p>We will contact you after you have completed the application to finish the setup process. You will have a link sent to your email to access your dashboard.</p>
     </div>
   </div>
 
   <div class="row my-5">
     <div class="col-8 col-md-3 mx-auto text-center">
-      <p>Continue your onboading journey with the link below:</p>
-      <%= link_to("Continue", onboarding_continue_path, class: 'next-link') %>
+      <p>Continue your onboarding journey with the link below:</p>
+      <%= link_to("Continue", onboarding_continue_path, class: 'btn btn-warning') %>
+      <div class="text-left pt-3"><small><%= link_to "Log Off", destroy_onboarding_restaurant_user_session_path, method: :delete %></small></div>
     </div>
   </div>
 

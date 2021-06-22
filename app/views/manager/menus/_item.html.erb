@@ -10,7 +10,7 @@
 
     %>
 
-    <li class='<%= available_css %> border p-1 m-1 <%= sub.node_type != 'item' ? "bg-secondary text-light pl-2" : "bg-light text-dark" %>'>
+    <li class='<%= available_css %> border p-1 m-1 <%= sub.node_type != 'item' ? "bg-secondary text-light pl-2" : "bg-light text-dark" %>' id='item-<%= sub.id %>'>
   
       <div class="row ">
         <% if sub.node_type != 'item' %>
@@ -55,25 +55,41 @@
         <div class="col management-description"> 
           <%=sub.description%>
         </div>
-        <div class="col-lg-1"> 
+        <div class="col-lg-1 switches"> 
 
-          <%= link_to 'toggle', manager_restaurant_menu_path(@restaurant, sub, menu: {available: !sub.available}, index: true),method: :put %>
-
-          <% if sub.available %>
-            <i class="fa fa-check available"> Available</i>
-          <% else %>
-            <i class="fa fa-times available"> Unavailable</i>
-          <% end %>
+          <%= check_box_tag dom_id(sub, :available), sub.id, sub.available, data: {
+                            remote: true,
+                            url: manager_restaurant_menu_toggle_active_path(@restaurant, sub),
+                            method: :post
+                            }, class: "available_menu" %>
+          <label for="<%= dom_id(sub, :available) %>">
+            <span id="available_<%= sub.id %>" class="management-description pr-2">
+              <%= sub.available ? "Available" : "Unavailable" %>
+            </span>
+            <span></span>
+          </label>
+          
         </div>
         <div class="col-lg-1"> 
           Position: <%= sub.position%>  
         </div>
         <div class="col-lg-1"> 
-          Screen: <%= sub.item_screen_type_name%>  
+          Screen: <%= sub.item_screen_type_name%><%= " & #{sub.secondary_item_screen_type_name}" if sub.secondary_item_screen_type_name %>
         </div>
-        <div class="col-lg-1"> 
-          <% sub.menu_item_categorisation.each do |category| %>
-            <i class="<%= category.icon %>"></i>
+        <ul class="col-lg-1 eicon-list eicon-x-small">
+          <% sub.menu_item_categorisations_menus.contains_allergen.each do |allergen| %>
+            <li class="allergen-level-yes"><span class="<%= allergen&.menu_item_categorisation&.icon %>"></span></li>
+          <% end %>
+          <% sub.menu_item_categorisations_menus.may_contain_allergen.each do |allergen| %>
+            <li class="allergen-level-may"><span class="<%= allergen&.menu_item_categorisation&.icon %>"></span></li>
+          <% end %>
+          <% sub.menu_item_categorisations_menus.dietary.each do |diet| %>
+            <li class="suitable-level-yes"><span class="<%= diet&.menu_item_categorisation&.icon %>"></span></li>
+          <% end %>
+        </ul>
+        <div class="col-lg-1">
+          <% sub.menu_item_categorisations_menus.category.each do |category| %>
+            <i class="<%= category&.menu_item_categorisation&.icon %>"></i>
           <% end %>
         </div>
         <div class="col-lg-1"> 

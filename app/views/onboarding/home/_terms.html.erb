@@ -15,7 +15,7 @@
   </script>
 <% end %>
 
-<% tos_version = '0.1' %>
+<% tos_version = '0.2' %>
 
 <%= form_with(model: [:onboarding, onboard], url: onboarding_agree_path, method: 'patch', local: true) do |form| %>
   <% if onboard.errors.any? %>

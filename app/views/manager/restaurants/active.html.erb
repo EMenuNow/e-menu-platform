@@ -1,3 +1,7 @@
+<% content_for :title do %>
+Active Menus - <%= @restaurant&.name ? @restaurant.name : "Welcome" %>
+<% end %> 
+
 <main role="main" class="container">
   <div class="my-3 p-3 bg-white rounded shadow-sm">
 	  <h3 class="border-bottom border-gray pb-2 mb-0">Choose Active Menu</h3>
