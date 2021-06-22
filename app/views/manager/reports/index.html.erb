@@ -14,10 +14,8 @@
 <% end %>
 
 <%
-  total_value = (@receipts.sum(&:basket_total)/100.0)
-  total_emenu_commission_value = (@receipts.sum(&:application_fee_amount)/100.0)
-  total_revenue = number_to_currency(total_value, unit: @restaurant.currency_symbol)
-  dates = @restaurant.receipts.select(:created_at).order(created_at: :asc).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
+  total_revenue = number_to_currency(@total_value, unit: @restaurant.currency_symbol)
+  total_refunded = number_to_currency(@refund_value, unit: @restaurant.currency_symbol)
 %>
 
 <main role="main">
@@ -30,7 +28,7 @@
 </main>
 
 <div class="container pt-1 pb-5 text-center">
-  <% if dates.present? %>
+  <% if @dates.present? %>
     <div class="row pb-1">
       <div class="col-lg-6 mx-auto">
         <div class="pt-2 pb-5 bg-white rounded">
@@ -38,11 +36,11 @@
                 
             <h5>Showing orders between:</h5>
             <div class="mb-2 input-group input-daterange">
-              <%= text_field_tag :after_created_at, params[:after_created_at] ? params[:after_created_at] : dates.last, hide_label: true, class: 'input-group-text form-control datepicker', id: 'after_created_at', autocomplete: 'off', :onchange => "$('#options-form').submit()" %>
+              <%= text_field_tag :after_created_at, params[:after_created_at] ? params[:after_created_at] : @dates.last, hide_label: true, class: 'input-group-text form-control datepicker', id: 'after_created_at', autocomplete: 'off', :onchange => "$('#options-form').submit()" %>
               <div class="input-group-prepend input-group-append">
                 <span class="input-group-text"> and </span>
               </div>
-              <%= text_field_tag :before_created_at, params[:before_created_at] ? params[:before_created_at] : dates.first, hide_label: true, class: 'input-group-text form-control datepicker', id: 'before_created_at', autocomplete: 'off', :onchange => "$('#options-form').submit()" %>
+              <%= text_field_tag :before_created_at, params[:before_created_at] ? params[:before_created_at] : @dates.first, hide_label: true, class: 'input-group-text form-control datepicker', id: 'before_created_at', autocomplete: 'off', :onchange => "$('#options-form').submit()" %>
             </div>
 
             <div class="mb-3 input-group">
@@ -79,13 +77,25 @@
       <div class="col-lg-3">
         <div class="card shadow p-3 mb-5 bg-white rounded">
           <h3 class="m-0">Average Value</h3>
-          <h5 class="m-0"><%= number_to_currency(total_value / @receipts.size, unit: @restaurant.currency_symbol) %></h5>
+          <h5 class="m-0"><%= number_to_currency(@total_value / @receipts.size, unit: @restaurant.currency_symbol) %></h5>
         </div>
       </div>
       <div class="col-lg-3">
         <div class="card shadow p-3 mb-5 bg-white rounded">
           <h3 class="m-0">Unique customers</h3>
           <h5 class="m-0"><%= @receipts.uniq{|x|x.order&.patrons}.size %></h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <h3 class="m-0">Refunds</h3>
+          <h5 class="m-0"><%= @refunds.size %></h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <h3 class="m-0">Refunded</h3>
+          <h5 class="m-0">(<%= total_refunded %>)</h5>
         </div>
       </div>
       <div class="col-lg-3">
@@ -198,10 +208,10 @@
         <div class="row pt-4 pb-1">
           <div class="col-12">
             <%= link_to "Download summary (excel)", manager_reports_path(format: "xlsx", view: "summary"), :class=>"d-block" %>
-            <%= link_to "Download detailed daily billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%d %m"), :class=>"d-block" %>
+            <%= link_to "Download detailed daily billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%d-%m"), :class=>"d-block" %>
             <%= link_to "Download detailed weekly billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%W"), :class=>"d-block" %>
             <%= link_to "Download detailed monthly billing (excel)", manager_reports_path(format: "xlsx", view: "detailed", segment: "%m"), :class=>"d-block" %>
-            <%= link_to "Download invoices (pdf)", manager_reports_path(format: "pdf") %>
+            <%= link_to "Download invoices (pdf)", manager_reports_path(format: "pdf", after_created_at: params[:after_created_at], before_created_at: params[:before_created_at]), target: "_blank" %>
           </div>
         </div>
       </div>

@@ -36,7 +36,6 @@
                 <% end %>
                 <%= link_to "creation_broadcast",receipt_creation_broadcast_path(receipt.id, only_path: true), method: :post, remote: true, class: 'btn btn-danger mt-3' if Rails.env=='development' %>
                 <% printers.each do |printer|%>
-                  <%# binding.pry %>
                   <%= link_to "Print: #{printer.name}", print_receipt_url(receipt.id, printer.id, only_path: true), remote: true, class: 'btn btn-info  mt-3' %>
                 <% end %>
               </li>

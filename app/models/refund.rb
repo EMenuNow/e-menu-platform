@@ -3,5 +3,12 @@
 class Refund < ApplicationRecord
     belongs_to :order
 
-    private 
+    after_create :email_receipt
+
+    private
+
+    def email_receipt
+      receipt = order.receipts.first
+      receipt.email_receipt
+    end
 end

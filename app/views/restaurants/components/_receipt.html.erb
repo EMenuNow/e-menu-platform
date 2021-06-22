@@ -37,22 +37,22 @@
         </tr>
         <% end %>
         <% if @receipt.discount_code.present? %>
-        <tr>
-          <td><%= @receipt.discount_code.description %></td>
-          <td></td>
-          <td class='text-left'>
-            -<%= number_to_currency(@receipt.discount_code.calculate_discount_from_basket_total(@receipt.basket_total), unit: @restaurant.currency_symbol) %>
-          </td>
-        </tr>
+          <tr>
+            <td><%= @receipt.discount_code.description %></td>
+            <td></td>
+            <td class='text-left'>
+              -<%= number_to_currency(@receipt.discount_code.calculate_discount_from_basket_total(@receipt.basket_total), unit: @restaurant.currency_symbol) %>
+            </td>
+          </tr>
         <% end %>
         <% if @receipt.delivery_fee.present? %>
-        <tr>
-          <td>Delivery Fee</td>
-          <td></td>
-          <td class='text-left'><%= number_to_currency(@receipt.delivery_fee.to_f, unit: @restaurant.currency_symbol) %></td>
-        </tr>
+          <tr>
+            <td>Delivery Fee</td>
+            <td></td>
+            <td class='text-left'><%= number_to_currency(@receipt.delivery_fee.to_f, unit: @restaurant.currency_symbol) %></td>
+          </tr>
         <% end %>
-        <tr>
+        <tr class="font-italic">
           <td>VAT Applied</td>
           <td class='text-left' colspan=2>
             <% @receipt.tax_rates.each do |g, tax_rate| %>
@@ -60,11 +60,30 @@
             <% end %>
           </td>
         </tr>
-        <tr>
+        <tr class="font-weight-bold">
           <td>Total</td>
           <td></td>
           <td class='text-left'><%= number_to_currency(@receipt.basket_total.to_f / 100.0, unit: @restaurant.currency_symbol) %></td>
         </tr>
+        <% if @receipt.order.refunds.any? %>
+          <%
+            refunds = @receipt.order.refunds
+            refund_total = refunds.sum{|r| r[:stripe_data]['amount']} / 100.0
+            net = @receipt.basket_total.to_f / 100.0 - refund_total
+          %>
+          <% refunds.each do |refund| %>
+            <tr>
+              <td>Refund</td>
+              <td></td>
+              <td class='text-left'><%= number_to_currency(-refund[:stripe_data]['amount'] / 100.0, unit: @restaurant.currency_symbol) %></td>
+            </tr>
+          <% end %>
+          <tr class="font-weight-bold">
+            <td>Net</td>
+            <td></td>
+            <td class='text-left'><%= number_to_currency(net, unit: @restaurant.currency_symbol) %></td>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   </div>
