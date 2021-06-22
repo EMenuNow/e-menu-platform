@@ -17,6 +17,8 @@ class EventFilterService
     case @payload[:type]
     when "checkout.session.completed"
       CheckoutSessionCompletedService.new(@payload)
+    when "charge.refunded"
+      ChargeRefundService.new(@payload)
     end
   end
 
