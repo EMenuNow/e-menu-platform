@@ -20,8 +20,11 @@
       </div>
     </div>
 
-
-
+    <div class="row bg-dark mt-4">
+      <div class='col text-center text-light'>
+          <%= link_to 'View receipt in browser', receipt_url(@restaurant.path, @receipt.uuid) %>     
+      </div>
+    </div>
 
   </div>
 </div>

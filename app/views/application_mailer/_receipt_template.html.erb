@@ -113,10 +113,30 @@
 
 
     <tr>
-      <td>Total</td>
+      <td><strong>Total</strong></td>
       <td></td>
-      <td class='text-right'><%= number_to_currency(@receipt.basket_total/100.to_f, unit: @receipt.restaurant.currency_symbol) %></td>
+      <td class='text-right'><strong><%= number_to_currency(@receipt.basket_total/100.to_f, unit: @receipt.restaurant.currency_symbol) %></strong></td>
     </tr>
+
+    <% if @receipt.order.refunds.any? %>
+      <%
+        refunds = @receipt.order.refunds
+        refund_total = refunds.sum{|r| r[:stripe_data]['amount']} / 100.0
+        net = @receipt.basket_total.to_f / 100.0 - refund_total
+      %>
+      <% refunds.each do |refund| %>
+        <tr>
+          <td>Refund</td>
+          <td></td>
+          <td class='text-left'><%= number_to_currency(-refund[:stripe_data]['amount'] / 100.0, unit: @restaurant.currency_symbol) %></td>
+        </tr>
+      <% end %>
+      <tr class="font-weight-bold">
+        <td><strong>Net</strong></td>
+        <td></td>
+        <td class='text-left'><strong><%= number_to_currency(net, unit: @restaurant.currency_symbol) %></strong></td>
+      </tr>
+    <% end %>
   </tbody>
 </table>
 <table>

@@ -1,9 +1,9 @@
 <%
-  total_value = (@receipts.sum(&:basket_total)/100.0)
-  total_emenu_commission_value = (@receipts.sum(&:application_fee_amount)/100.0)
-  total_revenue = number_to_currency(total_value, unit: @restaurant.currency_symbol)
-  dates = @restaurant.receipts.select(:created_at).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
+  total_revenue = number_to_currency(@total_value, unit: @restaurant.currency_symbol)
+  total_refunded = number_to_currency(@refund_value, unit: @restaurant.currency_symbol)
+  chargeback = @receipts.where(chargeback_enabled: true).any? || @restaurant.stripe_chargeback_enabled
 %>
+
 <!doctype html>
 <html>
   <head>
@@ -20,8 +20,8 @@
             <div class="col-12">
               <%= wicked_pdf_image_tag "logo/Logo__icon_v2.0.0.png", :class=>"pb-2 w-25" %>
               <h2 class="text-dark">Invoice for period</h2>
-              <h4 class="text-dark"><%= dates.last %> to <%= dates.first %></h4>
-              <h6 class="text-dark">Invoice Number: <%= (@restaurant.id.to_s + dates.last.to_s + dates.first.to_s).gsub("-","") %></h6>
+              <h4 class="text-dark"><%= @start_date %> to <%= @end_date %></h4>
+              <h6 class="text-dark">Invoice Number: <%= (@restaurant.id.to_s + @start_date.to_s + @end_date.to_s).gsub("-","") %></h6>
               <h6 class="text-dark">Date Generated: <%= DateTime.now.strftime("%d-%m-%Y") %></h6>
             </div>
           </div>
@@ -53,65 +53,90 @@
           </div>
         </div>
       <% else %>
-        <div class="row pt-1 text-center">
-          <div class="col-2 offset-1">
-            <b>Month/Year</b>
-          </div>
-          <div class="col-3">
-            <b>Sales Value</b>
-          </div>
-          <div class="col-3">
-            <b>Emenu Fees (VAT)</b>
-          </div>
-          <div class="col-1">
-            <b>Total Payout</b>
-          </div>
-        </div>
-        <% @receipts.group_by{|x|x.created_at.strftime("%m - %Y")}.each do |g, receipts| %>
-          <% receipts.group_by{|x|x.delivery_or_collection}.each do |stype, receipts| %>  
-            <%
-              basket_total = 0
-              fee_sum = 0
-            %>
-            <hr class="m-0" />
-            <div class="row pt-2 text-center">
-              <div class="col-2 offset-1">
-                <h6><%= g %></h6>
-              </div>
-              <div class="col-3">
-                <h6><%= number_to_currency(basket_total = receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol) %></h6>
-              </div>
-              <div class="col-3">
-                <h6><%= number_to_currency(fee_sum = receipts.sum{|x|x.application_fee_amount} / 100.0, unit: @restaurant.currency_symbol) %> (<%= number_to_currency(receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol) %>)</h6>
-              </div>
-              <div class="col-1">
-                <h6><%= number_to_currency(basket_total - fee_sum, unit: @restaurant.currency_symbol) %></h6>
-              </div>
-            </div>
-          <% end %>
-        <% end %>
-        <div class="row text-right pt-5">
-          <div class="col-8">
-            <b>Fees paid to EMenu:</b>
-          </div>
-          <div class="col-2"> 
-            <%= number_to_currency(@receipts.sum{|x|x.application_fee_amount} / 100.0, unit: @restaurant.currency_symbol) %>
-          </div>
-        </div>
-        <div class="row text-right">
-          <div class="col-8">
-            <b>VAT paid on EMenu fees:</b>
-          </div>
-          <div class="col-2"> 
-            <%= number_to_currency(@receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol) %>
-          </div>
-        </div>
-        <div class="row text-right">
-          <div class="col-8">
-            <b>Payout due to restaurant by EMenu:</b>
-          </div>
-          <div class="col-2"> 
-            <%= number_to_currency((@receipts.sum{|x|x.basket_total} - @receipts.sum{|x|x.application_fee_amount}) / 100.0, unit: @restaurant.currency_symbol) %>
+
+        <div class="row pt-1">
+          <div class="col-12">
+            <table class="w-100">
+              <colgroup>
+                <col span="1" style="width: auto;">
+                <col span="1" style="width: auto;">
+                <col span="1" style="width: auto;">
+                <col span="1" style="width: auto;">
+                <% if chargeback %>
+                  <col span="1" style="width: 15%;">
+                <% end %>
+                <col span="1" style="width: auto;">
+                <col span="1" style="width: 12%;">
+                <col span="1" style="width: auto;">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="text-center">Month/Year</th>
+                  <th class="text-center">Sales</th>
+                  <th class="text-center">Refunds</th>
+                  <th class="text-center">Bank Fee</th>
+                  <% if chargeback %>
+                    <th class="text-center">Chargeback Protection Fee</th>
+                  <% end %>
+                  <th class="text-center">EMenu Fee</th>
+                  <th class="text-center">VAT on EMenu Fee</th>
+                  <th class="text-right">Total Payout</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @receipts.group_by{|x|x.created_at.strftime("%m - %Y")}.each do |g, receipts| %>
+                  <%# receipts.group_by{|x|x.delivery_or_collection}.sort.each do |stype, receipts| %>  
+                    <%
+                      refunds = receipts.map{|r| r.order.refunds}.flatten
+                      basket_total = 0
+                      refund_total = 0
+                      stripe_fee_sum = 0
+                      chargeback_fee_sum = 0
+                      emenu_fee_sum = 0
+                      emenu_vat_sum = 0
+                      payout_total = 0
+                    %>
+                    <tr>
+                      <td class="text-center"><%= g.gsub(" - ", "/") %></td>
+                      <td class="text-center"><%= number_to_currency(basket_total = receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol) %></td>
+                      <td class="text-center"><%= number_to_currency(-refund_total = refunds.sum{|r| r[:stripe_data]['amount']} / 100.0, unit: @restaurant.currency_symbol, negative_format: "(%u%n)") %></td>
+                      <td class="text-center"><%= number_to_currency(-stripe_fee_sum = receipts.sum{|x|x.stripe_processing_fee || 0.0} / 100.0, unit: @restaurant.currency_symbol, negative_format: "(%u%n)") %></td>
+                      <% if chargeback %>
+                        <td class="text-center"><%= number_to_currency(-chargeback_fee_sum = receipts.sum{|x|x.chargeback_fee} / 100.0, unit: @restaurant.currency_symbol, negative_format: "(%u%n)") %></td>
+                      <% end %>
+                      <td class="text-center"><%= number_to_currency(-emenu_fee_sum = receipts.sum{|x|x.emenu_commission} / 100.0, unit: @restaurant.currency_symbol, negative_format: "(%u%n)") %></td>
+                      <td class="text-center"><%= number_to_currency(-emenu_vat_sum = receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol, negative_format: "(%u%n)") %></td>
+                      <td class="text-right"><%= number_to_currency(payout_total = basket_total - refund_total - stripe_fee_sum - emenu_fee_sum - emenu_vat_sum, unit: @restaurant.currency_symbol, negative_format: "(%u%n)") %></td>
+                    </tr>
+                  <%# end %>
+                <% end %>
+                <tr>
+                  <td class="text-right" colspan="<%= chargeback ? 8 : 7 %>"><b>&nbsp;</b></td>
+                </tr>
+                <tr>
+                  <td class="text-right" colspan="<%= chargeback ? 7 : 6 %>"><b>Fees paid to Bank:</b></td>
+                  <td class="text-right"><%= number_to_currency(@receipts.sum{|x|x.stripe_processing_fee || 0.0} / 100.0, unit: @restaurant.currency_symbol) %></td>
+                </tr>
+                <% if chargeback %>
+                  <tr>
+                    <td class="text-right" colspan="7"><b>Chargeback Protection Fees paid to Bank:</b></td>
+                    <td class="text-right"><%= number_to_currency(@receipts.sum{|x|x.chargeback_fee} / 100.0, unit: @restaurant.currency_symbol) %></td>
+                  </tr>
+                <% end %>
+                <tr>
+                  <td class="text-right" colspan="<%= chargeback ? 7 : 6 %>"><b>Fees paid to EMenu:</b></td>
+                  <td class="text-right"><%= number_to_currency(@receipts.sum{|x|x.emenu_commission} / 100.0, unit: @restaurant.currency_symbol) %></td>
+                </tr>
+                <tr>
+                  <td class="text-right" colspan="<%= chargeback ? 7 : 6 %>"><b>VAT Paid on EMenu Fees:</b></td>
+                  <td class="text-right"><%= number_to_currency(@receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol) %></td>
+                </tr>
+                <tr>
+                  <td class="text-right" colspan="<%= chargeback ? 7 : 6 %>"><b>Payout due to restaurant from EMenu:</b></td>
+                  <td class="text-right"><%= number_to_currency((@receipts.sum{|x|x.basket_total} - @refunds.sum{|r| r[:stripe_data]['amount']} - @receipts.sum{|x|x.application_fee_amount}) / 100.0, unit: @restaurant.currency_symbol) %></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       <% end %>

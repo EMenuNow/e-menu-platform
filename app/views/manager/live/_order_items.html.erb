@@ -147,6 +147,9 @@
           <% ready = receipt.processing_status == "ready" %>
           <% complete = receipt.processing_status == "complete" %>
 
+          <% refunded = receipt.is_refunded? if receipt.is_refunded? %>
+          <% paid = receipt&.order&.stripe_data.try(:[], "payment_status") %>
+
           <% status_pill = 'badge-secondary' %>
           <% status_pill = 'badge-danger' if new_order %>
           <% status_pill = 'badge-info' if preparing %>
@@ -157,6 +160,10 @@
           <% order_pill = 'badge-light' %>
           <% order_pill = 'badge-danger' if new_order or queued or accepted %>
           <% order_pill = 'badge-warning' if preparing %>
+
+          <% payment_pill = 'badge-secondary' %>
+          <% payment_pill = 'badge-success' if paid %>
+          <% payment_pill = 'badge-warning' if refunded %>
 
           <div class="position-absolute d-none d-lg-block py-auto mx-auto">
             <div class="bg-secondary text-white text-center rounded d-inline-block py-2 px-2"><%= check_box_tag "receipt_id[#{receipt.order_id}]", receipt.order_id, false, name: "receipt_ids[]", class: 'check-order checked-order' %></div>
@@ -186,8 +193,7 @@
                 <div class="col-12 col-lg-3 px-0 order-lg-last">
                   <div class="row pb-3 pb-lg-0 m-0">
                     <div class="col-4 pl-2 pl-lg-1 pr-0 text-left text-lg-center">
-                      <% paid_status = receipt&.order&.stripe_data.try(:[], "payment_status") %>
-                      <div class="m-0 <%= paid_status == 'paid' ? 'badge badge-pill badge-success' : '' %>"><%= paid_status&.titleize %></div>
+                      <div class="m-0 badge badge-pill <%= payment_pill %>"> <%= (refunded || paid || 'unknown')&.titleize %></div>
                     </div>
                     <div class="col-4 pl-1 pr-0 text-center">
                       <div class="m-0"><%= number_to_currency((receipts.sum{|x|x&.order&.stripe_data.try(:[], "amount_total") || 0}) / 100.0, unit: @restaurant.currency_symbol) %></div>

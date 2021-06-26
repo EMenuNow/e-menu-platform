@@ -1,66 +1,117 @@
 total_value = (@receipts.sum(&:basket_total)/100.0)
+refund_value = (@refunds.map{|r| r[:stripe_data]['amount']}.sum/100.0)
 total_emenu_commission_value = (@receipts.sum(&:application_fee_amount)/100.0)
 total_revenue = number_to_currency(total_value, unit: @restaurant.currency_symbol)
-dates = @restaurant.receipts.select(:created_at).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
+total_refunded = number_to_currency(refund_value, unit: @restaurant.currency_symbol)
+dates = @restaurant.receipts.select(:created_at).order(created_at: :asc).collect{|x|x.created_at.strftime("%d-%m-%Y")}.uniq.reverse
+start_date = params[:after_created_at] ? params[:after_created_at] : dates.last
+end_date = params[:before_created_at] ? params[:before_created_at] : dates.first
+chargeback = @receipts.where(chargeback_enabled: true).any? || @restaurant.stripe_chargeback_enabled
 
 wb = xlsx_package.workbook
 
-
 if params[:view] == "summary"
   wb.add_worksheet(name: "Summary View") do |sheet|
-    # this is the head row of your spreadsheet
-    sheet.add_row ["Date","Sales", "Tips", "Delivery Fees", "EMenu Service Charge", "Total Revenue"]
+
+    header = []
+    header << "DD-MM-YY"
+    header << "Sales"
+    header << "Sales Total"
+    header << "(inc. Delivery Fees)"
+    header << "Tips"
+    header << "Refunds"
+    header << "Refunds Total"
+    header << "Bank Fees"
+    header << "Chargeback Protection Fees" if chargeback
+    header << "EMenu Fees"
+    header << "VAT on EMenu Fees"
+    header << "Total Revenue"
     
-    # each user is a row on your spreadsheet
+    sheet.add_row header
+    
     @receipts.group_by{|x|x.created_at.strftime("%d-%m-%Y")}.each do |g, receipts|
-      sheet.add_row [g, receipts.size,"", number_to_currency(receipts.sum{|x|x.delivery_fee.to_i}/100.0, unit: @restaurant.currency_symbol), number_to_currency(receipts.sum{|x|x.application_fee_amount.to_i}/100.0, unit: @restaurant.currency_symbol), number_to_currency(receipts.sum{|x|x.basket_total.to_i}/100.0, unit: @restaurant.currency_symbol) ]
+      
+      refunds = receipts.map{|r| r.order.refunds}.flatten
+      basket_total = 0
+      delivery_fee = 0
+      refund_total = 0
+      stripe_fee_sum = 0
+      chargeback_fee_sum = 0
+      emenu_fee_sum = 0
+      emenu_vat_sum = 0
+      payout_total = 0
+
+      row = []
+      row << g
+      row << receipts.size
+      row << number_to_currency(basket_total = receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol)
+      row << number_to_currency(delivery_fee = receipts.sum{|x|x.delivery_fee.to_i} / 100.0, unit: @restaurant.currency_symbol)
+      row << ""
+      row << refunds.size
+      row << number_to_currency(-refund_total = refunds.sum{|r| r[:stripe_data]['amount']} / 100.0, unit: @restaurant.currency_symbol)
+      row << number_to_currency(-stripe_fee_sum = receipts.sum{|x|x.stripe_processing_fee || 0.0} / 100.0, unit: @restaurant.currency_symbol)
+      row << number_to_currency(-chargeback_fee_sum = receipts.sum{|x|x.chargeback_fee || 0.0} / 100.0, unit: @restaurant.currency_symbol) if chargeback
+      row << number_to_currency(-emenu_fee_sum = receipts.sum{|x|x.emenu_commission} / 100.0, unit: @restaurant.currency_symbol)
+      row << number_to_currency(-emenu_vat_sum = receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol)
+      row << number_to_currency(payout_total = basket_total - refund_total - stripe_fee_sum - emenu_fee_sum - emenu_vat_sum, unit: @restaurant.currency_symbol)
+
+      sheet.add_row row
+        
     end
   end
 elsif params[:view] == "detailed"
   wb.add_worksheet(name: "Detailed View") do |sheet|
-    # this is the head row of your spreadsheet
-    sheet.add_row ["Period", "Service Type","Sales", "Tips", "EMenu Service Charge", "Delivery Fees", "Total Revenue", "Refunds", "Stripe fee (Rounded up)", "Emenu Service Charge (Rounded up)", "EMenu VAT charge (Rounded up)", "Chargeback enabled", "Chargeback fee (Rounded up)", "Total Costs"]
+
+    header = []
+    header << "DD-MM-YY" if params[:segment] == "%d-%m"
+    header << "WW-YY" if params[:segment] == "%W"
+    header << "MM-YY" if params[:segment] == "%m"
+    header << "Service Type"
+    header << "Sales" unless false #params[:segment] == "%d-%m"
+    header << "Sales Total"
+    header << "(inc. Delivery Fees)"
+    header << "Tips"
+    header << "Refunds"
+    header << "Refunds Total"
+    header << "Bank Fees"
+    header << "Chargeback Protection Fees" if chargeback
+    header << "EMenu Fees"
+    header << "VAT on EMenu Fees"
+    header << "Total Revenue"
+
+    sheet.add_row header
     
-    # each user is a row on your spreadsheet
-    @receipts.group_by{|x|x.created_at.strftime("#{params[:segment]} - %Y")}.each do |g, receipts|
+    @receipts.group_by{|x|x.created_at.strftime("#{params[:segment]}-%Y")}.each do |g, receipts|
       receipts.group_by{|x|x.delivery_or_collection}.each do |stype, receipts|
-        if params[:segment] == "%d %m"
-          receipts.each do |receipt|
-            sheet.add_row ["#{g}",
-              receipt.delivery_or_collection,
-              number_to_currency(receipt.basket_total / 100.0, unit: @restaurant.currency_symbol),
-              "",
-              number_to_currency(receipt.application_fee_amount / 100.0, unit: @restaurant.currency_symbol),
-              number_to_currency(receipt.delivery_fee.to_f, unit: @restaurant.currency_symbol),
-              number_to_currency(receipt.basket_total / 100.0, unit: @restaurant.currency_symbol),
-              "",
-              number_to_currency(receipt.stripe_processing_fee.to_f / 100.0, unit: @restaurant.currency_symbol),
-              number_to_currency(receipt.emenu_commission / 100.0, unit: @restaurant.currency_symbol),
-              number_to_currency(receipt.emenu_vat_charge / 100.0, unit: @restaurant.currency_symbol),
-              receipt.chargeback_enabled,
-              number_to_currency(receipt.chargeback_fee / 100.0, unit: @restaurant.currency_symbol),
-              number_to_currency(receipt.emenu_vat_charge / 100.0, unit: @restaurant.currency_symbol),
-              number_to_currency(receipt.application_fee_amount / 100.0, unit: @restaurant.currency_symbol),
-            ]
-          end
-        else
-          sheet.add_row ["#{g}",
-            stype,
-            number_to_currency(receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol),
-            "",
-            number_to_currency(receipts.sum{|x|x.application_fee_amount} / 100.0, unit: @restaurant.currency_symbol),
-            number_to_currency(receipts.sum{|x|x.delivery_fee.to_f}, unit: @restaurant.currency_symbol),
-            number_to_currency(receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol),
-            "",
-            number_to_currency(receipts.sum{|x|x.stripe_processing_fee.to_f} / 100.0, unit: @restaurant.currency_symbol),
-            number_to_currency(receipts.sum{|x|x.emenu_commission} / 100.0, unit: @restaurant.currency_symbol),
-            number_to_currency(receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol),
-            "",
-            number_to_currency(receipts.sum{|x|x.chargeback_fee} / 100.0, unit: @restaurant.currency_symbol),
-            number_to_currency(receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol),
-            number_to_currency(receipts.sum{|x|x.application_fee_amount} / 100.0, unit: @restaurant.currency_symbol),
-          ]
-        end
+
+        refunds = receipts.map{|r| r.order.refunds}.flatten || []
+
+        basket_total = 0
+        delivery_fee = 0
+        refund_total = 0
+        stripe_fee_sum = 0
+        chargeback_fee_sum = 0
+        emenu_fee_sum = 0
+        emenu_vat_sum = 0
+        emenu_vat_sum = 0
+
+        row = []
+        row << "#{g}"
+        row << stype
+        row << receipts.size
+        row << number_to_currency(basket_total = receipts.sum{|x|x.basket_total} / 100.0, unit: @restaurant.currency_symbol)
+        row << number_to_currency(delivery_fee = receipts.sum{|x|x.delivery_fee.to_f}, unit: @restaurant.currency_symbol)
+        row << ""
+        row << refunds.size
+        row << number_to_currency(-refund_total = refunds.sum{|r| r[:stripe_data]['amount']} / 100.0, unit: @restaurant.currency_symbol)
+        row << number_to_currency(-stripe_fee_sum = receipts.sum{|x|x.stripe_processing_fee.to_f} / 100.0, unit: @restaurant.currency_symbol)
+        row << number_to_currency(-chargeback_fee_sum = receipts.sum{|x|x.chargeback_fee} / 100.0, unit: @restaurant.currency_symbol) if chargeback
+        row << number_to_currency(-emenu_fee_sum = receipts.sum{|x|x.emenu_commission} / 100.0, unit: @restaurant.currency_symbol)
+        row << number_to_currency(-emenu_vat_sum = receipts.sum{|x|x.emenu_vat_charge} / 100.0, unit: @restaurant.currency_symbol)
+        row << number_to_currency(payout_total = basket_total - refund_total - stripe_fee_sum - chargeback_fee_sum - emenu_fee_sum - emenu_vat_sum, unit: @restaurant.currency_symbol)
+
+        sheet.add_row row
+
       end
     end
   end
