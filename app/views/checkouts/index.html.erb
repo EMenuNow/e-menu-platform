@@ -169,6 +169,7 @@ function selectService(service_type) {
     <% end %>
     $('#name-field').show();
     $('#telephone-field').show();
+    $('#test-and-trace').hide();
     $('#email-field').show();
     $('#address-field').show();
     $('#payment-info').show();
@@ -190,6 +191,7 @@ function selectService(service_type) {
     <% end %>
     $('#name-field').show();
     $('#telephone-field').show();
+    $('#test-and-trace').hide();
     $('#email-field').show();
     $('#address-field').hide();
     $('#payment-info').show();
@@ -211,6 +213,7 @@ function selectService(service_type) {
     <% end %>
     $('#name-field').show();
     $('#telephone-field').show();
+    $('#test-and-trace').show();
     $('#email-field').show();
     $('#address-field').hide();
     $('#payment-info').show();
@@ -273,6 +276,7 @@ $(function(){
   <% end %>
   $('#name-field').hide();
   $('#telephone-field').hide();
+  $('#test-and-trace').hide();
   $('#email-field').hide();
   $('#address-field').hide();
   // $('#payment-info').hide();
@@ -391,6 +395,9 @@ $(function(){
                     <div class='col-sm-12 col-md-12 text-left form-group'>
                       <b><%= label_tag :email %> <strong id='email_required' class='text-danger'>*</strong></b>
                       <%= email_field_tag :email,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: 'for your email receipt' %>
+                    </div>
+                    <div id='test-and-trace' class="col-12 text-left form-group">
+                      <small>Your contact details will be used for NHS Test &amp; Trace, as required.</small>
                     </div>
                   </div>
                   <% if is_delivery?(@restaurant)%>
