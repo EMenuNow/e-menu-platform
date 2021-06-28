@@ -12,12 +12,12 @@
       <div class='col-sm-12 col-md-8 col-lg-5 col-xl-4'>
 
         <div class="modal-content bg-light">
-          <div class="modal-header">
-            
-            <div class="row">
-              <% image = get_menu_image(item[:id]) %>
-            </div> 
 
+          <% image = get_menu_image(item[:id]) if feature_match(:images, @restaurant.features) %>
+          <% image_style = "min-height: 250px; background-image: url('#{url_for(image.variant(resize: '650x650'))}'); background-repeat: no-repeat; background-position: center; background-size: cover;" if image.present? %>
+
+          <div class="modal-header" style="<%= image_style if image.present? %>">
+            
             <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -26,7 +26,6 @@
 
           <div class="modal-body text-dark">
             <div class="row">
-              <% if feature_match(:images, @restaurant.features) %> <% if image.present? %><div class='col-3'><%= image_tag image.variant(resize: "200x200"), class: 'img-fluid' %><%#=image_tag url_for(image), class: 'img-fluid'%></div><% end %><% end %>
               <div class='col'>
                 <h5 class="modal-title" id="<%=item[:name]%>"><%=item[:name]%></h5>
                 <div >

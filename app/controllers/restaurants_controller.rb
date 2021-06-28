@@ -61,7 +61,7 @@ class RestaurantsController < ApplicationController
           ancestry: parent.ancestry,
           css_class: parent.css_class,
           price_a: parent.price_a,
-          image: image , 
+          image: image, 
           description: parent.description,
           custom_lists: parent.custom_lists,
           categories: parent.menu_item_categorisations,
