@@ -128,28 +128,30 @@ style = "background: url('#{@restaurant.background}') ;" if @restaurant.backgrou
                         <div class="col-sm-12 col-lg-12 text-light">
                           <h2 class="text-left section-title"><%= section[:name] %></h2>
                             <div class='row'>
-                              <% nodes = [] %>
-                              <% section[:children].each do |item| %>
-                                <% if params[:dietary_ids].present? && item[:node_type] == 'item' %>
-                                  <% veggie_id = MenuItemCategorisation.where("lower(name) = ?", 'vegetarian').first.id.to_s %>
-                                  <% also_veggie = item[:categories].where(name: 'vegan').any? && params[:dietary_ids].include?(veggie_id) %>
-                                  <% next unless (params[:dietary_ids] + (also_veggie ? [veggie_id] : []) - (item[:categorisations].dietary.map{|mic| mic.menu_item_categorisation_id.to_s} + (also_veggie ? [veggie_id] : []))).empty? %>
+                              <div class="col">
+                                <% nodes = [] %>
+                                <% section[:children].each do |item| %>
+                                  <% if params[:dietary_ids].present? && item[:node_type] == 'item' %>
+                                    <% veggie_id = MenuItemCategorisation.where("lower(name) = ?", 'vegetarian').first.id.to_s %>
+                                    <% also_veggie = item[:categories].where(name: 'vegan').any? && params[:dietary_ids].include?(veggie_id) %>
+                                    <% next unless (params[:dietary_ids] + (also_veggie ? [veggie_id] : []) - (item[:categorisations].dietary.map{|mic| mic.menu_item_categorisation_id.to_s} + (also_veggie ? [veggie_id] : []))).empty? %>
+                                  <% end %>
+                                  <% if params[:may_contain_allergen_ids].present? %>
+                                    <% next unless (item[:categorisations].allergies.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:may_contain_allergen_ids]).empty? %>
+                                  <% end %>
+                                  <% if params[:contains_allergen_ids].present? %>
+                                    <% next unless (item[:categorisations].contains_allergen.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:contains_allergen_ids]).empty? %>
+                                  <% end %>
+                                  <% nodes << item %>
                                 <% end %>
-                                <% if params[:may_contain_allergen_ids].present? %>
-                                  <% next unless (item[:categorisations].allergies.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:may_contain_allergen_ids]).empty? %>
+                                <% if nodes.blank? %>
+                                  <%= render 'restaurants/components/no_item' %>
+                                <% else %>
+                                  <% nodes.each do |item| %>
+                                    <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false %>
+                                  <% end %>
                                 <% end %>
-                                <% if params[:contains_allergen_ids].present? %>
-                                  <% next unless (item[:categorisations].contains_allergen.map{|mic| mic.menu_item_categorisation_id.to_s} & params[:contains_allergen_ids]).empty? %>
-                                <% end %>
-                                <% nodes << item %>
-                              <% end %>
-                              <% if nodes.blank? %>
-                                <%= render 'restaurants/components/no_item' %>
-                              <% else %>
-                                <% nodes.each do |item| %>
-                                  <%= render 'restaurants/components/item', item: item, secondary_colour: false, no_background: false %>
-                                <% end %>
-                              <% end %>
+                              </div>
                             </div>
                           </div>
                         <% end %>
