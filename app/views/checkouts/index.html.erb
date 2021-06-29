@@ -384,17 +384,17 @@ $(function(){
                     <% end %>
                     <div id='name-field' class='col-sm-12 col-md-6 text-left form-group'>
                       <b><%= label_tag :name %> <strong id='name_required' class='text-danger'>*</strong></b>
-                      <%= text_field_tag :name,  nil, class: "border p-2 bg-light form-control validation_check" %>
+                      <%= text_field_tag :name, current_patron&.full_name, class: "border p-2 bg-light form-control validation_check" %>
                     </div>
                     <div id='telephone-field' class='col-sm-12 col-md-6 text-left form-group'>
                       <b><%= label_tag :telephone %> <strong id='telephone_required' class='text-danger'>*</strong></b>
-                      <%= text_field_tag :telephone,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: '' %>
+                      <%= text_field_tag :telephone, current_patron&.phone, class: "border p-2 bg-light form-control validation_check", placeholder: '' %>
                     </div>
                   </div>
                   <div class="row" id='email-field'>
                     <div class='col-sm-12 col-md-12 text-left form-group'>
                       <b><%= label_tag :email %> <strong id='email_required' class='text-danger'>*</strong></b>
-                      <%= email_field_tag :email,  nil, class: "border p-2 bg-light form-control validation_check", placeholder: 'for your email receipt' %>
+                      <%= email_field_tag :email,  current_patron&.email, class: "border p-2 bg-light form-control validation_check", placeholder: 'for your email receipt' %>
                     </div>
                     <div id='test-and-trace' class="col-12 text-left form-group">
                       <small>Your contact details will be used for NHS Test &amp; Trace, as required.</small>
@@ -448,15 +448,15 @@ $(function(){
                       </div>
 
                       <% if is_delivery?(@restaurant)%>
-                      <div class="row " id='delivery-fee'>
-                        <div class='col'>
-                          Delivery:
+                        <div class="row " id='delivery-fee'>
+                          <div class='col'>
+                            Delivery:
+                          </div>
+                          <div class='col'>
+                            <span class='delivery_fee_choose'>Select Address</span> 
+                            <%= hidden_field_tag :delivery_fee%>    
+                          </div>
                         </div>
-                        <div class='col'>
-                          <span class='delivery_fee_choose'>Select Address</span> 
-                          <%= hidden_field_tag :delivery_fee%>    
-                        </div>
-                      </div>
                       <% end %>
                       
                       <div class="row" id='basket-total'>
@@ -478,6 +478,15 @@ $(function(){
                     </div>
                   <% else %>
                     <div class="row mt-4 mb-4 " id='pay-now-button'>
+                      <div class='col-12 text-center form-group'>
+                        <label>
+                          <%= check_box_tag :agree_offers, nil, @restaurant.patrons.include?(current_patron) %>
+                          <span>Receive restaurant discounts and offers?</span><br />
+                          <% if @restaurant.patrons.include?(current_patron) %>
+                            <small>(You have previously agreed to receive restaurant offers and discount.)</small>
+                          <% end %>
+                        </label>
+                      </div>
                       <div class='col-12'>
                         <button id="checkout-button" class="btn btn-primary btn-block">Pay Now</button>
                       </div>

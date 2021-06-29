@@ -10,7 +10,7 @@
 	<div class="container text-light">
 		<div class="row">
 			<div class="col-lg-12">
-				<h1 class="display-2"><%= t("patron.account.your_account") %></h1>
+				<h1 class="display-4"><%= t("patron.account.your_account") %></h1>
 			</div>
 		</div>
 	</div>
@@ -26,7 +26,7 @@
           </a>
           <div class="collapse py-4 bg-light text-center" id="collapse1">
             <h5><%= current_patron.full_name %></h5>
-            <h5><%= current_patron.email.truncate(6) %></h5>
+            <h5><%= current_patron.email %></h5>
             <h5><%= current_patron.phone %></h5>
             <h5>Active since: <%= current_patron.created_at.strftime("%d %B %Y") %></h5>
             <h5><%= current_patron.orders.size %> previous orders</h5>
@@ -152,12 +152,12 @@
                 </div>
               <% end %>
             <% else %>
-              <h5>You have made no orders yet :)</h5>
+              <h5>You have made no orders yet...</h5>
             <% end %>
           </div>
         </div>
       </div>
-      <div class="row mt-1 ">
+      <div class="row mt-1 d-none">
         <div class="col-md-12 p-0 m-0">
           <a class="btn col-md-12 bg-dark text-light mt-1" data-toggle="collapse" href="#collapse5" role="button" aria-expanded="false" aria-controls="collapse5">
             <h5 class="m-0">Saved addresses</h5>
@@ -221,19 +221,6 @@
               <label>
                 <h5><i class=""></i> <%= "Emenu promotions" %>: 
                 <%= f.check_box :emenu_promotions, { checked: marketing.emenu_promotions, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
-              </label>
-            <% end %>
-            <hr />
-            <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
-              <label>
-                <h5><i class=""></i> <%= "Restaurant news" %>: 
-                <%= f.check_box :restaurant_news, { checked: marketing.restaurant_news, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
-              </label>
-            <% end %>
-            <%= form_for :patron_marketing_preference, :method => :patch, :url => patron_marketing_preference_path(current_patron), remote: true, :authenticity_token => true do |f| %>
-              <label>
-                <h5><i class=""></i> <%= "Restaurant promotions" %>: 
-                <%= f.check_box :restaurant_promotions, { checked: marketing.restaurant_promotions, onchange: 'Rails.fire(this.form, "submit")' }, '1', '0' %></h5>
               </label>
             <% end %>
           </div>

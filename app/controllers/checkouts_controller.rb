@@ -31,7 +31,9 @@ class CheckoutsController < ApplicationController
       @parameters["due_date"] = Time.parse("#{d.year}-#{d.month}-#{d.day} #{due_time}:00").in_time_zone(@restaurant.time_zone) + t.utc_offset - t.in_time_zone(@restaurant.time_zone).utc_offset
     end
     @checkout_service = CheckoutService.new(@restaurant, @parameters, @basket_service)
-
+    @checkout_service.update_patron
+    @checkout_service.restaurant_marketing
+    
     render json: @checkout_service.create_checkout_session
   end
   
@@ -54,7 +56,7 @@ class CheckoutsController < ApplicationController
 
   def stripe_parameters
     @parameters = params.slice(:service_type, :total, :price, :service_type, :collection_time, :date_offset, :table_number, :name, :telephone, :email, :house_number,
-    :street, :postcode, :basket, :delivery_fee, :apple_and_google, :stripe_success_token, :group_order)
+    :street, :postcode, :basket, :delivery_fee, :apple_and_google, :stripe_success_token, :group_order, :agree_offers)
   end
 
   def get_restaurant

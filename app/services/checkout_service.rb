@@ -9,13 +9,13 @@ class CheckoutService < ApplicationController
     @restaurant = restaurant
     @basket_service = basket_service
     @patron = @basket_service.patron
-
+    
     @total_payment = @total.to_f 
     @payment_in_pence = (@total_payment*100).to_i
     @address = "#{@house_number}, #{@street}, #{@postcode}"
     @application_fee_amount = application_fee_amount(to_stripe_amount(@total_payment))
   end
-
+  
   def create_checkout_session
     @order = generate_order
     Stripe.api_key = @restaurant.stripe_sk_api_key
@@ -38,6 +38,7 @@ class CheckoutService < ApplicationController
         },
         quantity: 1,
       }],
+      customer_email: @email,
       mode: 'payment',
       success_url: (Rails.env.development? ? 'https://eat.emenunow.com' : Rails.application.routes.url_helpers.receipt_url(@restaurant.path, @order.uuid, checkout_status: "success"))+"?&uuid=#{@order.uuid}&session_id={CHECKOUT_SESSION_ID}&checkout_status=success",
       cancel_url: (Rails.env.development? ? 'https://eat.emenunow.com' : Rails.application.routes.url_helpers.restaurant_url(@restaurant.path, checkout_status: "cancel"))+"?checkout_status=cancel&",
@@ -53,6 +54,24 @@ class CheckoutService < ApplicationController
   end
 
   def make_payment
+  end
+
+  def update_patron
+    @not_patron = !@patron || @patron.email != @email
+    @patron = Patron.first_or_create_patron(@email) if @not_patron
+    # sign_in @patron
+
+    @patron.full_name = @name if @name
+    @patron.phone = @telephone if @telephone
+    @patron.save
+  end
+
+  def restaurant_marketing
+    if @agree_offers
+      @restaurant.patrons << @patron if !@restaurant.patrons.include?(@patron)
+    else
+      @restaurant.patrons.delete(@patron) if @restaurant.patrons.include?(@patron) && !@not_patron
+    end
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_17_114124) do
+ActiveRecord::Schema.define(version: 2021_06_29_090259) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -393,8 +393,6 @@ ActiveRecord::Schema.define(version: 2021_06_17_114124) do
     t.bigint "patron_id", null: false
     t.boolean "emenu_news"
     t.boolean "emenu_promotions"
-    t.boolean "restaurant_news"
-    t.boolean "restaurant_promotions"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["patron_id"], name: "index_patron_marketing_preferences_on_patron_id"
@@ -422,6 +420,13 @@ ActiveRecord::Schema.define(version: 2021_06_17_114124) do
     t.string "phone"
     t.index ["email"], name: "index_patrons_on_email", unique: true
     t.index ["reset_password_token"], name: "index_patrons_on_reset_password_token", unique: true
+  end
+
+  create_table "patrons_restaurants", id: false, force: :cascade do |t|
+    t.bigint "restaurant_id", null: false
+    t.bigint "patron_id", null: false
+    t.index ["patron_id", "restaurant_id"], name: "index_patrons_restaurants_on_patron_id_and_restaurant_id", unique: true
+    t.index ["restaurant_id", "patron_id"], name: "index_patrons_restaurants_on_restaurant_id_and_patron_id", unique: true
   end
 
   create_table "pi_interfaces", force: :cascade do |t|

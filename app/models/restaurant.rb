@@ -16,6 +16,7 @@ class Restaurant < ApplicationRecord
   has_many :custom_lists, -> { order(position: :asc) }
   has_and_belongs_to_many :features, -> { distinct }
   has_and_belongs_to_many :template
+  has_and_belongs_to_many :patrons
 
   # has_many :tables, through: :restaurant_tables
 
