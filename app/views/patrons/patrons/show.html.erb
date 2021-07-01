@@ -43,23 +43,24 @@
               <% orders.each.with_index(1) do |order, i| %>
 
                 <% receipt =  order.receipts.first %>
+                <% next if !receipt %>
                 <% items =  receipt.items['items'] %>
 
                 <div class="card mb-3">
                   <div class="card-header">
-                    <h5 class="card-text float-left">Order #<%= order.id %></h5>
-                    <p class="card-text float-right"><%= order.created_at.in_time_zone(order.restaurant.time_zone).strftime("%d %B %Y") %></p>
+                    <h5 class="card-text float-left">Order #<%= receipt.id %></h5>
+                    <p class="card-text float-right"><%= receipt.created_at.in_time_zone(receipt.restaurant.time_zone).strftime("%d %B %Y") %></p>
                   </div>
                   <div class="card-body">
                     <div class="row">
                       <div class="col w-100">
-                        <h4 class="card-title float-left"><%= order.restaurant.name %></h4>
-                        <p class="card-text text-right"><%= pluralize( items.count, "Item" ) %></p>
+                        <h4 class="card-title float-left"><%= receipt.restaurant.name %></h4>
+                        <p class="card-text text-right"><%= pluralize( items.count, "Item" ) if items %></p>
                       </div>
                     </div>
                     <div class="row">
                       <div class="col w-100">
-                        <p class='card-text text-right'><%= number_to_currency(receipt.basket_total.to_f / 100.0, unit: order.restaurant.currency_symbol) %></p>
+                        <p class='card-text text-right'><%= number_to_currency(receipt.basket_total.to_f / 100.0, unit: receipt.restaurant.currency_symbol) %></p>
                       </div>
                     </div>
                     <div class="row justify-content-right mt-3">
@@ -72,13 +73,12 @@
                     </div>
                   </div>
                 </div>
-
                 <!-- Modal -->
                 <div class="modal fade w-auto h-auto" id="receipt-<%= i %>" tabindex="-1" aria-labelledby="receipt-<%= i %>-label" aria-hidden="true">
                   <div class="modal-dialog override">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="card-text float-left">Order #<%= order.id %></h5>
+                        <h5 class="card-text float-left">Order #<%= receipt.id %></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                         </button>
@@ -86,7 +86,7 @@
                       <div class="modal-body">
                         <div class="row bg-light text-dark text-left pt-2">
                           <div class="col mb-3">
-                            <h1><%=order.restaurant.name%></h1>
+                            <h1><%=receipt.restaurant.name%></h1>
                             <div><strong>Payment Date: </strong><%= receipt.created_at.in_time_zone(order.restaurant.time_zone).strftime("%d %B %Y - %H:%M") %></div>
                             <% if receipt.name.present?  %><div><strong>Name: </strong><%= receipt.name.titleize %></div><% end %>
                             <div><strong>Type: </strong><%=receipt.delivery_or_collection.camelcase%></div>
@@ -172,7 +172,7 @@
                 </div>
               <% end %>
             <% else %>
-              <h5>You have no addresses saved yet :)</h5>
+              <h5>You have no addresses saved yet</h5>
             <% end %>
           </div>
         </div>

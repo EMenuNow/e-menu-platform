@@ -26,9 +26,9 @@ class Patron < ApplicationRecord
 
   def self.first_or_create_patron(email)
     Patron.where(email: email.downcase).first_or_create!(
-      :password =>  Patrons::BaseController::DEFAULT_PATRON_PASSWORD,
-      :password_confirmation => Patrons::BaseController::DEFAULT_PATRON_PASSWORD,
-      :has_no_password => true,
+      password:  Patrons::BaseController::DEFAULT_PATRON_PASSWORD,
+      password_confirmation: Patrons::BaseController::DEFAULT_PATRON_PASSWORD,
+      has_no_password: true,
     )
   end
 

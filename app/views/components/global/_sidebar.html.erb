@@ -23,10 +23,10 @@
         <% end %>
         <% if patron_signed_in? %>
           <li>
-            <%= link_to "Your account", edit_patron_registration_path %>
+            <%= link_to "Your account",  settings_patrons_path %>
           </li>
           <li>
-            <%= link_to "Edit settings",  settings_patrons_path %>
+            <%= link_to "Edit settings", edit_patron_registration_path %>
           </li>
         <% end %>
         <% if !patron_signed_in? %>

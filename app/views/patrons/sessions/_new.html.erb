@@ -1,21 +1,22 @@
 <%
   redirect_after_signup_to ||= params[:redirect_after_signup_to]
   redirect_after_signup_to ||= request.original_fullpath
-  password_field_enabled ||= false
+  password_field_enabled ||= true
   show_hero ||= false
 %>
 <% content_for :hero do %>
-<div class="jumbotron jumbotron-fluid hero-main-user-background mb-0">
-	<div class="container text-light text-center">
-		<div class="row mb-0">
-			<div class="col-lg-12 pt-3 pb-3">
-				<h1 class="display-2">Sign in to your account</h1>
-        <h3>Manage your account, secure areas are password protected</h3>
-			</div>
-		</div>
-	</div>
-</div>
+  <div class="jumbotron jumbotron-fluid hero-main-user-background mb-0">
+    <div class="container text-light text-center">
+      <div class="row mb-0">
+        <div class="col-lg-12 pt-3 pb-3">
+          <h1 class="display-2">Sign in to your account</h1>
+          <h3>Manage your account & marketing preferences</h3>
+        </div>
+      </div>
+    </div>
+  </div>
 <% end if show_hero %>
+
 <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
   <%= f.hidden_field :redirect_after_signup_to, :value => redirect_after_signup_to %>
   <div class="field">
@@ -39,4 +40,5 @@
     <%= f.submit "Continue >", :class=>"w-100 mb-1 p-1" %>
   </div>
 <% end %>
-<%#= render "patrons/shared/links" %>
+
+<%= render "patrons/shared/links" %>
