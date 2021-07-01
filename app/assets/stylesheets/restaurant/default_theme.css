@@ -91,6 +91,11 @@ h3 a i:before {
   background-color: var(--light) !important;
 }
 
+/* Hide price for multi-buy items */
+.hide-price .text-right strong.item-name {
+  display: none !important;
+}
+
 .section-title{
   text-align: center !important;
   font-family: var(--font-primary);
