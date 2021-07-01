@@ -4,7 +4,7 @@
 
 <% end %>
 
-<%= form_with(model: ['manager', @restaurant, manager_theme], local: true) do |form| %>
+<%= form_with(model: [:manager, @restaurant, manager_theme], local: true) do |form| %>
   <% if manager_theme.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(manager_theme.errors.count, "error") %> prohibited this manager_theme from being saved:</h2>

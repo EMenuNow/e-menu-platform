@@ -9,7 +9,7 @@ class CheckoutSessionCompletedService
 
   def update_orders
     @order = Order.where("stripe_data ->> 'payment_intent' = ?", @data[:payment_intent]).first
-    @order.update_attributes(
+    @order.update(
       stripe_data: @data,
       status: @data[:payment_status]
     )

@@ -1,4 +1,4 @@
-<%= form_with(model: ['manager', @restaurant, delivery_postcode], local: true) do |form| %>
+<%= form_with(model: [:manager, @restaurant, delivery_postcode], local: true) do |form| %>
   <% if delivery_postcode.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(delivery_postcode.errors.count, "error") %> prohibited this delivery_postcode from being saved:</h2>
