@@ -2,11 +2,13 @@
   "name": "emeal",
   "private": true,
   "dependencies": {
-    "@rails/webpacker": "5.2.1"
+    "@rails/webpacker": "5.4.0",
+    "webpack-cli": "^3.3.12"
   },
   "devDependencies": {
     "@prettier/plugin-ruby": "^0.20.1",
     "prettier": "^2.1.2",
-    "webpack-dev-server": "^3.11.0"
+    "webpack": "^4.46.0",
+    "webpack-dev-server": "^3.11.2"
   }
 }
