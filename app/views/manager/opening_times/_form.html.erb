@@ -71,7 +71,7 @@
 <% end %>
 
 
-<%= form_with(model: ['manager', @restaurant, manager_opening_time], local: true) do |form| %>
+<%= form_with(model: [:manager, @restaurant, manager_opening_time], local: true) do |form| %>
   <% if manager_opening_time.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(manager_opening_time.errors.count, "error") %> prohibited this manager_opening_time from being saved:</h2>

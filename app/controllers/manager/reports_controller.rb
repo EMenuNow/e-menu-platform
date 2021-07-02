@@ -12,7 +12,6 @@ module Manager
       @receipts = @restaurant.receipts.where.not(order: nil).includes(:order).order(created_at: :DESC)
       .where("created_at >= ?", after_created_at ? Date.parse(after_created_at) : 10.years.ago)
       .where("created_at <= ?", (before_created_at ? Date.parse(before_created_at) : Date.today)+1.days)
-      .limit(500)
 
       @refunds = @receipts.map{|r| r.order.refunds}.flatten
 

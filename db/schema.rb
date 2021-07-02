@@ -2,15 +2,15 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# This file is the source Rails uses to define your schema when running `rails
-# db:schema:load`. When creating a new database, `rails db:schema:load` tends to
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
 # be faster and is potentially less error prone than running all of your
 # migrations from scratch. Old migrations may fail to apply correctly if those
 # migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_17_114124) do
+ActiveRecord::Schema.define(version: 2021_07_01_121409) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,7 +33,14 @@ ActiveRecord::Schema.define(version: 2021_06_17_114124) do
     t.bigint "byte_size", null: false
     t.string "checksum", null: false
     t.datetime "created_at", null: false
+    t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "baskets", force: :cascade do |t|
@@ -338,10 +345,6 @@ ActiveRecord::Schema.define(version: 2021_06_17_114124) do
     t.datetime "due_date"
     t.bigint "discount_code_id"
     t.jsonb "tax_rates"
-    t.string "address_2"
-    t.string "city"
-    t.string "post_code"
-    t.string "country_code"
     t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
     t.index ["restaurant_id"], name: "index_orders_on_restaurant_id"
   end
@@ -489,16 +492,12 @@ ActiveRecord::Schema.define(version: 2021_06_17_114124) do
     t.boolean "chargeback_enabled", default: false
     t.integer "emenu_vat_charge", default: 0
     t.integer "stripe_processing_fee"
-    t.boolean "group_order"
-    t.datetime "due_date"
-    t.string "processing_status", default: "pending"
-    t.string "first_print_status"
     t.string "print_status"
+    t.boolean "group_order"
+    t.string "processing_status", default: "pending"
+    t.datetime "due_date"
+    t.string "first_print_status"
     t.jsonb "tax_rates"
-    t.string "address_2"
-    t.string "city"
-    t.string "post_code"
-    t.string "country_code"
     t.index ["discount_code_id"], name: "index_receipts_on_discount_code_id"
     t.index ["order_id"], name: "index_receipts_on_order_id"
     t.index ["restaurant_id"], name: "index_receipts_on_restaurant_id"
@@ -576,9 +575,6 @@ ActiveRecord::Schema.define(version: 2021_06_17_114124) do
     t.boolean "stripe_chargeback_enabled", default: false
     t.boolean "subscription_enabled", default: true
     t.boolean "demo", default: false
-    t.string "address_2"
-    t.string "city"
-    t.string "country_code"
     t.index ["cuisine_id"], name: "index_restaurants_on_cuisine_id"
     t.index ["currency_id"], name: "index_restaurants_on_currency_id"
     t.index ["restaurant_user_id"], name: "index_restaurants_on_restaurant_user_id"
@@ -662,6 +658,7 @@ ActiveRecord::Schema.define(version: 2021_06_17_114124) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "busy_times", "restaurants"
   add_foreign_key "custom_list_items", "custom_lists"
   add_foreign_key "custom_lists", "restaurants"
