@@ -44,7 +44,7 @@ gem 'ancestry'
 gem 'faker'
 gem 'jquery_mobile_rails'
 
-gem 'rubyzip', '= 1.2.1'
+gem 'rubyzip', '1.3.0'
 gem 'caxlsx'
 gem 'caxlsx_rails'
 gem 'wicked_pdf'
