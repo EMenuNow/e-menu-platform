@@ -89,12 +89,31 @@ class Menu < ApplicationRecord
     # TranslateJob.perform_later self
   end
 
-  def clone_with_modifications!(attributes = nil, parent = nil, original_id_field_name = nil)
+  def clone_with_modifications!(attributes = nil, parent = nil, original_id_field_name = nil, cl_pairs = nil, cli_pairs = nil)
+    new_cl_map = {}
+    custom_lists.each do |cl|
+      new_cl = cl_pairs.select{|cl_pair| cl_pair[:orig] == cl[0]}.first[:clone]
+      new_clis = cl[1].map {|cli| cli_pairs.select{|cli_pair| cli_pair[:orig] == cli}.first[:clone]}
+      new_cl_map["#{new_cl}"] = new_clis
+    end if custom_lists.any?
+    
+    clone = self.class.create!(self.attributes.merge('id' => nil).merge('ancestry' => nil).merge(attributes).merge('custom_lists' => new_cl_map))
+    clone.parent = parent
+    self.children.each { |child| child.clone_with_modifications!(attributes, clone, original_id_field_name, cl_pairs, cli_pairs) }
+    clone.menu_time = menu_time if menu_time
+    clone.image.attach(image.blob) if image.attached?
+
+    self.menu_item_categorisations_menus.each{|c| c.clone!(c.id, clone.id)}
+    clone.save!
+    clone
+  end
+
+  def clone_with_modifications_old!(attributes = nil, parent = nil, original_id_field_name = nil)
     #binding.pry
     clone = self.class.create!(self.attributes.merge('id' => nil).merge('ancestry' => nil).merge(attributes))
     # clone.send("#{original_id_field_name}=", self.id) if original_id_field_name
     clone.parent = parent
-    self.children.each { |child| child.clone_with_modifications!(attributes, clone, original_id_field_name) }
+    self.children.each { |child| child.clone_with_modifications_old!(attributes, clone, original_id_field_name) }
     clone.save!
     clone
   end
