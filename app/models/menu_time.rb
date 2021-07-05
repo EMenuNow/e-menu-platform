@@ -52,4 +52,14 @@ class MenuTime < ApplicationRecord
     }
   end
 
+  def clone!(mt_id, menu_id)
+    menu_time = MenuTime.find(mt_id)
+    new_menu = Menu.find(menu_id)
+
+    new_menu_time = menu_time.dup
+    new_menu_time.menu_id = new_menu.id
+    new_menu_time.save
+    new_menu_time
+  end
+
 end
