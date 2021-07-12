@@ -11,6 +11,8 @@ class Order < ApplicationRecord
 
     def first_or_create_receipt
       r = self.receipts.where(uuid: uuid).first_or_initialize do |receipt|
+        auto_ready = self.restaurant.features.map{|s| s.key.to_sym}.include?('auto_ready'.to_sym)
+
         receipt.restaurant_id = self.restaurant_id
         receipt.basket_total = self.basket_total
         receipt.items = self.items
@@ -20,7 +22,7 @@ class Order < ApplicationRecord
         receipt.due_date = self.due_date
         receipt.stripe_token = self.stripe_token || {}
         receipt.status = self&.stripe_data.try("payment_status", :[]) || {}
-        receipt.is_ready = false
+        receipt.is_ready = auto_ready ? true : false
         receipt.source = :takeaway 
         receipt.telephone = self.telephone
         receipt.address = self.address
@@ -36,7 +38,7 @@ class Order < ApplicationRecord
         receipt.emenu_vat_charge = self.emenu_vat_charge
         receipt.group_order = self.group_order
         receipt.tax_rates = self.tax_rates
-        receipt.processing_status = "accepted" # temporary until pending payments is built
+        receipt.processing_status = auto_ready ? "ready" : "accepted" # temporary until pending payments is built
       end
       r.save
       r
