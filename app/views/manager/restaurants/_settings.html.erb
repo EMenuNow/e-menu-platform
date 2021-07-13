@@ -54,8 +54,9 @@
   </div>
 </div>
 
-<% checkout_toggle = @features.where(key: 'checkout').first %>
-<% group_order_toggle = @features.where(key: 'group_orders').first %>
+<% checkout_toggle = @features.find_by(key: 'checkout') %>
+<% group_order_toggle = @features.find_by(key: 'group_orders') %>
+<% auto_ready_toggle = @features.find_by(key: 'auto_ready') %>
 
 <div class="row">
   <div class="col-sm">
@@ -80,6 +81,17 @@
                           }, disabled: !@restaurant.subscription_enabled %>
         <label for="feature_<%= group_order_toggle.id %>">
           <span><%= group_order_toggle.name %> <small class="text-muted">(Allow group ordering)</small></span>
+          <span></span>
+        </label>
+      </li>
+      <li class="my-3">
+        <%= check_box_tag dom_id(auto_ready_toggle), auto_ready_toggle.id, @restaurant.features.include?(auto_ready_toggle), data: {
+                          remote: true,
+                          url: manager_restaurant_toggle_feature_path(@restaurant.id, auto_ready_toggle.id),
+                          method: :post
+                          }, disabled: !@restaurant.subscription_enabled %>
+        <label for="feature_<%= auto_ready_toggle.id %>">
+          <span><%= auto_ready_toggle.name %> <small class="text-muted">(If you use printers without a screen)</small></span>
           <span></span>
         </label>
       </li>

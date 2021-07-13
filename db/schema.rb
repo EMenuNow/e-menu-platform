@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_01_121409) do
+ActiveRecord::Schema.define(version: 2021_07_09_093256) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -396,8 +396,6 @@ ActiveRecord::Schema.define(version: 2021_07_01_121409) do
     t.bigint "patron_id", null: false
     t.boolean "emenu_news"
     t.boolean "emenu_promotions"
-    t.boolean "restaurant_news"
-    t.boolean "restaurant_promotions"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["patron_id"], name: "index_patron_marketing_preferences_on_patron_id"
@@ -509,6 +507,16 @@ ActiveRecord::Schema.define(version: 2021_07_01_121409) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["order_id"], name: "index_refunds_on_order_id"
+  end
+
+  create_table "restaurant_patrons", force: :cascade do |t|
+    t.bigint "restaurant_id"
+    t.bigint "patron_id"
+    t.boolean "marketing"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["patron_id"], name: "index_restaurant_patrons_on_patron_id"
+    t.index ["restaurant_id"], name: "index_restaurant_patrons_on_restaurant_id"
   end
 
   create_table "restaurant_tables", force: :cascade do |t|
